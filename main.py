@@ -18,14 +18,13 @@ import pyodbc
 import re
 import json
 #from datetime import datetime
-from flask import Flask, jsonify
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
-from fastapi.templating import Jinja2Templates
+#from fastapi.templating import Jinja2Templates
 from fastapi.encoders import jsonable_encoder
 from typing import Optional
-templates = Jinja2Templates(directory="templates")
+#templates = Jinja2Templates(directory="templates")
 import os
 import urllib
 from fastapi import File, UploadFile
@@ -2693,19 +2692,20 @@ def connect_db_MDCdata_chartb(from_dt, to_dt):
         print("Error message:- " + str(err))
 
 #with ata chartb
+#with ata chartb
 def connect_db_MDCdata_chartb_ata(ata,from_dt, to_dt):
-    sql = "SELECT * FROM Airline_MDC_Data WHERE ATA_Main IN " + str(ata) +" and  DateAndTime BETWEEN '" + from_dt + " 00:00:00 ' AND '" + to_dt + " 23:59:59 '"
-    column_names = ["Aircraft", "Tail", "Flight Leg No",
-                    "ATA Main", "ATA Sub", "ATA", "ATA Description", "LRU",
-                    "DateAndTime", "MDC Message", "Status", "Flight Phase", "Type",
-                    "Intermittent", "Equation ID", "Source", "Diagnostic Data",
-                    "Data Used to Determine Msg", "ID", "Flight", "airline_id", "aircraftno"]
+    sql = "SELECT * FROM MDC_MSGS WHERE ATA IN " + str(ata) +" and  MSG_Date BETWEEN '" + from_dt + " 00:00:00 ' AND '" + to_dt + " 23:59:59 '"
+    column_names = ["AC_MODEL", "AC_SN", "AC_TN",
+                    "OPERATOR", "MSG_TYPE", "MDC_SOFTWARE", "MDT_VERSION", "MSG_Date",
+                    "FLIGHT_NUM","FLIGHT_LEG", "FLIGHT_PHASE", "ATA", "ATA_NAME", "LRU",
+                    "COMP_ID", "MSG_TXT","EQ_ID", "INTERMITNT", "EVENT_NOTE",
+                    "EQ_TS_NOTE","SOURCE", "MSG_ID", "FALSE_MSG","BOOKMARK","msg_status"]
     print(sql)
     try:
         conn = pyodbc.connect(driver=db_driver, host=hostname, database=db_name,
                               user=db_username, password=db_password)
         MDCdataDF_chartb = pd.read_sql(sql, conn)
-        MDCdataDF_chartb.columns = column_names
+        # MDCdataDF_chartb.columns = column_names
         conn.close()
         return MDCdataDF_chartb
     except pyodbc.Error as err:
