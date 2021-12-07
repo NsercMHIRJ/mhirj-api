@@ -30,7 +30,7 @@ import os
 import urllib
 from fastapi import File, UploadFile
 from crud import *
-from pm_upload import *
+#from pm_upload import *
 
 
 app = FastAPI()
@@ -64,13 +64,14 @@ OutputTableHistory2 = pd.DataFrame()
 MDCeqns_arrayforgraphing = pd.DataFrame()
 
 # Initialiaze Database Properties
-hostname = os.environ.get('hostname', 'mhrijhumber.database.windows.net')
-db_server_port = urllib.parse.quote_plus(str(os.environ.get('db_server_port', '8080')))
-db_name = os.environ.get('db_name', 'MHIRJ')
-db_username = urllib.parse.quote_plus(str(os.environ.get('db_username', 'mhrij')))
-db_password = urllib.parse.quote_plus(str(os.environ.get('db_password', 'KaranCool123')))
+hostname = os.environ.get('hostname', 'aftermarket-mhirj.database.windows.net')
+db_server_port = urllib.parse.quote_plus(str(os.environ.get('db_server_port', '8000')))
+db_name = os.environ.get('db_name', 'MDP-Dev')
+db_username = urllib.parse.quote_plus(str(os.environ.get('db_username', 'humber_ro')))
+db_password = urllib.parse.quote_plus(str(os.environ.get('db_password', 'Container-Zesty-Wriggly7-Catalog')))
 ssl_mode = urllib.parse.quote_plus(str(os.environ.get('ssl_mode','prefer')))
 db_driver = "ODBC Driver 17 for SQL Server"
+
 
 """
 db_driver = "ODBC Driver 17 for SQL Server"
@@ -2357,19 +2358,19 @@ async def get_ChartOneData(top_n:int, aircraftNo:int, ata_main:str, fromDate: st
 
 ## Chart 2
 def connect_database_for_chart2(n, ata, from_dt, to_dt):
-   if len(ata) == 2:
-        sql = "SELECT * FROM Airline_MDC_Data WHERE  ATA_Main="+ata+" AND DateAndTime BETWEEN '"+from_dt+"' AND '"+to_dt+"'"
-   elif len(ata) == 5:  
-       sql = "SELECT * FROM Airline_MDC_Data where  ATA='"+ata+"'   AND DateAndTime BETWEEN '"+from_dt+"' AND '"+to_dt+"' "
+    if len(ata) == 2:
+        sql = "SELECT * FROM MDC_MSGS WHERE  ATA_Main="+ata+" AND MSG_Date BETWEEN '"+from_dt+"' AND '"+to_dt+"'"
+    elif len(ata) == 5:  
+       sql = "SELECT * FROM MDC_MSGS where  ATA='"+ata+"'   AND MSG_Date BETWEEN '"+from_dt+"' AND '"+to_dt+"' "
   
-   column_names = ["Aircraft", "Tail", "Flight Leg No",
-                   "ATA Main", "ATA Sub", "ATA", "ATA Description", "LRU",
-                   "DateAndTime", "MDC Message", "Status", "Flight Phase", "Type",
-                   "Intermittent", "Equation ID", "Source", "Diagnostic Data",
-                   "Data Used to Determine Msg", "ID", "Flight", "airline_id", "aircraftno"]
-   print(sql)
+    column_names = ["AC_MODEL", "AC_SN", "AC_TN",
+                    "OPERATOR", "MSG_TYPE", "MDC_SOFTWARE", "MDT_VERSION", "MSG_Date",
+                    "FLIGHT_NUM","FLIGHT_LEG", "FLIGHT_PHASE", "ATA", "ATA_NAME", "LRU",
+                    "COMP_ID", "MSG_TXT","EQ_ID", "INTERMITNT", "EVENT_NOTE",
+                    "EQ_TS_NOTE","SOURCE", "MSG_ID", "FALSE_MSG","BOOKMARK","msg_status"]
+    print(sql)
   
-   try:
+    try:
        conn = pyodbc.connect(driver=db_driver, host=hostname, database=db_name,
                              user=db_username, password=db_password)
        chart2_sql_df = pd.read_sql(sql, conn)
@@ -2378,7 +2379,7 @@ def connect_database_for_chart2(n, ata, from_dt, to_dt):
  
        conn.close()
        return chart2_sql_df
-   except pyodbc.Error as err:
+    except pyodbc.Error as err:
        print("Couldn't connect to Server")
        print("Error message:- " + str(err))
  
@@ -2387,10 +2388,10 @@ async def get_ChartwoData(top_values:int, ata:str, fromDate: str , toDate: str):
   ATAtoStudy=ata
   Topvalues2=top_values
   MDCdataDF = connect_database_for_chart2(top_values, ata, fromDate, toDate)
-  AircraftTailPairDF = MDCdataDF[["Aircraft", "Tail"]].drop_duplicates(ignore_index= True) # unique pairs of AC SN and Tail# for use in analysis
+  AircraftTailPairDF = MDCdataDF[["AC_SN", "AC_TN"]].drop_duplicates(ignore_index= True) # unique pairs of AC SN and Tail# for use in analysis
   AircraftTailPairDF.columns = ["AC SN","Tail"] # re naming the columns to match History/Daily analysis output
-  chart2DF = pd.merge(left = MDCdataDF[["Aircraft","ATA_Main", "ATA"]], right = AircraftTailPairDF, left_on="Aircraft", right_on="AC SN")
-  chart2DF["Aircraft"] = chart2DF["Aircraft"] + " / " + chart2DF["Tail"]
+  chart2DF = pd.merge(left = MDCdataDF[["AC_SN","LRU", "ATA"]], right = AircraftTailPairDF, left_on="AC_SN", right_on="AC SN")
+  chart2DF["AC_SN"] = chart2DF["AC_SN"] + " / " + chart2DF["Tail"]
   chart2DF.drop(labels = ["AC SN", "Tail"], axis = 1, inplace = True)
   
   if len(ATAtoStudy) == 2:
@@ -2403,13 +2404,14 @@ async def get_ChartwoData(top_values:int, ata:str, fromDate: str , toDate: str):
     
   elif len(ATAtoStudy) == 5:
    # Convert 4 Dig ATA array to Dataframe to analyze
-   FourDigATA_DF = chart2DF.drop("ATA_Main", axis = 1).copy()
+   FourDigATA_DF = chart2DF.drop("LRU", axis = 1).copy()
    # Count the occurrence of each ata in each aircraft
    ATAOccurrenceDF = FourDigATA_DF.value_counts().unstack()
    Plottinglabels = ATAOccurrenceDF[ATAtoStudy].sort_values().dropna().tail(Topvalues2) # Aircraft Labels
    
   chart2_sql_df_json = Plottinglabels.to_json(orient='index')
   return chart2_sql_df_json
+
 
 
 
@@ -2719,17 +2721,26 @@ async def get_Chart_B(ata:str,top_n: int,from_dt: str, to_dt: str):
             Topvalues2=50
         
         MDCdataDF = connect_db_MDCdata_chartb_ata(ata,from_dt, to_dt)
-        AircraftTailPairDF = MDCdataDF[["Aircraft", "Tail"]].drop_duplicates(ignore_index= True) # unique pairs of AC SN and Tail# for use in analysis
+        AircraftTailPairDF = MDCdataDF[["AC_SN", "AC_TN"]].drop_duplicates(ignore_index= True) # unique pairs of AC SN and Tail# for use in analysis
+        print("---------------test--------------")
+        print(AircraftTailPairDF)
         AircraftTailPairDF.columns = ["AC SN","Tail"] # re naming the columns to match History/Daily analysis output
-        chartADF = pd.merge(left = MDCdataDF[["Aircraft","ATA Main", "Equation ID"]], right = AircraftTailPairDF, left_on="Aircraft", right_on="AC SN")
-        chartADF["Aircraft"] = chartADF["Aircraft"] + " / " + chartADF["Tail"]
+        print("---------------test2--------------")
+        print(AircraftTailPairDF.columns)
+        chartADF = pd.merge(left = MDCdataDF[["AC_SN","ATA", "EQ_ID"]], right = AircraftTailPairDF, left_on="AC_SN", right_on="AC SN")
+        print("---------------test3--------------")
+        print(chartADF)
+        chartADF["AC_SN"] = chartADF["AC_SN"] + " / " + chartADF["Tail"]
+        print("---------------test4--------------")
+        print(chartADF["AC_SN"])
         chartADF.drop(labels = ["AC SN", "Tail"], axis = 1, inplace = True)
-        MessageCountbyAircraftATA = chartADF.groupby(["Aircraft","ATA Main"]).count()
+        MessageCountbyAircraftATA = chartADF.groupby(["AC_SN","ATA"]).count()
+        print("----test5-----------")
+        print(MessageCountbyAircraftATA)
         # https://towardsdatascience.com/stacked-bar-charts-with-pythons-matplotlib-f4020e4eb4a7
         # https://stackoverflow.com/questions/44309507/stacked-bar-plot-using-matplotlib
         # transpose the indexes. where the ATA label becomes the column and the aircraft is row. counts are middle
-        TransposedMessageCountbyAircraftATA = MessageCountbyAircraftATA["Equation ID"].unstack()
-
+        TransposedMessageCountbyAircraftATA = MessageCountbyAircraftATA["EQ_ID"].unstack()
         # fill Null values with 0
         TransposedMessageCountbyAircraftATA.fillna(value= 0, inplace= True)
 
@@ -3269,8 +3280,13 @@ async def generateDeltaReport(analysisType: str, occurences: int, legs: int, int
         MDCdataDF["Intermittent"].fillna(value=-1, inplace=True)  # Null values preprocessing for currentflightphase
         MDCdataDF["Intermittent"].replace(to_replace=">", value="9",
                                           inplace=True)  # > represents greater than 8 Intermittent values
-        MDCdataDF["Intermittent"] = MDCdataDF["Intermittent"].astype(int)  # cast type to int
-
+        # MDCdataDF["Intermittent"] = MDCdataDF["Intermittent"].astype(int)  # cast type to int
+        try:                      
+        #     print("data in intermittent ",MDCdataDF["Intermittent"])            
+             MDCdataDF["Intermittent"] = int(MDCdataDF["Intermittent"]) # cast type to int
+        except:
+        #     #print("data in intermittent exec",MDCdataDF["Intermittent"])            
+            MDCdataDF["Intermittent"] = 9
         MDCdataDF["Aircraft"] = MDCdataDF["Aircraft"].str.replace('AC', '')
         MDCdataDF.fillna(value=" ", inplace=True)  # replacing all REMAINING null values to a blank string
         MDCdataDF.sort_values(by="DateAndTime", ascending=False, inplace=True, ignore_index=True)
@@ -3710,8 +3726,14 @@ async def generateDeltaReport(analysisType: str, occurences: int, legs: int, int
         MDCdataDF["Intermittent"].fillna(value=-1, inplace=True)  # Null values preprocessing for currentflightphase
         MDCdataDF["Intermittent"].replace(to_replace=">", value="9",
                                           inplace=True)  # > represents greater than 8 Intermittent values
-        MDCdataDF["Intermittent"] = MDCdataDF["Intermittent"].astype(int)  # cast type to int
-
+        # MDCdataDF["Intermittent"] = MDCdataDF["Intermittent"].astype(int)  # cast type to int
+        
+        try:                      
+        #     print("data in intermittent ",MDCdataDF["Intermittent"])            
+            MDCdataDF["Intermittent"] = int(MDCdataDF["Intermittent"]) # cast type to int
+        except:
+        #     #print("data in intermittent exec",MDCdataDF["Intermittent"])            
+             MDCdataDF["Intermittent"] = 9
         MDCdataDF["Aircraft"] = MDCdataDF["Aircraft"].str.replace('AC', '')
         MDCdataDF.fillna(value=" ", inplace=True)  # replacing all REMAINING null values to a blank string
         MDCdataDF.sort_values(by="DateAndTime", ascending=False, inplace=True, ignore_index=True)
