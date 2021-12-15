@@ -2694,7 +2694,7 @@ def connect_db_MDCdata_chartb(from_dt, to_dt):
 #with ata chartb
 #with ata chartb
 def connect_db_MDCdata_chartb_ata(ata,from_dt, to_dt):
-    sql = "SELECT * FROM MDC_MSGS WHERE ATA IN " + str(ata) +" and  MSG_Date BETWEEN '" + from_dt + " 00:00:00 ' AND '" + to_dt + " 23:59:59 '"
+    sql = "SELECT * FROM MDC_MSGS WHERE SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) IN " + str(ata) +" and  MSG_Date BETWEEN '" + from_dt + " 00:00:00 ' AND '" + to_dt + " 23:59:59 '"
     column_names = ["AC_MODEL", "AC_SN", "AC_TN",
                     "OPERATOR", "MSG_TYPE", "MDC_SOFTWARE", "MDT_VERSION", "MSG_Date",
                     "FLIGHT_NUM","FLIGHT_LEG", "FLIGHT_PHASE", "ATA", "ATA_NAME", "LRU",
