@@ -2631,7 +2631,7 @@ def connect_db_MDCdata_chartb_static():
         return MDCdataDF_chartb
     except pyodbc.Error as err:
         print("Couldn't connect to Server")
-        print("Error message:- " + str(err))
+        print("Error message:- " + strLanding_Chart_B(err))
 
 # for reference -> http://localhost:8000/Landing_Chart_B
 @app.post("/api/Landing_Chart_B")
@@ -3030,7 +3030,8 @@ async def get_eqIData(all:str):
 
 
 def connect_database_for_ata_main(all):
-    sql = "SELECT DISTINCT Airline_MDC_Data.ATA_Main FROM Airline_MDC_Data"
+#    sql = "SELECT DISTINCT Airline_MDC_Data.ATA_Main FROM Airline_MDC_Data"
+    sql = "SELECT DISTINCT SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) AS ATA_Main FROM MDC_MSGS"
 
     try:
         conn = pyodbc.connect(driver=db_driver, host=hostname, database=db_name,
