@@ -2358,9 +2358,9 @@ async def get_ChartOneData(top_n:int, aircraftNo:int, ata_main:str, fromDate: st
 ## Chart 2
 def connect_database_for_chart2(n, ata, from_dt, to_dt):
     if len(ata) == 2:
-        sql = "SELECT * FROM MDC_MSGS WHERE  ATA_Main="+ata+" AND MSG_Date BETWEEN '"+from_dt+"' AND '"+to_dt+"'"
+        sql = "SELECT AC_SN,AC_TN,ATA,SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) AS ATA_Main FROM MDC_MSGS WHERE SUBSTRING(ATA, 0, CHARINDEX('-', ATA))="+ata+" AND MSG_Date BETWEEN '"+from_dt+"' AND '"+to_dt+"'"
     elif len(ata) == 5:  
-       sql = "SELECT * FROM MDC_MSGS where  ATA='"+ata+"'   AND MSG_Date BETWEEN '"+from_dt+"' AND '"+to_dt+"' "
+       sql = "SELECT AC_SN,AC_TN,ATA,SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) AS ATA_Main FROM MDC_MSGS where  ATA='"+ata+"'   AND MSG_Date BETWEEN '"+from_dt+"' AND '"+to_dt+"' "
   
     column_names = ["AC_MODEL", "AC_SN", "AC_TN",
                     "OPERATOR", "MSG_TYPE", "MDC_SOFTWARE", "MDT_VERSION", "MSG_Date",
@@ -2389,7 +2389,7 @@ async def get_ChartwoData(top_values:int, ata:str, fromDate: str , toDate: str):
   MDCdataDF = connect_database_for_chart2(top_values, ata, fromDate, toDate)
   AircraftTailPairDF = MDCdataDF[["AC_SN", "AC_TN"]].drop_duplicates(ignore_index= True) # unique pairs of AC SN and Tail# for use in analysis
   AircraftTailPairDF.columns = ["AC SN","Tail"] # re naming the columns to match History/Daily analysis output
-  chart2DF = pd.merge(left = MDCdataDF[["AC_SN","LRU", "ATA"]], right = AircraftTailPairDF, left_on="AC_SN", right_on="AC SN")
+  chart2DF = pd.merge(left = MDCdataDF[["AC_SN","ATA_Main", "ATA"]], right = AircraftTailPairDF, left_on="AC_SN", right_on="AC SN")
   chart2DF["AC_SN"] = chart2DF["AC_SN"] + " / " + chart2DF["Tail"]
   chart2DF.drop(labels = ["AC SN", "Tail"], axis = 1, inplace = True)
   
@@ -2399,11 +2399,11 @@ async def get_ChartwoData(top_values:int, ata:str, fromDate: str , toDate: str):
      TwoDigATA_DF = chart2DF.drop("ATA", axis = 1).copy()
      # Count the occurrence of each ata in each aircraft
      ATAOccurrenceDF = TwoDigATA_DF.value_counts().unstack()
-     Plottinglabels = ATAOccurrenceDF[int(ATAtoStudy)].sort_values().dropna().tail(Topvalues2) # Aircraft Labels
+     Plottinglabels = ATAOccurrenceDF[ATAtoStudy].sort_values().dropna().tail(Topvalues2) # Aircraft Labels
     
   elif len(ATAtoStudy) == 5:
    # Convert 4 Dig ATA array to Dataframe to analyze
-   FourDigATA_DF = chart2DF.drop("LRU", axis = 1).copy()
+   FourDigATA_DF = chart2DF.drop("ATA_Main", axis = 1).copy()
    # Count the occurrence of each ata in each aircraft
    ATAOccurrenceDF = FourDigATA_DF.value_counts().unstack()
    Plottinglabels = ATAOccurrenceDF[ATAtoStudy].sort_values().dropna().tail(Topvalues2) # Aircraft Labels
