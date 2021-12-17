@@ -17,10 +17,10 @@ def flightlegfill(FLintermittentDF):
     for i in range(len(Flightlegstoplot)):
             hello = Flightlegstoplot.at[i, "FL No"]
             for j in range(len(FLintermittentDF)):
-                there = FLintermittentDF.at[j, "Flight_Leg_No"]
+                there = FLintermittentDF.at[j, "FLIGHT_LEG"]
                 
                 if hello == there:
-                    Flightlegstoplot.at[i, "Values"] = FLintermittentDF.at[j, "Intermittent"]
+                    Flightlegstoplot.at[i, "Values"] = FLintermittentDF.at[j, "INTERMITNT"]
                     
     Flightlegs = Flightlegstoplot["FL No"]
     Valuestoplot = Flightlegstoplot.Values
@@ -30,12 +30,12 @@ def chart5Report(aircraft_no, equation_id, CurrentFlightPhaseEnabled, fromDate, 
     try:
         MDCdataDF = connect_database_for_charts(aircraft_no, equation_id, CurrentFlightPhaseEnabled, fromDate, toDate)
         if CurrentFlightPhaseEnabled == 1: #Show all, current and history
-            FLintermittentDF = MDCdataDF[["Flight_Leg_No","Equation_ID", "Aircraft", "Intermittent"]].copy()
+            FLintermittentDF = MDCdataDF[["FLIGHT_LEG","EQ_ID", "AC_SN", "INTERMITNT"]].copy()
             
         elif CurrentFlightPhaseEnabled == 0: #Only show history
-            FLintermittentDF = MDCdataDF[[ "Flight_Leg_No", "Equation_ID", "Aircraft", "Intermittent"]].copy()
+            FLintermittentDF = MDCdataDF[[ "FLIGHT_LEG", "EQ_ID", "AC_SN", "INTERMITNT"]].copy()
             FLintermittentDF = FLintermittentDF.replace(0, np.nan).dropna(axis=0, how='any')
-            FLintermittentDF = FLintermittentDF[["Flight_Leg_No","Equation_ID", "Aircraft", "Intermittent"]].copy()
+            FLintermittentDF = FLintermittentDF[["FLIGHT_LEG","EQ_ID", "AC_SN", "INTERMITNT"]].copy()
 
         removeParanthesisRegex = r"[()]"
         equation_ids = re.sub(removeParanthesisRegex, '', equation_id)
@@ -44,7 +44,7 @@ def chart5Report(aircraft_no, equation_id, CurrentFlightPhaseEnabled, fromDate, 
         for equation in equation_ids.split(','):
             equation = re.sub(r"['']",'',equation)
             try:
-                flintDF = FLintermittentDF.set_index(["Aircraft", "Equation_ID"]).sort_index().loc[('AC'+str(aircraft_no), equation)]
+                flintDF = FLintermittentDF.set_index(["AC_SN", "EQ_ID"]).sort_index().loc[(str(aircraft_no), equation)]
                 xaxis, yaxis = flightlegfill(flintDF)
                 valueObj = {}
                 for i in range(len(xaxis)):
