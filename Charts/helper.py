@@ -7,7 +7,7 @@ App().app
 def connect_to_fetch_all_ata(from_dt, to_dt):
     conn = pyodbc.connect(driver=App().db_driver, host=App().hostname, database=App().db_name,
                               user=App().db_username, password=App().db_password)
-    all_ata_query = "SELECT DISTINCT ATA_Main from Airline_MDC_Data WHERE DateAndTime BETWEEN '" + from_dt + "' AND '" + to_dt + "'"
+    all_ata_query = "SELECT DISTINCT SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) AS ATA_Main from MDC_MSGS WHERE MSG_Date BETWEEN '" + from_dt + "' AND '" + to_dt + "'"
     try:
         all_ata_df = pd.read_sql(all_ata_query, conn)
 
@@ -20,7 +20,7 @@ def connect_to_fetch_all_ata(from_dt, to_dt):
 def fetch_all_eqids(from_dt, to_dt):
     conn = pyodbc.connect(driver=App().db_driver, host=App().hostname, database=App().db_name,
                               user=App().db_username, password=App().db_password)
-    all_ata_query = "SELECT DISTINCT Equation_ID from Airline_MDC_Data WHERE DateAndTime BETWEEN '" + from_dt + "' AND '" + to_dt + "'"
+    all_ata_query = "SELECT DISTINCT EQ_ID from MDC_MSGS WHERE MSG_Date BETWEEN '" + from_dt + "' AND '" + to_dt + "'"
     try:
         all_eqid_df = pd.read_sql(all_ata_query, conn)
 
@@ -56,7 +56,7 @@ def connect_database_for_charts(aircraft_no, equation_id, CurrentFlightPhaseEnab
         all_eqid = fetch_all_eqids(from_dt, to_dt)
 
         all_eqid_str = "("
-        all_eqid_list = all_eqid['Equation_ID'].tolist()
+        all_eqid_list = all_eqid['EQ_ID'].tolist()
         for each_eqid in all_eqid_list:
             #all_eqid_str_list.append(str(each_eqid))
             all_eqid_str += "'" + str(each_eqid) + "'"
@@ -68,9 +68,9 @@ def connect_database_for_charts(aircraft_no, equation_id, CurrentFlightPhaseEnab
         equation_id = all_eqid_str
     
     if CurrentFlightPhaseEnabled == 0:
-        sql = "SELECT * FROM Airline_MDC_Data WHERE Equation_ID NOT IN " + equation_id + " AND aircraftno = " + str(aircraft_no) + " AND DateAndTime BETWEEN '" + from_dt + "' AND '" + to_dt + "'"
+        sql = "SELECT * FROM MDC_MSGS WHERE EQ_ID NOT IN " + equation_id + " AND AC_SN = " + str(aircraft_no) + " AND MSG_Date BETWEEN '" + from_dt + "' AND '" + to_dt + "'"
     else:
-        sql = "SELECT * FROM Airline_MDC_Data WHERE Equation_ID IN " + equation_id + " AND aircraftno = " + str(aircraft_no) + " AND DateAndTime BETWEEN '" + from_dt + "' AND '" + to_dt + "'"
+        sql = "SELECT * FROM MDC_MSGS WHERE EQ_ID IN " + equation_id + " AND AC_SN = " + str(aircraft_no) + " AND MSG_Date BETWEEN '" + from_dt + "' AND '" + to_dt + "'"
 
     print('Chart3 SQL ', sql)
     try:

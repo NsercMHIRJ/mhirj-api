@@ -2335,9 +2335,12 @@ def connect_database_for_chart1(n, aircraft_no, ata_main, from_dt, to_dt):
         print(all_ata_str)
 
     if ata_main == 'ALL':
-        sql = "SELECT DISTINCT TOP "+str(n)+" Count(MDCMessagesInputs.Message) AS "'total_message'", Airline_MDC_Data. Equation_ID, MDCMessagesInputs.Message, MDCMessagesInputs.EICAS, Airline_MDC_Data.LRU, Airline_MDC_Data.ATA FROM Airline_MDC_Data INNER JOIN MDCMessagesInputs ON Airline_MDC_Data.ATA = MDCMessagesInputs.ATA AND Airline_MDC_Data.Equation_ID = MDCMessagesInputs.Equation_ID WHERE Airline_MDC_Data.aircraftno = "+str(aircraft_no)+" AND Airline_MDC_Data.ATA_Main IN " + str(all_ata_str) + " AND Airline_MDC_Data.DateAndTime BETWEEN '"+from_dt+"' AND '"+to_dt+"' GROUP BY Airline_MDC_Data.Equation_ID, MDCMessagesInputs.Message, MDCMessagesInputs.EICAS, Airline_MDC_Data.LRU, Airline_MDC_Data.ATA ORDER BY Count(MDCMessagesInputs.Message) DESC"
+        sql = "SELECT DISTINCT TOP "+str(n)+" Count(EQUATIONS.MSG_NB) AS "'total_message'", MDC_MSGS. EQ_ID, EQUATIONS.MSG_NB, EQUATIONS.CAS, MDC_MSGS.LRU, MDC_MSGS.ATA FROM MDC_MSGS INNER JOIN EQUATIONS ON MDC_MSGS.ATA = EQUATIONS.ATA AND MDC_MSGS.EQ_ID = EQUATIONS.EQ_ID WHERE MDC_MSGS.AC_SN = "+str(aircraft_no)+" AND SUBSTRING(MDC_MSGS.ATA, 0, CHARINDEX('-', MDC_MSGS.ATA)) IN " + str(all_ata_str) + " AND MDC_MSGS.MSG_Date BETWEEN '"+from_dt+"' AND '"+to_dt+"' GROUP BY MDC_MSGS.EQ_ID, EQUATIONS.MSG_NB, EQUATIONS.CAS, MDC_MSGS.LRU, MDC_MSGS.ATA ORDER BY Count(EQUATIONS.MSG_NB) DESC"
+        print(sql)
     else:
-        sql = "SELECT DISTINCT TOP "+str(n)+" Count(MDCMessagesInputs.Message) AS "'total_message'", Airline_MDC_Data. Equation_ID, MDCMessagesInputs.Message, MDCMessagesInputs.EICAS, Airline_MDC_Data.LRU, Airline_MDC_Data.ATA FROM Airline_MDC_Data INNER JOIN MDCMessagesInputs ON Airline_MDC_Data.ATA = MDCMessagesInputs.ATA AND Airline_MDC_Data.Equation_ID = MDCMessagesInputs.Equation_ID WHERE Airline_MDC_Data.aircraftno = "+str(aircraft_no)+" AND Airline_MDC_Data.ATA_Main IN " + str(ata_main) + " AND Airline_MDC_Data.DateAndTime BETWEEN '"+from_dt+"' AND '"+to_dt+"' GROUP BY Airline_MDC_Data.Equation_ID, MDCMessagesInputs.Message, MDCMessagesInputs.EICAS, Airline_MDC_Data.LRU, Airline_MDC_Data.ATA ORDER BY Count(MDCMessagesInputs.Message) DESC"
+        sql = "SELECT DISTINCT TOP "+str(n)+" Count(EQUATIONS.MSG_NB) AS "'total_message'", MDC_MSGS. EQ_ID, EQUATIONS.MSG_NB, EQUATIONS.CAS, MDC_MSGS.LRU, MDC_MSGS.ATA FROM MDC_MSGS INNER JOIN EQUATIONS ON MDC_MSGS.ATA = EQUATIONS.ATA AND MDC_MSGS.EQ_ID = EQUATIONS.EQ_ID WHERE MDC_MSGS.AC_SN = "+str(aircraft_no)+" AND SUBSTRING(MDC_MSGS.ATA, 0, CHARINDEX('-', MDC_MSGS.ATA)) = " + str(ata_main) + " AND MDC_MSGS.MSG_Date BETWEEN '"+from_dt+"' AND '"+to_dt+"' GROUP BY MDC_MSGS.EQ_ID, EQUATIONS.MSG_NB, EQUATIONS.CAS, MDC_MSGS.LRU, MDC_MSGS.ATA ORDER BY Count(EQUATIONS.MSG_NB) DESC"
+        print(sql)
+ 
     try:
         conn = pyodbc.connect(driver=db_driver, host=hostname, database=db_name,
                               user=db_username, password=db_password)
@@ -2347,6 +2350,13 @@ def connect_database_for_chart1(n, aircraft_no, ata_main, from_dt, to_dt):
     except pyodbc.Error as err:
         print("Couldn't connect to Server")
         print("Error message:- " + str(err))
+
+
+@app.post("/api/chart_one/{top_n}/{aircraftNo}/{ata_main}/{fromDate}/{toDate}")
+async def get_ChartOneData(top_n:int, aircraftNo:int, ata_main:str, fromDate: str , toDate: str):
+    chart1_sql_df = connect_database_for_chart1(top_n, aircraftNo, ata_main, fromDate, toDate)
+    chart1_sql_df_json = chart1_sql_df.to_json(orient='records')
+    return chart1_sql_df_json
 
 
 @app.post("/api/chart_one/{top_n}/{aircraftNo}/{ata_main}/{fromDate}/{toDate}")

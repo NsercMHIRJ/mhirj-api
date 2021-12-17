@@ -8,18 +8,18 @@ import json
 def chart3Report(aircraft_no, equation_id, CurrentFlightPhaseEnabled, fromDate, toDate):
     print(aircraft_no, equation_id, CurrentFlightPhaseEnabled, fromDate, toDate)
     MDCdataDF = connect_database_for_charts(aircraft_no, equation_id, CurrentFlightPhaseEnabled, fromDate, toDate)
-    MDCdataDF["DateAndTime"] = pd.to_datetime(MDCdataDF["DateAndTime"])
+    MDCdataDF["MSG_Date"] = pd.to_datetime(MDCdataDF["MSG_Date"])
 
     if CurrentFlightPhaseEnabled == 1: #Show all, current and history
-        DateNmessageDF = MDCdataDF[["DateAndTime","Equation_ID", "Aircraft"]].copy()
+        DateNmessageDF = MDCdataDF[["MSG_Date","EQ_ID", "AC_SN"]].copy()
         
     elif CurrentFlightPhaseEnabled == 0: #Only show history
-        DateNmessageDF = MDCdataDF[["DateAndTime","Equation_ID", "Aircraft", "Flight_Phase"]].copy()
+        DateNmessageDF = MDCdataDF[["MSG_Date","EQ_ID", "AC_SN", "FLIGHT_PHASE"]].copy()
         DateNmessageDF = DateNmessageDF.replace(False, np.nan).dropna(axis=0, how='any')
-        DateNmessageDF = DateNmessageDF[["DateAndTime","Equation_ID", "Aircraft"]].copy()
+        DateNmessageDF = DateNmessageDF[["MSG_Date","EQ_ID", "AC_SN"]].copy()
         
-    pd.to_datetime(DateNmessageDF["DateAndTime"])
-    counts = pd.DataFrame(data= DateNmessageDF.groupby(['Aircraft', "Equation_ID", "DateAndTime"]).agg(len), columns= ["Counts"])
+    pd.to_datetime(DateNmessageDF["MSG_Date"])
+    counts = pd.DataFrame(data= DateNmessageDF.groupby(['AC_SN', "EQ_ID", "MSG_Date"]).agg(len), columns= ["Counts"])
 
     removeParanthesisRegex = r"[()]"
     equation_ids = re.sub(removeParanthesisRegex, '', equation_id)
@@ -28,7 +28,7 @@ def chart3Report(aircraft_no, equation_id, CurrentFlightPhaseEnabled, fromDate, 
     for equation in equation_ids.split(','):
         equation = re.sub(r"[' ']",'',equation)
         try:
-            valuesfoundinMDCdata += counts.loc[('AC'+str(aircraft_no), equation)].resample('D')["Counts"].sum().to_json()
+            valuesfoundinMDCdata += counts.loc[(str(aircraft_no), equation)].resample('D')["Counts"].sum().to_json()
         except:
             unavailableEquationIds.append(equation)
 
