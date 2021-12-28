@@ -31,6 +31,7 @@ from fastapi import File, UploadFile
 from crud import *
 #from pm_upload import *
 import uvicorn
+from util.util import connect_database_mdc_message_input
 
 app = FastAPI()
 """origins = [
@@ -3363,23 +3364,10 @@ async def get_mdcRawData(from_date:str, to_date:str):
 async def getMDCFileUploadStatus():
     return getFileUploadStatusPercentage() 
 
-def connect_database_mdc_message_input(eq_id):
-    sql = "SELECT * from [dbo].[MDCMessagesInputs_CSV_UPLOAD] c WHERE c.Equation_ID='" + eq_id + "' "
 
-    try:
-        conn = pyodbc.connect(driver=db_driver, host=hostname, database=db_name,
-                              user=db_username, password=db_password)
-                              
-        print(sql)
-        mdcRaw_df = pd.read_sql(sql, conn)
-        #MDCdataDF.columns = column_names
-        return mdcRaw_df
-    except pyodbc.Error as err:
-        print("Couldn't connect to Server")
-        print("Error message:- " + str(err))
-
-@app.post("/api/list_mdc_messages_input/{eq_id}")
+@app.post("/api/all_mdc_messages_input/{eq_id}")
 async def get_mdcMessageInput(eq_id:str):
     mdcRaw_df = connect_database_mdc_message_input(eq_id)
-    mdcRaw_df_json =  mdcRaw_df.to_json(orient='records')
+    mdcRaw_df_json =  mdcRaw_df.to_json(orient='records',lines=True)
+    print(mdcRaw_df_json)
     return  mdcRaw_df_json
