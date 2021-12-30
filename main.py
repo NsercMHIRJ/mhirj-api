@@ -32,6 +32,11 @@ from crud import *
 #from pm_upload import *
 import uvicorn
 from util.util import connect_database_mdc_message_input
+from GenerateReport.jamReport import jamReport
+# from GenerateReport.jamReport import MDCdataDF
+from GenerateReport.jamReport import mdcDF
+from GenerateReport.flagReport import Toreport
+
 
 app = FastAPI()
 """origins = [
@@ -286,6 +291,48 @@ async def generateReport(analysisType: str, occurences: int, legs: int, intermit
     
     respObj = dailyReport(occurences, legs, intermittent, consecutiveDays, ata, exclude_EqID, airline_operator, include_current_message, fromDate , toDate)
     return respObj
+
+
+#--------jamReport-----------------
+@app.post(
+   "/api/GenerateReport/{analysisType}/{occurences}/{legs}/{intermittent}/{consecutiveDays}/{ata}/{exclude_EqID}/{airline_operator}/{include_current_message}/{fromDate}/{toDate}/{ACSN_chosen}")
+async def generateJamsReport(analysisType: str, occurences: int, legs: int, intermittent: int, consecutiveDays: int,
+                        ata: str, exclude_EqID: str, airline_operator: str, include_current_message: int,
+                        fromDate: str, toDate: str, ACSN_chosen:int):
+   
+   if (analysisType.lower() == "history"):
+       OutputTableHistory = historyReport(occurences, legs, intermittent, consecutiveDays, ata, exclude_EqID, airline_operator, include_current_message, fromDate , toDate)
+       mdcDataDF=mdcDF(occurences, legs, intermittent, consecutiveDays, ata, exclude_EqID, airline_operator, include_current_message, fromDate , toDate)
+       resObj= jamReport(OutputTableHistory, ACSN_chosen,mdcDataDF)
+       return resObj.to_json(orient='records')
+
+   elif (analysisType.lower() == "daily"):
+        OutputTableDaily = dailyReport(occurences, legs, intermittent, consecutiveDays, ata, exclude_EqID, airline_operator, include_current_message, fromDate , toDate)
+        mdcDataDF=mdcDF(occurences, legs, intermittent, consecutiveDays, ata, exclude_EqID, airline_operator, include_current_message, fromDate , toDate)
+        resObj= jamReport(OutputTableDaily, ACSN_chosen,mdcDataDF)
+        return resObj.to_json(orient='records')
+
+
+# --------------flagReport------------------    
+@app.post("/api/GenerateReport/{analysisType}/{occurences}/{legs}/{intermittent}/{consecutiveDays}/{ata}/{exclude_EqID}/{airline_operator}/{include_current_message}/{fromDate}/{toDate}/{flag}/{list_of_tuples_acsn_bcode}")
+async def generateFlagReport(analysisType: str, occurences: int, legs: int, intermittent: int, consecutiveDays: int, ata: str, exclude_EqID:str, airline_operator: str, include_current_message: int, fromDate: str , toDate: str, flag:int, list_of_tuples_acsn_bcode):
+
+    if (analysisType.lower() == "history"):
+        
+        OutputTableHistory = historyReport(occurences, legs, intermittent, consecutiveDays, ata, exclude_EqID, airline_operator, include_current_message, fromDate , toDate)
+        print("----------this is outputtable history--------")
+        print(OutputTableHistory)
+        mdcDataDF=mdcDF(occurences, legs, intermittent, consecutiveDays, ata, exclude_EqID, airline_operator, include_current_message, fromDate , toDate)
+        print("----------this is mdcDatadf--------")
+        print(mdcDataDF)
+        newreport = True
+        Flagsreport = 1
+
+        resObj= Toreport(Flagsreport,OutputTableHistory,mdcDataDF,include_current_message,list_of_tuples_acsn_bcode,newreport)
+        print("-----this is final result ----------")
+        print(resObj)
+        return resObj.to_json(orient='records')
+
 
     # elif(analysisType.lower() == "history"):
     #     #global UniqueSerialNumArray
@@ -674,8 +721,8 @@ def flagsinreport(OutputTable, Aircraft, listofmessages=listofJamMessages):
     print(FinalDF)
     return FinalDF.loc[Aircraft]
 
-@app.post(
-    "/api/GenerateReport/{analysisType}/{occurences}/{legs}/{intermittent}/{consecutiveDays}/{ata}/{exclude_EqID}/{airline_operator}/{include_current_message}/{fromDate}/{toDate}/{ACSN_chosen}")
+# @app.post(
+    # "/api/GenerateReport/{analysisType}/{occurences}/{legs}/{intermittent}/{consecutiveDays}/{ata}/{exclude_EqID}/{airline_operator}/{include_current_message}/{fromDate}/{toDate}/{ACSN_chosen}")
 async def generateJamsReport(analysisType: str, occurences: int, legs: int, intermittent: int, consecutiveDays: int,
                          ata: str, exclude_EqID: str, airline_operator: str, include_current_message: int,
                          fromDate: str, toDate: str, ACSN_chosen:int):
@@ -1488,7 +1535,7 @@ from typing import Optional
 
 # for reference -> http://localhost:8000/GenerateReport/history/2/2/2/8/('32','22')/('B1-007553', 'B1-246748')/skw/1/2020-11-11/2020-11-12/('10222','B1-006989'), ('10222','B1-007028'), ('10145','B1-007008')
 #for Daily Report: value of consecutiveDays = 0 in URL -> for reference!!       ('32','22')/('B1-007553', 'B1-246748')/skw/1/2020-11-11/2020-11-12
-@app.post("/api/GenerateReport/{analysisType}/{occurences}/{legs}/{intermittent}/{consecutiveDays}/{ata}/{exclude_EqID}/{airline_operator}/{include_current_message}/{fromDate}/{toDate}/{flag}/{list_of_tuples_acsn_bcode}")
+# @app.post("/api/GenerateReport/{analysisType}/{occurences}/{legs}/{intermittent}/{consecutiveDays}/{ata}/{exclude_EqID}/{airline_operator}/{include_current_message}/{fromDate}/{toDate}/{flag}/{list_of_tuples_acsn_bcode}")
 async def generateFlagReport(analysisType: str, occurences: int, legs: int, intermittent: int, consecutiveDays: int, ata: str, exclude_EqID:str, airline_operator: str, include_current_message: int, fromDate: str , toDate: str, flag:int, list_of_tuples_acsn_bcode):
     print(fromDate, " ", toDate)
     """
