@@ -1,16 +1,27 @@
 from app import App
+from app import DB_RW
 import pyodbc
 import pandas as pd
 import datetime
-
+# conn2 = pyodbc.connect(driver=DB_RW().db_driver, host=DB_RW().hostname, database=DB_RW().db_name,
+#                               user=DB_RW().db_username, password=DB_RW().db_password, Trusted_Connection="no")
+conn2 = pyodbc.connect(
+            Trusted_Connection='No',
+            driver='{ODBC Driver 17 for SQL Server}', host='aftermarket-mhirj.database.windows.net', database='MHIRJ_HUMBER',
+                              user='humber_rw', password='nP@yWw@!$4NxWeK6p*ttu3q6')
+# conn = pyodbc.connect(driver=DB_RW().db_driver, host=DB_RW().hostname, database=DB_RW().db_name,
+#                               user=DB_RW().db_username, password=DB_RW().db_password)
 conn = pyodbc.connect(driver=App().db_driver, host=App().hostname, database=App().db_name,
-                              user=App().db_username, password=App().db_password)
-def isValidParams(occurences: int, legs: int, intermittent: int, consecutiveDays: int, ata: str, exclude_EqID:str, airline_operator: str, include_current_message: int, fromDate: str , toDate: str):
+                               user=App().db_username, password=App().db_password)
+# conn2 = pyodbc.connect(driver=App().db_driver, host=App().hostname, database=App().db_name,
+#                                user=App().db_username, password=App().db_password)
+                  
+def isValidParams(occurences: int, legs: int, INTERMITNT: int, consecutiveDays: int, ata: str, exclude_EqID:str, airline_operator: str, include_current_message: int, fromDate: str , toDate: str):
     return True
 
 
 def connect_to_fetch_all_ata(from_dt, to_dt):
-    all_ata_query = "SELECT DISTINCT ATA_Main from Airline_MDC_Data WHERE DateAndTime BETWEEN '" + from_dt + "' AND '" + to_dt + "'"
+    all_ata_query = "SELECT DISTINCT SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) as ATA_MAIN from MDC_MSGS WHERE MSG_Date BETWEEN '" + from_dt + "' AND '" + to_dt + "'"
     try:
         all_ata_df = pd.read_sql(all_ata_query, conn)
 
@@ -20,7 +31,7 @@ def connect_to_fetch_all_ata(from_dt, to_dt):
         print("Error message:- " + str(err))
 
 def connect_to_fetch_all_eqids(from_dt, to_dt):
-    all_ata_query = "SELECT DISTINCT Equation_ID from Airline_MDC_Data WHERE DateAndTime BETWEEN '" + from_dt + "' AND '" + to_dt + "'"
+    all_ata_query = "SELECT DISTINCT EQ_ID from MDC_MSGS WHERE MSG_Date BETWEEN '" + from_dt + "' AND '" + to_dt + "'"
     try:
         all_eqid_df = pd.read_sql(all_ata_query, conn)
 
@@ -55,7 +66,7 @@ def connect_database_MDCdata(ata, excl_eqid, airline_operator, include_current_m
         all_eqid = connect_to_fetch_all_eqids(from_dt, to_dt)
 
         all_eqid_str = "("
-        all_eqid_list = all_eqid['Equation_ID'].tolist()
+        all_eqid_list = all_eqid['EQ_ID'].tolist()
         for each_eqid in all_eqid_list:
             #all_eqid_str_list.append(str(each_eqid))
             all_eqid_str += "'" + str(each_eqid) + "'"
@@ -66,52 +77,45 @@ def connect_database_MDCdata(ata, excl_eqid, airline_operator, include_current_m
 
     from_dt = from_dt + " 00:00:00"
     to_dt = to_dt + " 23:59:59"
-    # If we do not want to include current message -> exclude null flight phase and null intermittents
+    # If we do not want to include current message -> exclude null FLIGHT_PHASE and null INTERMITNTs
     if include_current_message == 0:    
         if ata == 'ALL' and excl_eqid == 'NONE':
-            sql = "SELECT * FROM Airline_MDC_Data WHERE ATA_Main IN " + str(all_ata_str) + " AND Equation_ID IN " + str(
-                all_eqid_str) + " AND airline_id = " + str(
-                airline_id) + " AND flight_phase IS NOT NULL AND Intermittent IS NOT NULL AND DateAndTime BETWEEN '" + from_dt + "' AND '" + to_dt + "'"
+            sql = "SELECT *, SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) AS ATA_Main, SUBSTRING(ATA, 4,4) AS ATA_SUB, dd.MSG_ID FROM MDC_MSGS mg JOIN LRU_DIAG_DATA dd ON dd.MSG_ID = mg.MSG_ID WHERE SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) as ATA_MAIN IN " + str(all_ata_str) + " AND EQ_ID IN " + str(
+                all_eqid_str) + " AND FLIGHT_PHASE IS NOT NULL AND INTERMITNT IS NOT NULL AND MSG_Date BETWEEN '" + from_dt + "' AND '" + to_dt + "'"
         elif excl_eqid == 'NONE':
-            sql = "SELECT * FROM Airline_MDC_Data WHERE ATA_Main IN " + str(ata) + " AND Equation_ID IN " + str(
-                all_eqid_str) + " AND airline_id = " + str(
-                airline_id) + " AND flight_phase IS NOT NULL AND Intermittent IS NOT NULL AND DateAndTime BETWEEN '" + from_dt + "' AND '" + to_dt + "'"
+            sql = "SELECT *, SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) AS ATA_Main, SUBSTRING(ATA, 4,4) AS ATA_SUB, dd.MSG_ID FROM MDC_MSGS mg JOIN LRU_DIAG_DATA dd ON dd.MSG_ID = mg.MSG_ID WHERE SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) IN " + str(ata) + " AND EQ_ID IN " + str(
+                all_eqid_str) + " AND FLIGHT_PHASE IS NOT NULL AND INTERMITNT IS NOT NULL AND MSG_Date BETWEEN '" + from_dt + "' AND '" + to_dt + "'"
         elif ata == 'ALL':
-            sql = "SELECT * FROM Airline_MDC_Data WHERE ATA_Main IN " + str(all_ata_str) + " AND Equation_ID NOT IN " + str(
-                excl_eqid) + " AND airline_id = " + str(
-                airline_id) + " AND flight_phase IS NOT NULL AND Intermittent IS NOT NULL AND DateAndTime BETWEEN '" + from_dt + "' AND '" + to_dt + "'"
+            sql = "SELECT *, SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) AS ATA_Main, SUBSTRING(ATA, 4,4) AS ATA_SUB, dd.MSG_ID FROM MDC_MSGS mg JOIN LRU_DIAG_DATA dd ON dd.MSG_ID = mg.MSG_ID WHERE SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) as ATA_MAIN IN " + str(all_ata_str) + " AND EQ_ID NOT IN " + str(
+                excl_eqid) + " AND FLIGHT_PHASE IS NOT NULL AND INTERMITNT IS NOT NULL AND MSG_Date BETWEEN '" + from_dt + "' AND '" + to_dt + "'"
         else:
-            sql = "SELECT * FROM Airline_MDC_Data WHERE ATA_Main IN " + str(ata) + " AND Equation_ID NOT IN " + str(
-                excl_eqid) + " AND airline_id = " + str(
-                airline_id) + " AND flight_phase IS NOT NULL AND Intermittent IS NOT NULL AND DateAndTime BETWEEN '" + from_dt + "' AND '" + to_dt + "'"
+            sql = "SELECT *, SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) AS ATA_Main, SUBSTRING(ATA, 4,4) AS ATA_SUB, dd.MSG_ID FROM MDC_MSGS mg JOIN LRU_DIAG_DATA dd ON dd.MSG_ID = mg.MSG_ID WHERE SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) as ATA_MAIN IN " + str(ata) + " AND EQ_ID NOT IN " + str(
+                excl_eqid) + " AND FLIGHT_PHASE IS NOT NULL AND INTERMITNT IS NOT NULL AND MSG_Date BETWEEN '" + from_dt + "' AND '" + to_dt + "'"
 
     elif include_current_message == 1:
         if ata == 'ALL' and excl_eqid =='NONE':
-            sql = "SELECT * FROM Airline_MDC_Data WHERE ATA_Main IN " + str(all_ata_str) + " AND Equation_ID IN " + str(
-                all_eqid_str) + " AND airline_id = " + str(
-                airline_id) + " AND DateAndTime BETWEEN '" + from_dt + "' AND '" + to_dt + "'"
+            sql = "SELECT *, SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) AS ATA_Main, SUBSTRING(ATA, 4,4) AS ATA_SUB, dd.MSG_ID FROM MDC_MSGS mg JOIN LRU_DIAG_DATA dd ON dd.MSG_ID = mg.MSG_ID WHERE SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) as ATA_MAIN IN " + str(all_ata_str) + " AND EQ_ID IN " + str(
+                all_eqid_str) + " AND MSG_Date BETWEEN '" + from_dt + "' AND '" + to_dt + "'"
         elif ata == 'ALL':
-            sql = "SELECT * FROM Airline_MDC_Data WHERE ATA_Main IN " + str(all_ata_str) + " AND Equation_ID NOT IN " + str(
-                excl_eqid) + " AND airline_id = " + str(
-                airline_id) + " AND DateAndTime BETWEEN '" + from_dt + "' AND '" + to_dt + "'"
+            sql = "SELECT *, SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) AS ATA_Main, SUBSTRING(ATA, 4,4) AS ATA_SUB, dd.MSG_ID FROM MDC_MSGS mg JOIN LRU_DIAG_DATA dd ON dd.MSG_ID = mg.MSG_ID WHERE SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) as ATA_MAIN IN " + str(all_ata_str) + " AND EQ_ID NOT IN " + str(
+                excl_eqid) + " AND MSG_Date BETWEEN '" + from_dt + "' AND '" + to_dt + "'"
         elif excl_eqid == 'NONE':
-            sql = "SELECT * FROM Airline_MDC_Data WHERE ATA_Main IN " + str(ata) + " AND Equation_ID IN " + str(
-                all_eqid_str) + " AND airline_id = " + str(
-                airline_id) + " AND DateAndTime BETWEEN '" + from_dt + "' AND '" + to_dt + "'"
+            sql = "SELECT *, SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) AS ATA_Main, SUBSTRING(ATA, 4,4) AS ATA_SUB, dd.MSG_ID FROM MDC_MSGS mg JOIN LRU_DIAG_DATA dd ON dd.MSG_ID = mg.MSG_ID WHERE SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) as ATA_MAIN IN " + str(ata) + " AND EQ_ID IN " + str(
+                all_eqid_str) + " AND MSG_Date BETWEEN '" + from_dt + "' AND '" + to_dt + "'"
         else:
-            sql = "SELECT * FROM Airline_MDC_Data WHERE ATA_Main IN " + str(ata) + " AND Equation_ID NOT IN " + str(
-                excl_eqid) + " AND airline_id = " + str(
-                airline_id) + " AND DateAndTime BETWEEN '" + from_dt + "' AND '" + to_dt + "'"
+            sql = "SELECT *, SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) AS ATA_Main, SUBSTRING(ATA, 4,4) AS ATA_SUB, dd.MSG_ID FROM MDC_MSGS mg JOIN LRU_DIAG_DATA dd ON dd.MSG_ID = mg.MSG_ID WHERE SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) as ATA_MAIN IN " + str(ata) + " AND EQ_ID NOT IN " + str(
+                excl_eqid) + " AND MSG_Date BETWEEN '" + from_dt + "' AND '" + to_dt + "'"
 
-    column_names = ["Aircraft", "Tail#", "Flight Leg No",
-               "ATA Main", "ATA Sub", "ATA", "ATA Description", "LRU",
-               "DateAndTime", "MDC Message", "Status", "Flight Phase", "Type",
-               "Intermittent", "Equation ID", "Source", "Diagnostic Data",
-               "Data Used to Determine Msg", "ID", "Flight", "airline_id", "aircraftno"]
+    column_names = ["AC_SN", "AC_TN", "FLIGHT_LEG",
+               "ATA_Main", "ATA_SUB", "ATA", "ATA_NAME", "LRU",
+               "MSG_Date", "msg_status", "FLIGHT_PHASE", "MSG_TYPE",
+               "INTERMITNT", "EQ_ID", "SOURCE", "LABEL",
+               "LRU_NAME", "MSG_ID"]
     print(sql)
     try:
         MDCdataDF = pd.read_sql(sql, conn)
-        MDCdataDF.columns = column_names
+        print("coloumns ", MDCdataDF.columns)
+        MDCdataDF = MDCdataDF[column_names]
         return MDCdataDF
     except pyodbc.Error as err:
         print("Couldn't connect to Server")
@@ -120,10 +124,10 @@ def connect_database_MDCdata(ata, excl_eqid, airline_operator, include_current_m
 
 def connect_database_MDCmessagesInputs():
     global MDCMessagesDF
-    sql = "SELECT * FROM MDCMessagesInputs_CSV_UPLOAD" #MDCMessagesInputs_CSV_UPLOAD
+    sql = "SELECT * FROM MDCMessagesInputs" #MDCMessagesInputs_CSV_UPLOAD
 
     try:
-        MDCMessagesDF = pd.read_sql(sql, conn)
+        MDCMessagesDF = pd.read_sql(sql, conn2)
         print(MDCMessagesDF.columns)
         return MDCMessagesDF
     except pyodbc.Error as err:
@@ -135,7 +139,7 @@ def connect_database_TopMessagesSheet():
     sql = "SELECT * FROM TopMessagesSheet"
 
     try:
-        TopMessagesDF = pd.read_sql(sql, conn)
+        TopMessagesDF = pd.read_sql(sql, conn2)
         return TopMessagesDF
     except pyodbc.Error as err:
         print("Couldn't connect to Server")
@@ -144,7 +148,7 @@ def connect_database_TopMessagesSheet():
 def connect_to_fetch_all_jam_messages():
     jam_messages_query = "SELECT * from JamMessagesList"
     try:
-        jam_messages_df = pd.read_sql(jam_messages_query, conn)
+        jam_messages_df = pd.read_sql(jam_messages_query, conn2)
 
         return jam_messages_df
     except pyodbc.Error as err:
@@ -209,7 +213,6 @@ def LongestConseq(unique_arr, days_legs):
         for i in range(len(unique_arr)):
             if (i > 0 and unique_arr[i] == unique_arr[i - 1] - datetime.timedelta(1)):
                 count += 1
-
             # Reset the count
             else:
                 count = 1
@@ -221,7 +224,7 @@ def LongestConseq(unique_arr, days_legs):
         # Find the maximum length
         # by traversing the array
         for i in range(len(unique_arr)):
-            if (i > 0 and int(unique_arr[i]) == int(unique_arr[i - 1] -1)):
+            if (i > 0 and int(unique_arr[i]) == int(unique_arr[i - 1])):
                 count += 1
 
             # Reset the count

@@ -5,36 +5,36 @@ import numbers
 
 def dailyReport(occurences, legs, intermittent, consecutiveDays, ata, exclude_EqID, airline_operator, include_current_message, fromDate , toDate):
     MDCdataDF = connect_database_MDCdata(ata, exclude_EqID, airline_operator, include_current_message, fromDate, toDate)
-    print(MDCdataDF)
+    print("data ", MDCdataDF)
     # Date formatting
-    MDCdataDF["DateAndTime"] = pd.to_datetime(MDCdataDF["DateAndTime"])
-    # print(MDCdataDF["DateAndTime"])
-    MDCdataDF["Flight Leg No"].fillna(value=0.0, inplace=True)  # Null values preprocessing - if 0 = Currentflightphase
-    # print(MDCdataDF["Flight Leg No"])
-    MDCdataDF["Flight Phase"].fillna(False, inplace=True)  # NuCell values preprocessing for currentflightphase
-    MDCdataDF["Intermittent"].fillna(value=-1, inplace=True)  # Null values preprocessing for currentflightphase
-    MDCdataDF["Intermittent"].replace(to_replace=">", value=9,
-                                      inplace=True)  # > represents greater than 8 Intermittent values
+    MDCdataDF["MSG_Date"] = pd.to_datetime(MDCdataDF["MSG_Date"])
+    # print(MDCdataDF["MSG_Date"])
+    MDCdataDF["FLIGHT_LEG"].fillna(value=0.0, inplace=True)  # Null values preprocessing - if 0 = Currentflightphase
+    # print(MDCdataDF["FLIGHT_LEG"])
+    MDCdataDF["FLIGHT_PHASE"].fillna(False, inplace=True)  # NuCell values preprocessing for currentflightphase
+    MDCdataDF["INTERMITNT"].fillna(value=-1, inplace=True)  # Null values preprocessing for currentflightphase
+    MDCdataDF["INTERMITNT"].replace(to_replace=">", value=9,
+                                      inplace=True)  # > represents greater than 8 INTERMITNT values
 
     try:                      
-        #print("data in intermittent ",MDCdataDF["Intermittent"])            
-        MDCdataDF["Intermittent"] = int(MDCdataDF["Intermittent"]) # cast type to int
+        #print("data in intermittent ",MDCdataDF["INTERMITNT"])            
+        MDCdataDF["INTERMITNT"] = int(MDCdataDF["INTERMITNT"]) # cast type to int
     except:
-        #print("data in intermittent exec",MDCdataDF["Intermittent"])            
-        MDCdataDF["Intermittent"] = 9
+        #print("data in intermittent exec",MDCdataDF["INTERMITNT"])            
+        MDCdataDF["INTERMITNT"] = 9
 
 
-    MDCdataDF["Aircraft"] = MDCdataDF["Aircraft"].str.replace('AC', '')
+    MDCdataDF["AC_SN"] = MDCdataDF["AC_SN"].str.replace('AC', '')
     MDCdataDF.fillna(value=" ", inplace=True)  # replacing all REMAINING null values to a blank string
-    MDCdataDF.sort_values(by= "DateAndTime", ascending= False, inplace= True, ignore_index= True)
+    MDCdataDF.sort_values(by= "MSG_Date", ascending= False, inplace= True, ignore_index= True)
 
-    AircraftTailPairDF = MDCdataDF[["Aircraft", "Tail#"]].drop_duplicates(ignore_index= True) # unique pairs of AC SN and Tail# for use in analysis
-    AircraftTailPairDF.columns = ["AC SN","Tail#"] # re naming the columns to match History/Daily analysis output
+    AircraftTailPairDF = MDCdataDF[["AC_SN", "AC_TN"]].drop_duplicates(ignore_index= True) # unique pairs of AC SN and AC_TN for use in analysis
+    AircraftTailPairDF.columns = ["AC SN","AC_TN"] # re naming the columns to match History/Daily analysis output
 
-    DatesinData = MDCdataDF["DateAndTime"].dt.date.unique()  # these are the dates in the data in Datetime format.
-    NumberofDays = len(MDCdataDF["DateAndTime"].dt.date.unique())  # to pass into Daily analysis number of days in data
-    latestDay = str(MDCdataDF.loc[0, "DateAndTime"].date())  # to pass into Daily analysis
-    LastLeg = max(MDCdataDF["Flight Leg No"])  # Latest Leg in the data
+    DatesinData = MDCdataDF["MSG_Date"].dt.date.unique()  # these are the dates in the data in Datetime format.
+    NumberofDays = len(MDCdataDF["MSG_Date"].dt.date.unique())  # to pass into Daily analysis number of days in data
+    latestDay = str(MDCdataDF.loc[0, "MSG_Date"].date())  # to pass into Daily analysis
+    LastLeg = max(MDCdataDF["FLIGHT_LEG"])  # Latest Leg in the data
     MDCdataArray = MDCdataDF.to_numpy()  # converting to numpy to work with arrays
 
     # MDCMessagesDF = pd.read_csv(MDCMessagesURL_path, encoding="utf8")  # bring messages and inputs into a Dataframe
@@ -78,10 +78,10 @@ def dailyReport(occurences, legs, intermittent, consecutiveDays, ata, exclude_Eq
         return DailyDataDF
 
     AnalysisDF = MDCdataDF.set_index(
-        "DateAndTime")  # since dateandtime was moved to the index of the DF, the column values change from the original MDCdataDF
+        "MSG_Date")  # since MSG_Date was moved to the index of the DF, the column values change from the original MDCdataDF
 
     currentRow = 0
-    MAINtable_array_temp = np.empty((1, 18), object)  # 18 for the date #input from user
+    MAINtable_array_temp = np.empty((1, 17), object)  # 18 for the date #input from user
     MAINtable_array = []
 
     # will loop through each day to slice the data for each day, then initialize arrays to individually analyze each day
@@ -94,9 +94,9 @@ def dailyReport(occurences, legs, intermittent, consecutiveDays, ata, exclude_Eq
 
         ShapeDailyanalysisDF = DailyanalysisDF.shape  # tuple of the shape of the daily data (#rows, #columns)
         DailyanalysisArray = DailyanalysisDF.to_numpy()  # slicing the array to only include the daily data
-        NumAC = DailyanalysisDF["Aircraft"].nunique()  # number of unique aircraft SN in the data
-        UniqueSerialNumArray = DailyanalysisDF.Aircraft.unique()  # unique aircraft values
-        SerialNumFreqSeries = DailyanalysisDF.Aircraft.value_counts()  # the index of this var contains the AC with the most occurrences
+        NumAC = DailyanalysisDF["AC_SN"].nunique()  # number of unique aircraft SN in the data
+        UniqueSerialNumArray = DailyanalysisDF.AC_SN.unique()  # unique aircraft values
+        SerialNumFreqSeries = DailyanalysisDF.AC_SN.value_counts()  # the index of this var contains the AC with the most occurrences
         MaxOfAnAC = SerialNumFreqSeries[0]  # the freq series sorts in descending order, max value is top
 
         # Define the arrays as numpy
@@ -133,7 +133,7 @@ def dailyReport(occurences, legs, intermittent, consecutiveDays, ata, exclude_Eq
                     # format for these arrays :   | AC1 | AC2 | AC3 |.... | NumAC
                     # MDCarraycounter(vertically)| xx | xx | xx |...
                     MDCeqns_array[MDCArrayCounter, SNCounter] = DailyanalysisArray[
-                        MDCsheetCounter, 13]  # since dateandtime is the index, 13 corresponds to the equations column, where in the history analysis is 14
+                        MDCsheetCounter, 13]  # since MSG_Date is the index, 13 corresponds to the equations column, where in the history analysis is 14
                     MDCLegs_array[MDCArrayCounter, SNCounter] = DailyanalysisArray[MDCsheetCounter, 2]
                     MDCIntermittent_array[MDCArrayCounter, SNCounter] = DailyanalysisArray[
                         MDCsheetCounter, 12]  # same as above ^
@@ -160,7 +160,7 @@ def dailyReport(occurences, legs, intermittent, consecutiveDays, ata, exclude_Eq
                 MaxConsecutiveLegs = 0
                 tempLeg = LastLeg
 
-                # Intermittent
+                # INTERMITNT
                 IntermittentFlightLegs = 0
 
                 MDCArrayCounter = 0
@@ -192,13 +192,13 @@ def dailyReport(occurences, legs, intermittent, consecutiveDays, ata, exclude_Eq
                                 ConsecutiveLegs = 1
                                 tempLeg = MDCLegs_array[MDCArrayCounter, SNCounter]
 
-                            # Intermittent
+                            # INTERMITNT
                             # Taking the maximum intermittent value - come back to this and implement max function for an column
                             x = MDCIntermittent_array[MDCArrayCounter, SNCounter]
                             if isinstance(x, numbers.Number) and MDCIntermittent_array[
                                 MDCArrayCounter, SNCounter] > IntermittentFlightLegs:
                                 IntermittentFlightLegs = MDCIntermittent_array[MDCArrayCounter, SNCounter]
-                            # End if Intermittent numeric check
+                            # End if INTERMITNT numeric check
 
                             # Other
                             # Check that the legs is not over the given limit
@@ -259,60 +259,59 @@ def dailyReport(occurences, legs, intermittent, consecutiveDays, ata, exclude_Eq
                     MAINtable_array_temp[0, 0] = daytopass
                     MAINtable_array_temp[0, 1] = UniqueSerialNumArray[SNCounter]
                     MAINtable_array_temp[0, 2] = MDCMessagesArray[EqnCounter, 8]
-                    MAINtable_array_temp[0, 3] = MDCMessagesArray[EqnCounter, 4]
-                    MAINtable_array_temp[0, 4] = MDCMessagesArray[EqnCounter, 0]
-                    MAINtable_array_temp[0, 5] = MDCMessagesArray[EqnCounter, 1]
-                    MAINtable_array_temp[0, 6] = MDCMessagesArray[EqnCounter, 12]
-                    MAINtable_array_temp[0, 7] = MDCMessagesArray[EqnCounter, 7]
-                    MAINtable_array_temp[0, 8] = MDCMessagesArray[EqnCounter, 11]
-                    MAINtable_array_temp[0, 9] = TotalOccurances_array[EqnCounter, SNCounter]
+                    MAINtable_array_temp[0, 3] = MDCMessagesArray[EqnCounter, 0]
+                    MAINtable_array_temp[0, 4] = MDCMessagesArray[EqnCounter, 1]
+                    MAINtable_array_temp[0, 5] = MDCMessagesArray[EqnCounter, 12]
+                    MAINtable_array_temp[0, 6] = MDCMessagesArray[EqnCounter, 7]
+                    MAINtable_array_temp[0, 7] = MDCMessagesArray[EqnCounter, 11]
+                    MAINtable_array_temp[0, 8] = TotalOccurances_array[EqnCounter, SNCounter]
 
-                    MAINtable_array_temp[0, 10] = ConsecutiveLegs_array[EqnCounter, SNCounter]
-                    MAINtable_array_temp[0, 11] = IntermittentInLeg_array[EqnCounter, SNCounter]
-                    MAINtable_array_temp[0, 12] = Flags_array[EqnCounter, SNCounter]
+                    MAINtable_array_temp[0, 9] = ConsecutiveLegs_array[EqnCounter, SNCounter]
+                    MAINtable_array_temp[0, 10] = IntermittentInLeg_array[EqnCounter, SNCounter]
+                    MAINtable_array_temp[0, 11] = Flags_array[EqnCounter, SNCounter]
 
                     # if the input is empty set the priority to 4
                     if MDCMessagesArray[EqnCounter, 15] == 0:
-                        MAINtable_array_temp[0, 13] = 4
+                        MAINtable_array_temp[0, 12] = 4
                     else:
-                        MAINtable_array_temp[0, 13] = MDCMessagesArray[EqnCounter, 15]
+                        MAINtable_array_temp[0, 12] = MDCMessagesArray[EqnCounter, 15]
 
                     # For B1-006424 & B1-006430 Could MDC Trend tool assign Priority 3 if logged on A/C below 10340, 15317. Priority 1 if logged on 10340, 15317, 19001 and up
                     if MDCMessagesArray[EqnCounter, 12] == "B1-006424" or MDCMessagesArray[
                         EqnCounter, 12] == "B1-006430":
                         if int(UniqueSerialNumArray[SNCounter]) <= 10340 and int(
                                 UniqueSerialNumArray[SNCounter]) > 10000:
-                            MAINtable_array_temp[0, 13] = 3
+                            MAINtable_array_temp[0, 12] = 3
                         elif int(UniqueSerialNumArray[SNCounter]) > 10340 and int(
                                 UniqueSerialNumArray[SNCounter]) < 11000:
-                            MAINtable_array_temp[0, 13] = 1
+                            MAINtable_array_temp[0, 12] = 1
                         elif int(UniqueSerialNumArray[SNCounter]) <= 15317 and int(
                                 UniqueSerialNumArray[SNCounter]) > 15000:
-                            MAINtable_array_temp[0, 13] = 3
+                            MAINtable_array_temp[0, 12] = 3
                         elif int(UniqueSerialNumArray[SNCounter]) > 15317 and int(
                                 UniqueSerialNumArray[SNCounter]) < 16000:
-                            MAINtable_array_temp[0, 13] = 1
+                            MAINtable_array_temp[0, 12] = 1
                         elif int(UniqueSerialNumArray[SNCounter]) >= 19001 and int(
                                 UniqueSerialNumArray[SNCounter]) < 20000:
-                            MAINtable_array_temp[0, 13] = 1
+                            MAINtable_array_temp[0, 12] = 1
 
                             # check the content of MHIRJ ISE recommendation and add to array
                     if MDCMessagesArray[EqnCounter, 16] == 0:
-                        MAINtable_array_temp[0, 15] = ""
+                        MAINtable_array_temp[0, 14] = ""
                     else:
-                        MAINtable_array_temp[0, 15] = MDCMessagesArray[EqnCounter, 16]
+                        MAINtable_array_temp[0, 14] = MDCMessagesArray[EqnCounter, 16]
 
                     # check content of "additional"
                     if MDCMessagesArray[EqnCounter, 17] == 0:
-                        MAINtable_array_temp[0, 16] = ""
+                        MAINtable_array_temp[0, 15] = ""
                     else:
-                        MAINtable_array_temp[0, 16] = MDCMessagesArray[EqnCounter, 17]
+                        MAINtable_array_temp[0, 15] = MDCMessagesArray[EqnCounter, 17]
 
                     # check content of "MHIRJ Input"
                     if MDCMessagesArray[EqnCounter, 18] == 0:
-                        MAINtable_array_temp[0, 17] = ""
+                        MAINtable_array_temp[0, 16] = ""
                     else:
-                        MAINtable_array_temp[0, 17] = MDCMessagesArray[EqnCounter, 18]
+                        MAINtable_array_temp[0, 16] = MDCMessagesArray[EqnCounter, 18]
 
                     # Check for the equation in the Top Messages sheet
                     TopCounter = 0
@@ -323,7 +322,7 @@ def dailyReport(occurences, legs, intermittent, consecutiveDays, ata, exclude_Eq
                         if MDCMessagesArray[EqnCounter][12] == TopMessagesArray[TopCounter, 4]:
 
                             # Found the equation in the Top Messages Sheet. Put the information in the last column
-                            MAINtable_array_temp[0, 14] = "Known Nuissance: " + str(TopMessagesArray[TopCounter, 13]) \
+                            MAINtable_array_temp[0, 13] = "Known Nuissance: " + str(TopMessagesArray[TopCounter, 13]) \
                                                             + " / In-Service Document: " + str(
                                 TopMessagesArray[TopCounter, 11]) \
                                                             + " / FIM Task: " + str(TopMessagesArray[TopCounter, 10]) \
@@ -334,7 +333,7 @@ def dailyReport(occurences, legs, intermittent, consecutiveDays, ata, exclude_Eq
 
                         else:
                             # Not equal, go to next equation
-                            MAINtable_array_temp[0, 14] = ""
+                            MAINtable_array_temp[0, 13] = ""
                             TopCounter += 1
                     # End while
 
@@ -347,26 +346,26 @@ def dailyReport(occurences, legs, intermittent, consecutiveDays, ata, exclude_Eq
                     # Move to next Row on Main page for next flag
                     currentRow = currentRow + 1
 
-    TitlesArrayDaily = ["Date", "AC SN", "EICAS Message", "MDC Message", "LRU", "ATA", "B1-Equation", "Type",
+    TitlesArrayDaily = ["Date", "AC SN", "EICAS Message", "LRU", "ATA", "B1-Equation", "Type",
                         "Equation Description", "Total Occurences", "Consecutive FL",
-                        "Intermittent", "Reason(s) for flag", "Priority", "Known Top Message - Recommended Documents",
+                        "INTERMITNT", "Reason(s) for flag", "Priority", "Known Top Message - Recommended Documents",
                         "MHIRJ ISE Recommendation", "Additional Comments", "MHIRJ ISE Input"]
     # Converts the Numpy Array to Dataframe to manipulate
     # pd.set_option('display.max_rows', None)
     OutputTableDaily = pd.DataFrame(data=MAINtable_array, columns=TitlesArrayDaily).fillna(" ").sort_values(
         by=["Date", "Type", "Priority"])
     OutputTableDaily = OutputTableDaily.merge(AircraftTailPairDF, on= "AC SN") # Tail # added
-    OutputTableDaily = OutputTableDaily[["Tail#", "Date", "AC SN", "EICAS Message", "MDC Message", "LRU", "ATA", "B1-Equation", "Type",
+    OutputTableDaily = OutputTableDaily[["AC_TN", "Date", "AC SN", "EICAS Message", "LRU", "ATA", "B1-Equation", "Type",
             "Equation Description", "Total Occurences", "Consecutive FL",
-            "Intermittent", "Reason(s) for flag", "Priority", "Known Top Message - Recommended Documents",
-            "MHIRJ ISE Recommendation", "Additional Comments", "MHIRJ ISE Input"]] # Tail# added to output table which means that column order has to be re ordered
+            "INTERMITNT", "Reason(s) for flag", "Priority", "Known Top Message - Recommended Documents",
+            "MHIRJ ISE Recommendation", "Additional Comments", "MHIRJ ISE Input"]] # AC_TN added to output table which means that column order has to be re ordered
     
 
     listofJamMessages = list()
-    all_jam_messages = connect_to_fetch_all_jam_messages()
-    for each_jam_message in all_jam_messages['Jam_Message']:
-        listofJamMessages.append(each_jam_message)
-    print(listofJamMessages)
+    # all_jam_messages = connect_to_fetch_all_jam_messages()
+    # for each_jam_message in all_jam_messages['Jam_Message']:
+    #     listofJamMessages.append(each_jam_message)
+    # print(listofJamMessages)
 
     # highlight function starts here
     OutputTableDaily = OutputTableDaily.assign(
