@@ -33,3 +33,5 @@ def jamReport(OutputTableHistory, ACSN_chosen,MDCdataDF):
    FinalDF_history_json = (FinalDF.loc[str(ACSN_chosen)])
 
    return FinalDF_history_json
+#    return FinalDF_history_json
+
