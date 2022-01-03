@@ -134,7 +134,7 @@ def historyReport(MaxAllowedOccurrences: int, MaxAllowedConsecLegs: int, MaxAllo
             or consec_days.at[equation, aircraft] >= MaxAllowedConsecDays \
             or consec_legs.at[equation, aircraft] >= MaxAllowedConsecLegs \
             or max_intermittent.at[equation, aircraft] >= MaxAllowedIntermittent \
-            or (legs >32600).any() \
+            or (int(legs) >32600) \
             or (flags_jams == equation).any() \
             or ((flags_2in5 == equation).any() and check_2in5(dates)):
                 count = count + 1

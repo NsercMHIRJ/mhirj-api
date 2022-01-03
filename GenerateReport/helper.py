@@ -21,7 +21,7 @@ def isValidParams(occurences: int, legs: int, INTERMITNT: int, consecutiveDays: 
 
 
 def connect_to_fetch_all_ata(from_dt, to_dt):
-    all_ata_query = "SELECT DISTINCT SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) as ATA_MAIN from MDC_MSGS WHERE MSG_Date BETWEEN '" + from_dt + "' AND '" + to_dt + "'"
+    all_ata_query = "SELECT DISTINCT SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) as ATA_Main from MDC_MSGS WHERE MSG_Date BETWEEN '" + from_dt + "' AND '" + to_dt + "'"
     try:
         all_ata_df = pd.read_sql(all_ata_query, conn)
 
@@ -86,24 +86,24 @@ def connect_database_MDCdata(ata, excl_eqid, airline_operator, include_current_m
             sql = "SELECT *, SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) AS ATA_Main, SUBSTRING(ATA, 4,4) AS ATA_SUB, dd.MSG_ID FROM MDC_MSGS mg JOIN LRU_DIAG_DATA dd ON dd.MSG_ID = mg.MSG_ID WHERE SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) IN " + str(ata) + " AND EQ_ID IN " + str(
                 all_eqid_str) + " AND FLIGHT_PHASE IS NOT NULL AND INTERMITNT IS NOT NULL AND MSG_Date BETWEEN '" + from_dt + "' AND '" + to_dt + "'"
         elif ata == 'ALL':
-            sql = "SELECT *, SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) AS ATA_Main, SUBSTRING(ATA, 4,4) AS ATA_SUB, dd.MSG_ID FROM MDC_MSGS mg JOIN LRU_DIAG_DATA dd ON dd.MSG_ID = mg.MSG_ID WHERE SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) as ATA_MAIN IN " + str(all_ata_str) + " AND EQ_ID NOT IN " + str(
+            sql = "SELECT *, SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) AS ATA_Main, SUBSTRING(ATA, 4,4) AS ATA_SUB, dd.MSG_ID FROM MDC_MSGS mg JOIN LRU_DIAG_DATA dd ON dd.MSG_ID = mg.MSG_ID WHERE SUBSTRING(ATA, 0, CHARINDEX('-', ATA))  IN " + str(all_ata_str) + " AND EQ_ID NOT IN " + str(
                 excl_eqid) + " AND FLIGHT_PHASE IS NOT NULL AND INTERMITNT IS NOT NULL AND MSG_Date BETWEEN '" + from_dt + "' AND '" + to_dt + "'"
         else:
-            sql = "SELECT *, SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) AS ATA_Main, SUBSTRING(ATA, 4,4) AS ATA_SUB, dd.MSG_ID FROM MDC_MSGS mg JOIN LRU_DIAG_DATA dd ON dd.MSG_ID = mg.MSG_ID WHERE SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) as ATA_MAIN IN " + str(ata) + " AND EQ_ID NOT IN " + str(
+            sql = "SELECT *, SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) AS ATA_Main, SUBSTRING(ATA, 4,4) AS ATA_SUB, dd.MSG_ID FROM MDC_MSGS mg JOIN LRU_DIAG_DATA dd ON dd.MSG_ID = mg.MSG_ID WHERE SUBSTRING(ATA, 0, CHARINDEX('-', ATA))  IN " + str(ata) + " AND EQ_ID NOT IN " + str(
                 excl_eqid) + " AND FLIGHT_PHASE IS NOT NULL AND INTERMITNT IS NOT NULL AND MSG_Date BETWEEN '" + from_dt + "' AND '" + to_dt + "'"
 
     elif include_current_message == 1:
         if ata == 'ALL' and excl_eqid =='NONE':
-            sql = "SELECT *, SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) AS ATA_Main, SUBSTRING(ATA, 4,4) AS ATA_SUB, dd.MSG_ID FROM MDC_MSGS mg JOIN LRU_DIAG_DATA dd ON dd.MSG_ID = mg.MSG_ID WHERE SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) as ATA_MAIN IN " + str(all_ata_str) + " AND EQ_ID IN " + str(
+            sql = "SELECT *, SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) AS ATA_Main, SUBSTRING(ATA, 4,4) AS ATA_SUB, dd.MSG_ID FROM MDC_MSGS mg JOIN LRU_DIAG_DATA dd ON dd.MSG_ID = mg.MSG_ID WHERE SUBSTRING(ATA, 0, CHARINDEX('-', ATA))  IN " + str(all_ata_str) + " AND EQ_ID IN " + str(
                 all_eqid_str) + " AND MSG_Date BETWEEN '" + from_dt + "' AND '" + to_dt + "'"
         elif ata == 'ALL':
-            sql = "SELECT *, SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) AS ATA_Main, SUBSTRING(ATA, 4,4) AS ATA_SUB, dd.MSG_ID FROM MDC_MSGS mg JOIN LRU_DIAG_DATA dd ON dd.MSG_ID = mg.MSG_ID WHERE SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) as ATA_MAIN IN " + str(all_ata_str) + " AND EQ_ID NOT IN " + str(
+            sql = "SELECT *, SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) AS ATA_Main, SUBSTRING(ATA, 4,4) AS ATA_SUB, dd.MSG_ID FROM MDC_MSGS mg JOIN LRU_DIAG_DATA dd ON dd.MSG_ID = mg.MSG_ID WHERE SUBSTRING(ATA, 0, CHARINDEX('-', ATA))  IN " + str(all_ata_str) + " AND EQ_ID NOT IN " + str(
                 excl_eqid) + " AND MSG_Date BETWEEN '" + from_dt + "' AND '" + to_dt + "'"
         elif excl_eqid == 'NONE':
-            sql = "SELECT *, SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) AS ATA_Main, SUBSTRING(ATA, 4,4) AS ATA_SUB, dd.MSG_ID FROM MDC_MSGS mg JOIN LRU_DIAG_DATA dd ON dd.MSG_ID = mg.MSG_ID WHERE SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) as ATA_MAIN IN " + str(ata) + " AND EQ_ID IN " + str(
+            sql = "SELECT *, SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) AS ATA_Main, SUBSTRING(ATA, 4,4) AS ATA_SUB, dd.MSG_ID FROM MDC_MSGS mg JOIN LRU_DIAG_DATA dd ON dd.MSG_ID = mg.MSG_ID WHERE SUBSTRING(ATA, 0, CHARINDEX('-', ATA))  IN " + str(ata) + " AND EQ_ID IN " + str(
                 all_eqid_str) + " AND MSG_Date BETWEEN '" + from_dt + "' AND '" + to_dt + "'"
         else:
-            sql = "SELECT *, SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) AS ATA_Main, SUBSTRING(ATA, 4,4) AS ATA_SUB, dd.MSG_ID FROM MDC_MSGS mg JOIN LRU_DIAG_DATA dd ON dd.MSG_ID = mg.MSG_ID WHERE SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) as ATA_MAIN IN " + str(ata) + " AND EQ_ID NOT IN " + str(
+            sql = "SELECT *, SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) AS ATA_Main, SUBSTRING(ATA, 4,4) AS ATA_SUB, dd.MSG_ID FROM MDC_MSGS mg JOIN LRU_DIAG_DATA dd ON dd.MSG_ID = mg.MSG_ID WHERE SUBSTRING(ATA, 0, CHARINDEX('-', ATA))  IN " + str(ata) + " AND EQ_ID NOT IN " + str(
                 excl_eqid) + " AND MSG_Date BETWEEN '" + from_dt + "' AND '" + to_dt + "'"
 
     column_names = ["AC_SN", "AC_TN", "FLIGHT_LEG",
