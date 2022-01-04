@@ -80,7 +80,7 @@ def connect_database_MDCdata(ata, excl_eqid, airline_operator, include_current_m
     # If we do not want to include current message -> exclude null FLIGHT_PHASE and null INTERMITNTs
     if include_current_message == 0:    
         if ata == 'ALL' and excl_eqid == 'NONE':
-            sql = "SELECT *, SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) AS ATA_Main, SUBSTRING(ATA, 4,4) AS ATA_SUB, dd.MSG_ID FROM MDC_MSGS mg JOIN LRU_DIAG_DATA dd ON dd.MSG_ID = mg.MSG_ID WHERE SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) as ATA_MAIN IN " + str(all_ata_str) + " AND EQ_ID IN " + str(
+            sql = "SELECT *, SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) AS ATA_Main, SUBSTRING(ATA, 4,4) AS ATA_SUB, dd.MSG_ID FROM MDC_MSGS mg JOIN LRU_DIAG_DATA dd ON dd.MSG_ID = mg.MSG_ID WHERE SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) IN " + str(all_ata_str) + " AND EQ_ID IN " + str(
                 all_eqid_str) + " AND FLIGHT_PHASE IS NOT NULL AND INTERMITNT IS NOT NULL AND MSG_Date BETWEEN '" + from_dt + "' AND '" + to_dt + "'"
         elif excl_eqid == 'NONE':
             sql = "SELECT *, SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) AS ATA_Main, SUBSTRING(ATA, 4,4) AS ATA_SUB, dd.MSG_ID FROM MDC_MSGS mg JOIN LRU_DIAG_DATA dd ON dd.MSG_ID = mg.MSG_ID WHERE SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) IN " + str(ata) + " AND EQ_ID IN " + str(
