@@ -224,12 +224,16 @@ def LongestConseq(unique_arr, days_legs):
         # Find the maximum length
         # by traversing the array
         for i in range(len(unique_arr)):
-            if (i > 0 and int(unique_arr[i]) == int(unique_arr[i - 1])):
-                count += 1
+            try:
 
-            # Reset the count
-            else:
-                count = 1
+                if (i > 0 and int(unique_arr[i]) == int(unique_arr[i - 1])):
+                    count += 1
+
+                # Reset the count
+                else:
+                    count = 1
+            except:
+                print("Error!! ")
 
             # Update the maximum
             ans = max(ans, count)

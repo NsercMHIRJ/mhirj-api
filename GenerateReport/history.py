@@ -124,17 +124,15 @@ def historyReport(MaxAllowedOccurrences: int, MaxAllowedConsecLegs: int, MaxAllo
             
             # set up intermitt selection for analysis
             intermitt = Intermittent_selection.loc[aircraft, equation].INTERMITNT
-            
             # run 
             consec_days.at[equation, aircraft] = LongestConseq(unique_arr= dates, days_legs= "days")
             consec_legs.at[equation, aircraft] = LongestConseq(unique_arr= legs, days_legs= "legs")
             max_intermittent.at[equation, float(aircraft)] = max(intermitt)
-            
             if total_occ_DF.at[equation, aircraft] >= MaxAllowedOccurrences \
             or consec_days.at[equation, aircraft] >= MaxAllowedConsecDays \
             or consec_legs.at[equation, aircraft] >= MaxAllowedConsecLegs \
             or max_intermittent.at[equation, aircraft] >= MaxAllowedIntermittent \
-            or (int(legs) >32600) \
+            or (all(v.strip() for v in legs) and int(legs) > 32600) \
             or (flags_jams == equation).any() \
             or ((flags_2in5 == equation).any() and check_2in5(dates)):
                 count = count + 1
