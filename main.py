@@ -3069,7 +3069,7 @@ async def get_correlation_process_status():
     return correlation_process_status_json
 
 def connect_database_for_eqId(all):
-    sql = "SELECT DISTINCT Airline_MDC_Data.Equation_ID FROM Airline_MDC_Data"
+    sql = "SELECT DISTINCT MDC_MSGS.EQ_ID FROM MDC_MSGS"
 
     try:
         conn = pyodbc.connect(driver=db_driver, host=hostname, database=db_name,
@@ -3083,11 +3083,19 @@ def connect_database_for_eqId(all):
 
 
 
+# @app.post("/api/GenerateReport/equation_id/{all}")
+# async def get_eqIData(all:str):
+#     report_eqId_sql_df = connect_database_for_eqId(all)
+#     report_eqId_sql_df_json = report_eqId_sql_df.to_json(orient='records')
+#     return report_eqId_sql_df_json
 @app.post("/api/GenerateReport/equation_id/{all}")
 async def get_eqIData(all:str):
-    report_eqId_sql_df = connect_database_for_eqId(all)
-    report_eqId_sql_df_json = report_eqId_sql_df.to_json(orient='records')
-    return report_eqId_sql_df_json
+    # report_eqId_sql_df = connect_database_for_eqId(all)
+    # report_eqId_sql_df_json = report_eqId_sql_df.to_json(orient='records')
+    f = open ('equations.json', "r")
+    data = json.loads(f.read())
+    data_string = json.dumps(data)
+    return data_string
 
 
 def connect_database_for_ata_main(all):
@@ -3106,11 +3114,20 @@ def connect_database_for_ata_main(all):
 
 
 
+# @app.post("/api/GenerateReport/ata_main/{all}")
+# async def get_eqIData(all:str):
+#     report_ata_main_sql_df = connect_database_for_ata_main(all)
+#     report_ata_main_sql_df_json = report_ata_main_sql_df.to_json(orient='records')
+#     return report_ata_main_sql_df_json
+
 @app.post("/api/GenerateReport/ata_main/{all}")
 async def get_eqIData(all:str):
-    report_ata_main_sql_df = connect_database_for_ata_main(all)
-    report_ata_main_sql_df_json = report_ata_main_sql_df.to_json(orient='records')
-    return report_ata_main_sql_df_json
+    # report_eqId_sql_df = connect_database_for_eqId(all)
+    # report_eqId_sql_df_json = report_eqId_sql_df.to_json(orient='records')
+    f = open ('ata.json', "r")
+    data = json.loads(f.read())
+    data_string = json.dumps(data)
+    return data_string
 
 @app.post("/api/uploadfile_airline_mdc_raw_data/")
 async def create_upload_file(file: UploadFile = File(...)):
