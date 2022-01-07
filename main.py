@@ -3120,7 +3120,7 @@ def connect_database_for_ata_main(all):
 #     report_ata_main_sql_df_json = report_ata_main_sql_df.to_json(orient='records')
 #     return report_ata_main_sql_df_json
 
-# @app.post("/api/GenerateReport/ata_main/{all}")
+@app.post("/api/GenerateReport/ata_main/{all}")
 async def get_eqIData(all:str):
     # report_eqId_sql_df = connect_database_for_eqId(all)
     # report_eqId_sql_df_json = report_eqId_sql_df.to_json(orient='records')
