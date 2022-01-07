@@ -3069,7 +3069,7 @@ async def get_correlation_process_status():
     return correlation_process_status_json
 
 def connect_database_for_eqId(all):
-    sql = "SELECT DISTINCT Airline_MDC_Data.Equation_ID FROM Airline_MDC_Data"
+    sql = "SELECT DISTINCT MDC_MSGS.EQ_ID FROM MDC_MSGS"
 
     try:
         conn = pyodbc.connect(driver=db_driver, host=hostname, database=db_name,
