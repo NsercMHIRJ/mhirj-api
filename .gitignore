@@ -1,0 +1,5 @@
+*.pyc
+__pycache__/
+Charts/__pycache__/
+GenerateReport/__pycache__/
+util/__pycache__/
