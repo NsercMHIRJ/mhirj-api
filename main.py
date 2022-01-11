@@ -3129,13 +3129,13 @@ async def get_eqIData(all:str):
     data_string = json.dumps(data)
     return data_string
 
-@app.post("/api/uploadfile_airline_mdc_raw_data/")
-async def create_upload_file(file: UploadFile = File(...)):
-    result = insertData(file)
-    return {"result": result}      
+# @app.post("/api/uploadfile_airline_mdc_raw_data/")
+# async def create_upload_file(file: UploadFile = File(...)):
+#     result = insertData(file)
+#     return {"result": result}      
     
 @app.post("/api/uploadfile_input_message_data/")
-async def create_upload_file1(file: UploadFile = File(...)):
+async def uploadfile_input_message_data(file: UploadFile = File(...)):
     result = insertData_MDCMessageInputs(file)
     return {"result": result} 
 
@@ -3217,17 +3217,18 @@ async def update_data(Equation_ID:str, EICAS:str,Priority_:str, MHIRJ_ISE_inputs
 
 # delete from MDC messege input    
 
-@app.post("/api/delete/")
+@app.post("/api/delete_MDC_Message_Input/")
 async def delete():
     delete_data = connect_database_for_delete()
     return delete_data    
 
 def connect_database_for_delete():
    
-         
+       
         conn = pyodbc.connect(driver=db_driver, host=hostname, database=db_name,
                               user=db_username, password=db_password)
         cursor = conn.cursor()  
+        # TODO : delete from mdc_message where B1-EQ = 
         sql =" DELETE FROM MDCMessagesInputs_CSV_UPLOAD"
         print(sql)
  
@@ -3237,36 +3238,11 @@ def connect_database_for_delete():
         # return update_sql_df
         return "Delete from MDCMessagesInputs"  
 
-# Select all data from MDC messege input   
-def connect_database_for_mdcMessageData():
-    sql = "SELECT * From MDCMessagesInputs_CSV_UPLOAD"
-
-    try:
-        conn = pyodbc.connect(driver=db_driver, host=hostname, database=db_name,
-                              user=db_username, password=db_password)
-        mdcMessage_df = pd.read_sql(sql, conn)
-        #MDCdataDF.columns = column_names
-        return mdcMessage_df
-    except pyodbc.Error as err:
-        print("Couldn't connect to Server")
-        print("Error message:- " + str(err))
-
-
-
-@app.post("/api/MDC_message_data")
-async def get_mdcMessageData():
-    mdcMessage_df = connect_database_for_mdcMessageData()
-    mdcMessage_df_json =  mdcMessage_df.to_json(orient='records')
-    return  mdcMessage_df_json
-
-
-   
-
-#upload top message data     
-@app.post("/api/uploadfile_top_message_data/")
-async def create_upload_file2(file: UploadFile = File(...)):
-    result = insertData_TopMessageSheet(file)
-    return {"result": result}   
+# #upload top message data     
+# @app.post("/api/uploadfile_top_message_data/")
+# async def create_upload_file2(file: UploadFile = File(...)):
+#     result = insertData_TopMessageSheet(file)
+#     return {"result": result}   
 
 
 ## Delta Report
@@ -3404,44 +3380,19 @@ async def generateDeltaReport(analysisType: str, occurences: int, legs: int, int
 	
 
 # blob storage
-@app.post("/api/upload_PM_file/")
-async def pm_upload_blob(file: UploadFile = File(...)):
-    result = run_sample(file)
-    return {"result": result}
+# @app.post("/api/upload_PM_file/")
+# async def pm_upload_blob(file: UploadFile = File(...)):
+#     result = run_sample(file)
+#     return {"result": result}   
 
-# Select all data from MDC raw data  
-def connect_database_for_mdcRawData(from_date, to_date):
-    sql = "SELECT count(*) OVER () as total, c.* From Airline_MDC_Data c WHERE c.DateAndTime BETWEEN '" + from_date + "' AND '" + to_date + "' "
-
-    try:
-        conn = pyodbc.connect(driver=db_driver, host=hostname, database=db_name,
-                              user=db_username, password=db_password)
-                              
-        print(sql)
-        mdcRaw_df = pd.read_sql(sql, conn)
-        #MDCdataDF.columns = column_names
-        return mdcRaw_df
-    except pyodbc.Error as err:
-        print("Couldn't connect to Server")
-        print("Error message:- " + str(err))
-
-@app.post("/api/SELECT_MDC_RAW_data/{from_date}/{to_date}")
-async def get_mdcRawData(from_date:str, to_date:str):
-    mdcRaw_df = connect_database_for_mdcRawData(from_date , to_date)
-    total = mdcRaw_df['total'].iloc[0]
-    mdcRaw_df = mdcRaw_df.drop(columns=['total'])
-    print("total is : ",total)
-    mdcRaw_df_json =  mdcRaw_df.to_json(orient='records')
-    return  {"total":str(total),"data":mdcRaw_df_json}    
-
-@app.get("/api/getMDCFileUploadStatus")
-async def getMDCFileUploadStatus():
-    return getFileUploadStatusPercentage() 
+# @app.get("/api/getMDCFileUploadStatus")
+# async def getMDCFileUploadStatus():
+#     return getFileUploadStatusPercentage() 
 
 
 @app.post("/api/all_mdc_messages_input/{eq_id}")
 async def get_mdcMessageInput(eq_id:str):
     mdcRaw_df = connect_database_mdc_message_input(eq_id)
-    mdcRaw_df_json =  mdcRaw_df.to_json(orient='records',lines=True)
+    mdcRaw_df_json =  mdcRaw_df.to_json(orient='records')
     print(mdcRaw_df_json)
     return  mdcRaw_df_json
