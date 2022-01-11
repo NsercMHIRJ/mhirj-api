@@ -9,7 +9,7 @@ def dailyReport(MaxAllowedOccurrences: int, MaxAllowedConsecLegs: int, MaxAllowe
     MDCdataDF["MSG_Date"] = pd.to_datetime(MDCdataDF["MSG_Date"])
     # print(MDCdataDF["MSG_Date"])
     MDCdataDF["FLIGHT_LEG"].fillna(value=0.0, inplace=True)  # Null values preprocessing - if 0 = Currentflightphase
-    # print(MDCdataDF["FLIGHT_LEG"])
+    MDCdataDF["FLIGHT_LEG"] = MDCdataDF["FLIGHT_LEG"].astype(int)
     MDCdataDF["FLIGHT_PHASE"].fillna(False, inplace=True)  # NuCell values preprocessing for currentflightphase
     MDCdataDF["INTERMITNT"].fillna(value=-1, inplace=True)  # Null values preprocessing for currentflightphase
     MDCdataDF["INTERMITNT"].replace(to_replace=">", value=9,
@@ -169,7 +169,7 @@ def dailyReport(MaxAllowedOccurrences: int, MaxAllowedConsecLegs: int, MaxAllowe
                 legs = legs["FLIGHT_LEG"].item()
                 consec_legs.at[equation, aircraft] = 0
                 
-                if all(v.strip() for v in legs) and int(legs) > 32600:
+                if int(legs) > 32600:
                     legs_flag = True
                 else:
                     legs_flag = False

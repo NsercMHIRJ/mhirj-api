@@ -11,6 +11,7 @@ def historyReport(MaxAllowedOccurrences: int, MaxAllowedConsecLegs: int, MaxAllo
         MDCdataDF["FLIGHT_PHASE"].fillna(False, inplace= True) # NuCell values preprocessing for currentflightphase
         MDCdataDF["INTERMITNT"].fillna(value= 0.0, inplace= True) # Null values preprocessing for currentflightphase
         MDCdataDF["INTERMITNT"].replace(to_replace= ">", value= "9", inplace=True) # > represents greater than 8 INTERMITNT values
+        MDCdataDF["INTERMITNT"].replace(to_replace= ">9", value= "9", inplace=True)
         # try:                      
         #     print("data in intermittent ",MDCdataDF["INTERMITNT"])            
         #     MDCdataDF["INTERMITNT"] = int(MDCdataDF["INTERMITNT"]) # cast type to int
@@ -44,11 +45,13 @@ def historyReport(MaxAllowedOccurrences: int, MaxAllowedConsecLegs: int, MaxAllo
             dates_selection.sort_index(inplace= True)
             
             # selecting only the necessary data for - consecutive legs
+            MDCdataDF['FLIGHT_LEG'] = MDCdataDF['FLIGHT_LEG'].astype(int)
             legs_selection = MDCdataDF[["AC_SN", "EQ_ID", "FLIGHT_LEG"]].sort_values(by= ["FLIGHT_LEG"], ascending= False).copy()
             legs_selection.set_index(["AC_SN", "EQ_ID"], inplace= True)
             legs_selection.sort_index(inplace= True)
             
             # selecting only the necessary data for - intermittent
+            MDCdataDF['INTERMITNT'] = MDCdataDF['INTERMITNT'].astype(int)
             Intermittent_selection = MDCdataDF[["AC_SN", "EQ_ID", "INTERMITNT"]].copy()
             Intermittent_selection.set_index(["AC_SN", "EQ_ID"], inplace= True)
             Intermittent_selection.sort_index(inplace= True)
@@ -127,6 +130,7 @@ def historyReport(MaxAllowedOccurrences: int, MaxAllowedConsecLegs: int, MaxAllo
             # run 
             consec_days.at[equation, aircraft] = LongestConseq(unique_arr= dates, days_legs= "days")
             consec_legs.at[equation, aircraft] = LongestConseq(unique_arr= legs, days_legs= "legs")
+            print("err ", aircraft, type(aircraft))
             max_intermittent.at[equation, float(aircraft)] = max(intermitt)
             
             def f(x):
@@ -138,7 +142,7 @@ def historyReport(MaxAllowedOccurrences: int, MaxAllowedConsecLegs: int, MaxAllo
             or consec_days.at[equation, aircraft] >= MaxAllowedConsecDays \
             or consec_legs.at[equation, aircraft] >= MaxAllowedConsecLegs \
             or max_intermittent.at[equation, aircraft] >= MaxAllowedIntermittent \
-            or (len(legs) and all(v.strip() for v in legs) and f2(legs).any() > 32600) \
+            or (len(legs) and all(v for v in legs) and f2(legs).any() > 32600) \
             or (flags_jams == equation).any() \
             or ((flags_2in5 == equation).any() and check_2in5(dates)):
                 count = count + 1
