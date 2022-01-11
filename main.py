@@ -31,7 +31,7 @@ from fastapi import File, UploadFile
 from crud import *
 #from pm_upload import *
 import uvicorn
-from util.util import connect_database_mdc_message_input
+from util.util import connect_database_mdc_message_input , connect_database_MDCdata
 from GenerateReport.jamReport import jamReport
 # from GenerateReport.jamReport import MDCdataDF
 from GenerateReport.jamReport import mdcDF
@@ -121,118 +121,33 @@ def convert_array_to_tuple(array_list):
 
 
 
-def connect_to_fetch_all_ata(from_dt, to_dt):
-    all_ata_query = "SELECT DISTINCT ATA_Main from Airline_MDC_Data WHERE DateAndTime BETWEEN '" + from_dt + "' AND '" + to_dt + "'"
-    try:
-        conn = pyodbc.connect(driver=db_driver, host=hostname, database=db_name,
-                              user=db_username, password=db_password)
-        all_ata_df = pd.read_sql(all_ata_query, conn)
+# def connect_to_fetch_all_ata(from_dt, to_dt):
+#     all_ata_query = "SELECT DISTINCT SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) AS ATA_Main FROM MDC_MSGS WHERE DateAndTime BETWEEN '" + from_dt + "' AND '" + to_dt + "'"
+#     # all_ata_query = "SELECT DISTINCT ATA_Main from Airline_MDC_Data WHERE DateAndTime BETWEEN '" + from_dt + "' AND '" + to_dt + "'"
+#     try:
+#         conn = pyodbc.connect(driver=db_driver, host=hostname, database=db_name,
+#                               user=db_username, password=db_password)
+#         all_ata_df = pd.read_sql(all_ata_query, conn)
 
-        return all_ata_df
-    except pyodbc.Error as err:
-        print("Couldn't connect to Server")
-        print("Error message:- " + str(err))
+#         return all_ata_df
+#     except pyodbc.Error as err:
+#         print("Couldn't connect to Server")
+#         print("Error message:- " + str(err))
 
-def connect_to_fetch_all_eqids(from_dt, to_dt):
-    all_ata_query = "SELECT DISTINCT Equation_ID from Airline_MDC_Data WHERE DateAndTime BETWEEN '" + from_dt + "' AND '" + to_dt + "'"
-    try:
-        conn = pyodbc.connect(driver=db_driver, host=hostname, database=db_name,
-                              user=db_username, password=db_password)
-        all_eqid_df = pd.read_sql(all_ata_query, conn)
+# def connect_to_fetch_all_eqids(from_dt, to_dt):
+#     all_ata_query = "SELECT DISTINCT MDC_MSGS.EQ_ID FROM MDC_MSGS WHERE DateAndTime BETWEEN '" + from_dt + "' AND '" + to_dt + "'"
+#     # all_ata_query = "SELECT DISTINCT Equation_ID from Airline_MDC_Data WHERE DateAndTime BETWEEN '" + from_dt + "' AND '" + to_dt + "'"
+#     try:
+#         conn = pyodbc.connect(driver=db_driver, host=hostname, database=db_name,
+#                               user=db_username, password=db_password)
+#         all_eqid_df = pd.read_sql(all_ata_query, conn)
 
-        return all_eqid_df
-    except pyodbc.Error as err:
-        print("Couldn't connect to Server")
-        print("Error message:- " + str(err))
+#         return all_eqid_df
+#     except pyodbc.Error as err:
+#         print("Couldn't connect to Server")
+#         print("Error message:- " + str(err))
 
-def connect_database_MDCdata(ata, excl_eqid, airline_operator, include_current_message, from_dt, to_dt):
-    global MDCdataDF
-    global airline_id
-    all_ata_str_list = []
-    
-    if airline_operator.upper() == "SKW":
-        airline_id = 101
 
-    if ata == 'ALL':
-        all_ata = connect_to_fetch_all_ata(from_dt, to_dt)
-
-        all_ata_str = "("
-        all_ata_list = all_ata['ATA_Main'].tolist()
-        for each_ata in all_ata_list:
-            all_ata_str_list.append(str(each_ata))
-            all_ata_str += "'"+str(each_ata)+"'"
-            if each_ata != all_ata_list[-1]:
-                all_ata_str += ","
-            else:
-                all_ata_str += ")"
-        print(all_ata_str)
-
-    if excl_eqid == 'NONE':
-        all_eqid = connect_to_fetch_all_eqids(from_dt, to_dt)
-
-        all_eqid_str = "("
-        all_eqid_list = all_eqid['Equation_ID'].tolist()
-        for each_eqid in all_eqid_list:
-            #all_eqid_str_list.append(str(each_eqid))
-            all_eqid_str += "'" + str(each_eqid) + "'"
-            if each_eqid != all_eqid_list[-1]:
-                all_eqid_str += ","
-            else:
-                all_eqid_str += ")"
-        print(all_eqid_str)
-
-    # If we do not want to include current message -> exclude null flight phase and null intermittents
-    if include_current_message == 0:    
-        if ata == 'ALL' and excl_eqid == 'NONE':
-            sql = "SELECT * FROM Airline_MDC_Data WHERE ATA_Main IN " + str(all_ata_str) + " AND Equation_ID IN " + str(
-                all_eqid_str) + " AND airline_id = " + str(
-                airline_id) + " AND flight_phase IS NOT NULL AND Intermittent IS NOT NULL AND DateAndTime BETWEEN '" + from_dt + "' AND '" + to_dt + "'"
-        elif excl_eqid == 'NONE':
-            sql = "SELECT * FROM Airline_MDC_Data WHERE ATA_Main IN " + str(ata) + " AND Equation_ID IN " + str(
-                all_eqid_str) + " AND airline_id = " + str(
-                airline_id) + " AND flight_phase IS NOT NULL AND Intermittent IS NOT NULL AND DateAndTime BETWEEN '" + from_dt + "' AND '" + to_dt + "'"
-        elif ata == 'ALL':
-            sql = "SELECT * FROM Airline_MDC_Data WHERE ATA_Main IN " + str(all_ata_str) + " AND Equation_ID NOT IN " + str(
-                excl_eqid) + " AND airline_id = " + str(
-                airline_id) + " AND flight_phase IS NOT NULL AND Intermittent IS NOT NULL AND DateAndTime BETWEEN '" + from_dt + "' AND '" + to_dt + "'"
-        else:
-            sql = "SELECT * FROM Airline_MDC_Data WHERE ATA_Main IN " + str(ata) + " AND Equation_ID NOT IN " + str(
-                excl_eqid) + " AND airline_id = " + str(
-                airline_id) + " AND flight_phase IS NOT NULL AND Intermittent IS NOT NULL AND DateAndTime BETWEEN '" + from_dt + "' AND '" + to_dt + "'"
-
-    elif include_current_message == 1:
-        if ata == 'ALL' and excl_eqid =='NONE':
-            sql = "SELECT * FROM Airline_MDC_Data WHERE ATA_Main IN " + str(all_ata_str) + " AND Equation_ID IN " + str(
-                all_eqid_str) + " AND airline_id = " + str(
-                airline_id) + " AND DateAndTime BETWEEN '" + from_dt + "' AND '" + to_dt + "'"
-        elif ata == 'ALL':
-            sql = "SELECT * FROM Airline_MDC_Data WHERE ATA_Main IN " + str(all_ata_str) + " AND Equation_ID NOT IN " + str(
-                excl_eqid) + " AND airline_id = " + str(
-                airline_id) + " AND DateAndTime BETWEEN '" + from_dt + "' AND '" + to_dt + "'"
-        elif excl_eqid == 'NONE':
-            sql = "SELECT * FROM Airline_MDC_Data WHERE ATA_Main IN " + str(ata) + " AND Equation_ID IN " + str(
-                all_eqid_str) + " AND airline_id = " + str(
-                airline_id) + " AND DateAndTime BETWEEN '" + from_dt + "' AND '" + to_dt + "'"
-        else:
-            sql = "SELECT * FROM Airline_MDC_Data WHERE ATA_Main IN " + str(ata) + " AND Equation_ID NOT IN " + str(
-                excl_eqid) + " AND airline_id = " + str(
-                airline_id) + " AND DateAndTime BETWEEN '" + from_dt + "' AND '" + to_dt + "'"
-
-    column_names = ["Aircraft", "Tail#", "Flight Leg No",
-               "ATA Main", "ATA Sub", "ATA", "ATA Description", "LRU",
-               "DateAndTime", "MDC Message", "Status", "Flight Phase", "Type",
-               "Intermittent", "Equation ID", "Source", "Diagnostic Data",
-               "Data Used to Determine Msg", "ID", "Flight", "airline_id", "aircraftno"]
-    print(sql)
-    try:
-        conn = pyodbc.connect(driver=db_driver, host=hostname, database=db_name,
-                              user=db_username, password=db_password)
-        MDCdataDF = pd.read_sql(sql, conn)
-        MDCdataDF.columns = column_names
-        return MDCdataDF
-    except pyodbc.Error as err:
-        print("Couldn't connect to Server")
-        print("Error message:- " + str(err))
 
 def connect_database_MDCmessagesInputs():
     global MDCMessagesDF
@@ -261,13 +176,14 @@ def connect_database_TopMessagesSheet():
         print("Error message:- " + err)
 
 
-@app.post("/api/MDCRawData/{ATAMain_list}/{exclude_EqID_list}/{airline_operator}/{include_current_message}/{fromDate}/{toDate}")
-async def get_MDCRawData(ATAMain_list:str, exclude_EqID_list:str, airline_operator:str, include_current_message:int, fromDate: str , toDate: str):
+# @app.post("/api/RawData/{ATAMain_list}/{exclude_EqID_list}/{airline_operator}/{include_current_message}/{fromDate}/{toDate}")
+@app.post("/api/RawData/{fromDate}/{toDate}")
+async def get_MDCRawData(fromDate: str , toDate: str , ATAMain_list: Optional[str] = None, exclude_EqID_list:Optional[str] = None, airline_operator:Optional[str] = None, include_current_message:Optional[int] = None):
     c = connect_database_MDCdata(ATAMain_list, exclude_EqID_list, airline_operator, include_current_message, fromDate, toDate)
     #print(c['DateAndTime'].astype('datetime64[s]'))
     #c['DateAndTime'] = c['DateAndTime'].astype('datetime64[s]')
-    print(c['DateAndTime'])
-    print(type(c['DateAndTime']))
+    print(c['MSG_Date'])
+    print(type(c['MSG_Date']))
     #c['DateAndTime'] = (c['DateAndTime'].to_string()).strip(':00.0000000') #.str.strip(':00.0000000')
     #print(c['DateAndTime'])
 
@@ -3114,20 +3030,20 @@ def connect_database_for_ata_main(all):
 
 
 
-# @app.post("/api/GenerateReport/ata_main/{all}")
-# async def get_eqIData(all:str):
-#     report_ata_main_sql_df = connect_database_for_ata_main(all)
-#     report_ata_main_sql_df_json = report_ata_main_sql_df.to_json(orient='records')
-#     return report_ata_main_sql_df_json
-
 @app.post("/api/GenerateReport/ata_main/{all}")
 async def get_eqIData(all:str):
-    # report_eqId_sql_df = connect_database_for_eqId(all)
-    # report_eqId_sql_df_json = report_eqId_sql_df.to_json(orient='records')
-    f = open ('ata.json', "r")
-    data = json.loads(f.read())
-    data_string = json.dumps(data)
-    return data_string
+    report_ata_main_sql_df = connect_database_for_ata_main(all)
+    report_ata_main_sql_df_json = report_ata_main_sql_df.to_json(orient='records')
+    return report_ata_main_sql_df_json
+
+# @app.post("/api/GenerateReport/ata_main/{all}")
+# async def get_eqIData(all:str):
+#     # report_eqId_sql_df = connect_database_for_eqId(all)
+#     # report_eqId_sql_df_json = report_eqId_sql_df.to_json(orient='records')
+#     f = open ('ata.json', "r")
+#     data = json.loads(f.read())
+#     data_string = json.dumps(data)
+#     return data_string
 
 # @app.post("/api/uploadfile_airline_mdc_raw_data/")
 # async def create_upload_file(file: UploadFile = File(...)):
