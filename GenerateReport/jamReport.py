@@ -16,9 +16,8 @@ def mdcDF(MaxAllowedOccurrences: int, MaxAllowedConsecLegs: int, MaxAllowedInter
 listofJamMessages = ["B1-309178","B1-309179","B1-309180","B1-060044","B1-060045","B1-007973",
                      "B1-060017","B1-006551","B1-240885","B1-006552","B1-006553","B1-006554",
                      "B1-006555","B1-007798","B1-007772","B1-240938","B1-007925","B1-007905",
-                     "B1-007927","B1-007915","B1-007926","B1-007910","B1-007928","B1-007920","B1-008064"]    
+                     "B1-007927","B1-007915","B1-007926","B1-007910","B1-007928","B1-007920"] 
 
-#delte last value
 
  
 def jamReport(OutputTableHistory, ACSN_chosen,MDCdataDF,listofmessages= listofJamMessages):
