@@ -2,6 +2,7 @@ from app2 import App2
 import pyodbc
 import pandas as pd
 import sqlite3
+from datetime import datetime
 
 driver_vdi = '{ODBC Driver 17 for SQL Server}'
 host_vdi='aftermarket-mhirj.database.windows.net'
@@ -56,16 +57,15 @@ def connect_to_fetch_all_eqids(from_dt, to_dt):
         print("Couldn't connect to Server")
         print("Error message:- " + str(err))
 
-def connect_database_MDCdata(ata, excl_eqid, airline_operator, include_current_message, from_dt, to_dt):
+def connect_database_MDCdata(ata, excl_eqid, include_current_message, from_dt, to_dt):
     global MDCdataDF
     global airline_id
-    airline_id = ""
     all_ata_str_list = []
     all_ata_str = ""
     all_eqid_str = ""
-    if airline_operator:
-        if airline_operator.upper() == "SKW":
-            airline_id = 101
+    from_dt = from_dt + " 00:00:00"
+    to_dt = to_dt + " 23:59:59"
+    airline_operator = "SKW"
 
     if ata == 'ALL':
         all_ata = connect_to_fetch_all_ata(from_dt, to_dt)
@@ -98,9 +98,9 @@ def connect_database_MDCdata(ata, excl_eqid, airline_operator, include_current_m
     # connecting to the database
     # sql = f'''SELECT * FROM MDC_MSGS WHERE (MSG_Date BETWEEN  {from_dt} AND {to_dt}) AND ({f"SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) IN {str(all_ata_str)} OR " if all_ata_str else f"SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) IN {str(ata)} OR " if ata != 'ALL' else 
     # f"SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) IN {str(ata)} OR " if ata else ''} {f"EQ_ID IN {str(all_eqid_str)} OR " if all_eqid_str else ''} {f"OPERATOR = {str(airline_id)}" if airline_id else ''} AND flight_phase IS NOT NULL AND INTERMITNT IS NOT NULL) '''
-    sql = f"SELECT * FROM MDC_MSGS WHERE (MSG_Date BETWEEN  {from_dt} AND {to_dt})"
-    if ata or all_ata_str or all_eqid_str or excl_eqid or airline_id or include_current_message:
-        sql += 'AND'
+    sql = f"SELECT * FROM MDC_MSGS WHERE (MSG_Date BETWEEN '{from_dt}' AND '{to_dt}') AND (OPERATOR = '{airline_operator}')"
+    if ata or all_ata_str or all_eqid_str or excl_eqid or include_current_message:
+        sql += ' AND'
         if ata != 'ALL' and ata:
             sql += f"(SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) IN {str(ata)}) AND"
         if all_ata_str:
@@ -109,9 +109,7 @@ def connect_database_MDCdata(ata, excl_eqid, airline_operator, include_current_m
             sql += f"(EQ_ID IN {str(all_eqid_str)}) AND"
         if excl_eqid != 'NONE' and excl_eqid:
             sql += f"(EQ_ID IN {str(excl_eqid)}) AND"
-        if airline_id:
-            sql += f"(OPERATOR = {str(airline_id)}) AND"
-        if include_current_message ==1:
+        if include_current_message == 0:
             sql += "(flight_phase IS NOT NULL AND INTERMITNT IS NOT NULL)"
         if sql.split()[-1] == "AND":
             sql = sql[:-4]
