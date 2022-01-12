@@ -287,10 +287,10 @@ async def generateReport(analysisType: str, occurences: int, legs: int, intermit
     print(fromDate, " ", toDate)
     if analysisType.lower() == "history":
         respObj = historyReport(occurences, legs, intermittent, consecutiveDays, ata, exclude_EqID, airline_operator, include_current_message, fromDate , toDate)
-        return respObj
+        return respObj.to_json(orient='records')
     
     respObj = dailyReport(occurences, legs, intermittent, consecutiveDays, ata, exclude_EqID, airline_operator, include_current_message, fromDate , toDate)
-    return respObj
+    return respObj.to_json(orient='records')
 
 
 #--------jamReport-----------------
