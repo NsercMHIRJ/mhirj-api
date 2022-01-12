@@ -2675,7 +2675,7 @@ def connect_db_MDCdata_chartb(from_dt, to_dt):
 #with ata chartb
 #with ata chartb
 def connect_db_MDCdata_chartb_ata(ata,from_dt, to_dt):
-    sql = "SELECT * FROM MDC_MSGS WHERE SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) IN " + str(ata) +" and  MSG_Date BETWEEN '" + from_dt + " 00:00:00 ' AND '" + to_dt + " 23:59:59 '"
+    sql = "SELECT AC_SN,AC_TN,EQ_ID,SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) AS ATA_Main FROM MDC_MSGS WHERE SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) IN " + str(ata) +" and  MSG_Date BETWEEN '" + from_dt + " 00:00:00 ' AND '" + to_dt + " 23:59:59 '"
     column_names = ["AC_MODEL", "AC_SN", "AC_TN",
                     "OPERATOR", "MSG_TYPE", "MDC_SOFTWARE", "MDT_VERSION", "MSG_Date",
                     "FLIGHT_NUM","FLIGHT_LEG", "FLIGHT_PHASE", "ATA", "ATA_NAME", "LRU",
@@ -2708,14 +2708,14 @@ async def get_Chart_B(ata:str,top_n: int,from_dt: str, to_dt: str):
         AircraftTailPairDF.columns = ["AC SN","Tail"] # re naming the columns to match History/Daily analysis output
         print("---------------test2--------------")
         print(AircraftTailPairDF.columns)
-        chartADF = pd.merge(left = MDCdataDF[["AC_SN","ATA", "EQ_ID"]], right = AircraftTailPairDF, left_on="AC_SN", right_on="AC SN")
+        chartADF = pd.merge(left = MDCdataDF[["AC_SN","ATA_Main", "EQ_ID"]], right = AircraftTailPairDF, left_on="AC_SN", right_on="AC SN")
         print("---------------test3--------------")
         print(chartADF)
         chartADF["AC_SN"] = chartADF["AC_SN"] + " / " + chartADF["Tail"]
         print("---------------test4--------------")
         print(chartADF["AC_SN"])
         chartADF.drop(labels = ["AC SN", "Tail"], axis = 1, inplace = True)
-        MessageCountbyAircraftATA = chartADF.groupby(["AC_SN","ATA"]).count()
+        MessageCountbyAircraftATA = chartADF.groupby(["AC_SN","ATA_Main"]).count()
         print("----test5-----------")
         print(MessageCountbyAircraftATA)
         # https://towardsdatascience.com/stacked-bar-charts-with-pythons-matplotlib-f4020e4eb4a7
