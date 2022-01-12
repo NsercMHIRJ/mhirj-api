@@ -317,6 +317,6 @@ def historyReport(MaxAllowedOccurrences: int, MaxAllowedConsecLegs: int, MaxAllo
 
         OutputTableHistory = highlightJams(OutputTableHistory, listofJamMessages)
         OutputTableHistory_json = OutputTableHistory.to_json(orient='records')
-        return OutputTableHistory_json
+        return OutputTableHistory
     # else:
         # throw error response

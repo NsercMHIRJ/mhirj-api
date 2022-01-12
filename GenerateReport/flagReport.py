@@ -10,8 +10,8 @@ import re
 def mdcDF(MaxAllowedOccurrences: int, MaxAllowedConsecLegs: int, MaxAllowedIntermittent: int, MaxAllowedConsecDays: int, ata: str, exclude_EqID:str, airline_operator: str, include_current_message: int, fromDate: str , toDate: str):
         MDCdataDF = connect_database_MDCdata(ata, exclude_EqID, airline_operator, include_current_message, fromDate, toDate)
         MDCdataDF["MSG_Date"] = pd.to_datetime(MDCdataDF["MSG_Date"]) # formatting for date
-        MDCdataDF["Flight Leg No"].fillna(value= 0.0, inplace= True) # Null values preprocessing - if 0 = Currentflightphase
-        MDCdataDF["Flight Phase"].fillna(False, inplace= True) # NuCell values preprocessing for currentflightphase
+        MDCdataDF["FLIGHT_LEG"].fillna(value= 0.0, inplace= True) # Null values preprocessing - if 0 = Currentflightphase
+        MDCdataDF["FLIGHT_PHASE"].fillna(False, inplace= True) # NuCell values preprocessing for currentflightphase
         MDCdataDF["INTERMITNT"].fillna(value= 0.0, inplace= True) # Null values preprocessing for currentflightphase
         MDCdataDF["INTERMITNT"].replace(to_replace= ">", value= "9", inplace=True) # > represents greater than 8 Intermittent values
         MDCdataDF["AC_SN"] = MDCdataDF["AC_SN"].str.replace('AC', '')
@@ -33,17 +33,27 @@ def Toreport(Flagsreport, HistoryReport,MDCdataDF,include_current_message,list_o
     #creating dataframe to look at dates
     if (include_current_message == 1):
     # if CurrentFlightPhaseEnabled == 1: #Show all, current and history
-        DatesDF = MDCdataDF[["MSG_Date","Equation ID", "AC_SN"]].copy()
+        DatesDF = MDCdataDF[["MSG_Date","EQ_ID", "AC_SN"]].copy()
+        print("-----this is datadf-----")
+        print(DatesDF)
 
     elif (include_current_message == 0):
     # elif CurrentFlightPhaseEnabled == 0: #Only show history
-        DatesDF = MDCdataDF[["MSG_Date","Equation ID", "AC_SN", "Flight Phase"]].copy()
+        DatesDF = MDCdataDF[["MSG_Date","EQ_ID", "AC_SN", "FLIGHT_PHASE"]].copy()
+        print("-----this is datadf---2-----")
+        print(DatesDF)
         DatesDF = DatesDF.replace(False, np.nan).dropna(axis=0, how='any')
-        DatesDF = DatesDF[["MSG_Date","Equation ID", "AC_SN"]].copy()
+        print("-----this is datadf---3-----")
+        print(DatesDF)
+        DatesDF = DatesDF[["MSG_Date","EQ_ID", "AC_SN"]].copy()
+        print("-----this is datadf---4-----")
+        print(DatesDF)
 
     # this exists to check which dates are present for the specific aircraft and message chosen
-    counts = pd.DataFrame(data= DatesDF.groupby(['AC_SN', "Equation ID", "MSG_Date"]).agg(len), columns= ["Counts"])
+    counts = pd.DataFrame(data= DatesDF.groupby(['AC_SN', "EQ_ID", "MSG_Date"]).agg(len), columns= ["Counts"])
     counts
+    print("--------counts----------")
+    print(counts)
 
     
     DatesfoundinMDCdata = ''
@@ -60,22 +70,25 @@ def Toreport(Flagsreport, HistoryReport,MDCdataDF,include_current_message,list_o
                 
                 try:
                      DatesfoundinMDCdata = counts.loc[(AircraftSN, Bcode)].resample('D')["Counts"].sum().index
+                     print("------------datesfound in mdc---------")
+                     print(DatesfoundinMDCdata)
                 except:
                      unavailable.append(ab)
                      print("------exception----------")
 
-                newrow = indexedreport.loc[(AircraftSN, Bcode), ["Tail#", "ATA", "LRU", "MDC Message", "Type","EICAS Message", "MEL or No-Dispatch", "MHIRJ Input", "MHIRJ Recommendation", "Additional Comments"]].to_frame().transpose()
+                # newrow = indexedreport.loc[(AircraftSN, Bcode), ["AC_TN", "ATA", "LRU", "MDC Message", "Type","EICAS Message", "MEL or No-Dispatch", "MHIRJ Input", "MHIRJ Recommendation", "Additional Comments"]].to_frame().transpose()
+                newrow = indexedreport.loc[(AircraftSN, Bcode), ["AC_TN", "ATA", "LRU", "Type","EICAS Message", "MEL or No-Dispatch", "MHIRJ Input", "MHIRJ Recommendation", "Additional Comments"]].to_frame().transpose()
+                print("--this is new row---")
+                print(newrow)
                 newrow.insert(loc= 0, column= "AC SN", value= AircraftSN)
                 newrow.insert(loc= 3, column= "B1-code", value= Bcode)
                 newrow.insert(loc= 8, column= "Date From", value= DatesfoundinMDCdata.min().date()) #.date()removes the time data from datetime format
                 newrow.insert(loc= 9, column= "Date To", value= DatesfoundinMDCdata.max().date())
                 newrow.insert(loc= 10, column= "SKW action WIP", value= "")
-                newrow = newrow.rename(columns= {"AC SN":"MSN", "MDC Message": "Message", "EICAS Message":"Potential FDE"})
-    
+                # newrow = newrow.rename(columns= {"AC SN":"MSN", "MDC Message": "Message", "EICAS Message":"Potential FDE"})
+                newrow = newrow.rename(columns= {"AC SN":"MSN", "EICAS Message":"Potential FDE"})
+
                 # append the new row to the existing report
                 Flagsreport = Flagsreport.append(newrow, ignore_index= True)
 
     return Flagsreport    
-
-
-    
