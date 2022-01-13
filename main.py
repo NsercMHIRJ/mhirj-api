@@ -2717,9 +2717,40 @@ def connect_db_MDCdata_chartb(from_dt, to_dt):
         print("Error message:- " + str(err))
 
 #with ata chartb
-#with ata chartb
+
+def connect_to_fetch_all_ata(from_dt, to_dt):
+    all_ata_query = "SELECT DISTINCT SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) AS ATA_Main from MDC_MSGS WHERE MSG_Date BETWEEN '" + from_dt + "' AND '" + to_dt + "'"
+    try:
+        conn = pyodbc.connect(driver=db_driver, host=hostname, database=db_name,
+                              user=db_username, password=db_password)
+        all_ata_df = pd.read_sql(all_ata_query, conn)
+
+        return all_ata_df
+    except pyodbc.Error as err:
+        print("Couldn't connect to Server")
+        print("Error message:- " + str(err))
+        
 def connect_db_MDCdata_chartb_ata(ata,from_dt, to_dt):
-    sql = "SELECT AC_SN,AC_TN,EQ_ID,SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) AS ATA_Main FROM MDC_MSGS WHERE SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) IN " + str(ata) +" and  MSG_Date BETWEEN '" + from_dt + " 00:00:00 ' AND '" + to_dt + " 23:59:59 '"
+    all_ata_str_list = []
+    if ata == 'ALL':
+       all_ata = connect_to_fetch_all_ata(from_dt, to_dt)
+ 
+       all_ata_str = "("
+       all_ata_list = all_ata['ATA_Main'].tolist()
+       for each_ata in all_ata_list:
+           all_ata_str_list.append(str(each_ata))
+           all_ata_str += "'"+str(each_ata)+"'"
+           if each_ata != all_ata_list[-1]:
+               all_ata_str += ","
+           else:
+               all_ata_str += ")"
+       print(all_ata_str)
+
+    if ata == 'ALL': 
+        sql = "SELECT AC_SN,AC_TN,EQ_ID,SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) AS ATA_Main FROM MDC_MSGS WHERE SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) IN " + str(all_ata_str) +" and  MSG_Date BETWEEN '" + from_dt + " 00:00:00 ' AND '" + to_dt + " 23:59:59 '"
+
+    else:   
+        sql = "SELECT AC_SN,AC_TN,EQ_ID,SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) AS ATA_Main FROM MDC_MSGS WHERE SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) IN " + str(ata) +" and  MSG_Date BETWEEN '" + from_dt + " 00:00:00 ' AND '" + to_dt + " 23:59:59 '"
     column_names = ["AC_MODEL", "AC_SN", "AC_TN",
                     "OPERATOR", "MSG_TYPE", "MDC_SOFTWARE", "MDT_VERSION", "MSG_Date",
                     "FLIGHT_NUM","FLIGHT_LEG", "FLIGHT_PHASE", "ATA", "ATA_NAME", "LRU",
