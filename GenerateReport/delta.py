@@ -26,10 +26,10 @@ def deltaReport(occurences, legs, intermittent, consecutiveDays, ata, exclude_Eq
                         "B1-060017","B1-006551","B1-240885","B1-006552","B1-006553","B1-006554",
                         "B1-006555","B1-007798","B1-007772","B1-240938","B1-007925","B1-007905",
                         "B1-007927","B1-007915","B1-007926","B1-007910","B1-007928","B1-007920"]
-    curr_history_json = historyReport(occurences, legs, intermittent, consecutiveDays, ata, exclude_EqID, airline_operator, include_current_message, curr_fromDate, curr_toDate)
-    prev_history_json = historyReport(occurences, legs, intermittent, consecutiveDays, ata, exclude_EqID, airline_operator, include_current_message, prev_fromDate, prev_toDate)
-    curr_history_dataframe = pd.read_json(curr_history_json)
-    prev_history_dataframe = pd.read_json(prev_history_json)
+    curr_history_dataframe = historyReport(occurences, legs, intermittent, consecutiveDays, ata, exclude_EqID, airline_operator, include_current_message, curr_fromDate, curr_toDate)
+    prev_history_dataframe = historyReport(occurences, legs, intermittent, consecutiveDays, ata, exclude_EqID, airline_operator, include_current_message, prev_fromDate, prev_toDate)
+    # curr_history_dataframe = pd.read_json(curr_history_json)
+    # prev_history_dataframe = pd.read_json(prev_history_json)
     True_list, False_list = create_delta_lists(prev_history_dataframe, curr_history_dataframe)
 
     curr_history_dataframe.set_index(["AC SN", "B1-Equation"], drop= False, inplace= True)
@@ -88,6 +88,4 @@ def deltaReport(occurences, legs, intermittent, consecutiveDays, ata, exclude_Eq
         
         delta.append(tmpData)
         i += 1
-    list_str = json.dumps(delta)
-    list_json = json.loads(list_str)
-    return list_json
+    return delta
