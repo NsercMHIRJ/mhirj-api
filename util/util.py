@@ -1,8 +1,16 @@
+from asyncio.windows_events import NULL
+from contextlib import nullcontext
+import json
+from statistics import mode
 from app2 import App2
 import pyodbc
 import pandas as pd
 import sqlite3
 from datetime import datetime
+import json
+from types import SimpleNamespace
+
+from model.inputmessagemodel import InputMessageModel
 
 driver_vdi = '{ODBC Driver 17 for SQL Server}'
 host_vdi='aftermarket-mhirj.database.windows.net'
@@ -11,8 +19,10 @@ user_vdi='humber_rw'
 password_vdi='nP@yWw@!$4NxWeK6p*ttu3q6'
 
 def connect_database_mdc_message_input(eq_id):
-    sql = "SELECT * from [dbo].[MDCMessagesInputs] c WHERE c.Equation_ID='" + eq_id + "' "
-
+    if eq_id:
+        sql = "SELECT * from [dbo].[MDCMessagesInputs] c WHERE c.Equation_ID='" + eq_id + "' "
+    else :
+        sql = "SELECT * from [dbo].[MDCMessagesInputs]"
     try:
         conn = pyodbc.connect(
             Trusted_Connection='No',
@@ -30,6 +40,113 @@ def connect_database_mdc_message_input(eq_id):
     except pyodbc.Error as err:
         print("Couldn't connect to Server")
         print("Error message:- " + str(err))
+
+def db_delete_mdc_messages_input_by_eq_id(eq_id):
+    try:
+        conn = pyodbc.connect(
+            Trusted_Connection='No',
+            driver=driver_vdi, host=host_vdi, database=database_vdi,
+                              user=user_vdi, password=password_vdi)
+                                               
+        cursor = conn.cursor()       
+        cursor.execute('''
+        DELETE from [dbo].[MDCMessagesInputs] WHERE Equation_ID=?
+        ''',eq_id)
+        conn.commit()
+        conn.close()
+        return {"message": eq_id+" Successfully Deleted."}
+    except Exception as e: 
+        print(e)
+        return {'message': 'error in '+str(e)}
+
+def db_insert_mdc_messages_input(raw_data):
+    print("data : ",raw_data)
+    try : 
+        model = InputMessageModel(
+            raw_data['lru'],
+            raw_data['ata'],
+            raw_data['message'],
+            raw_data['comp_id'],
+            raw_data['message1'],
+            raw_data['fault_logged'],
+            raw_data['status'],
+            raw_data['message_type'],
+            raw_data['eicas'],
+            raw_data['timer'],
+            raw_data['logic'],
+            raw_data['equation_description'],
+            raw_data['equation_id'],
+            raw_data['occurance_flag'],
+            raw_data['days_count'],
+            raw_data['priority'],
+            raw_data['recommended_actions'],
+            raw_data['additional_comment'],
+            raw_data['ise_input'],
+            raw_data['ata_main'],
+            raw_data['ata_sub'],
+        )
+        print('raw_data lru ',model.lru)
+        conn = pyodbc.connect(
+            Trusted_Connection='No',
+            driver=driver_vdi, host=host_vdi, database=database_vdi,
+                              user=user_vdi, password=password_vdi)
+                                               
+        cursor = conn.cursor()       
+        cursor.execute('''
+        INSERT INTO [dbo].[MDCMessagesInputs](
+        [LRU],
+        [ATA],
+        [Message],
+        [Comp_ID],
+        [Message1],
+        [Fault_Logged],
+        [Status],
+        [Message_Type],
+        [EICAS],
+        [Timer],
+        [Logic],
+        [Equation_Description],
+        [Equation_ID],
+        [Occurance_Flag],
+        [Days_Count],
+        [Priority],
+        [MHIRJ_ISE_reccomended_actions],
+        [Additional_comment],
+        [MHIRJ_ISE_inputs],
+        [ATA_Main],
+        [ATA_Sub]
+       )
+       VALUES
+       (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+       ''',
+       model.lru,
+       model.ata,
+       model.message,
+       model.comp_id,
+       model.message1,
+       model.fault_logged,
+       model.status,
+       model.message_type,
+       model.eicas,
+       model.timer,
+       model.logic,
+       model.equation_description,
+       model.equation_id,
+       model.occurance_flag,
+       model.days_count,
+       model.priority,
+       model.recommended_actions,
+       model.additional_comment,
+       model.ise_input,
+       model.ata_main,
+       model.ata_sub
+       )
+        conn.commit()
+        return {"message":"Data Successfully Inserted."}
+    except Exception as e: 
+        print(e)
+        return {'message': 'error in '+str(e)}
+
 
 def connect_to_fetch_all_ata(from_dt, to_dt):
     all_ata_query = "SELECT DISTINCT SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) AS ATA_Main FROM MDC_MSGS WHERE MSG_Date BETWEEN '" + from_dt + "' AND '" + to_dt + "'"

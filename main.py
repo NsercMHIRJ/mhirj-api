@@ -32,7 +32,7 @@ from fastapi import File, UploadFile
 from crud import *
 #from pm_upload import *
 import uvicorn
-from util.util import connect_database_mdc_message_input , connect_database_MDCdata , connect_to_fetch_all_ata , connect_to_fetch_all_eqids
+from util.util import connect_database_mdc_message_input , connect_database_MDCdata , connect_to_fetch_all_ata , connect_to_fetch_all_eqids, db_delete_mdc_messages_input_by_eq_id, db_insert_mdc_messages_input
 from GenerateReport.jamReport import jamReport
 # from GenerateReport.jamReport import MDCdataDF
 from GenerateReport.jamReport import mdcDF
@@ -3212,26 +3212,26 @@ async def update_data(Equation_ID:str, EICAS:str,Priority_:str, MHIRJ_ISE_inputs
 
 # delete from MDC messege input    
 
-@app.post("/api/delete_MDC_Message_Input/")
-async def delete():
-    delete_data = connect_database_for_delete()
-    return delete_data    
+# @app.post("/api/delete_MDC_Message_Input/")
+# async def delete():
+#     delete_data = connect_database_for_delete()
+#     return delete_data    
 
-def connect_database_for_delete():
+# def connect_database_for_delete():
    
        
-        conn = pyodbc.connect(driver=db_driver, host=hostname, database=db_name,
-                              user=db_username, password=db_password)
-        cursor = conn.cursor()  
-        # TODO : delete from mdc_message where B1-EQ = 
-        sql =" DELETE FROM MDCMessagesInputs_CSV_UPLOAD"
-        print(sql)
+#         conn = pyodbc.connect(driver=db_driver, host=hostname, database=db_name,
+#                               user=db_username, password=db_password)
+#         cursor = conn.cursor()  
+#         # TODO : delete from mdc_message where B1-EQ = 
+#         sql =" DELETE FROM MDCMessagesInputs_CSV_UPLOAD"
+#         print(sql)
  
-        cursor.execute(sql)
-        conn.commit()
-        conn.close()
-        # return update_sql_df
-        return "Delete from MDCMessagesInputs"  
+#         cursor.execute(sql)
+#         conn.commit()
+#         conn.close()
+#         # return update_sql_df
+#         return "Delete from MDCMessagesInputs"  
 
 # #upload top message data     
 # @app.post("/api/uploadfile_top_message_data/")
@@ -3304,9 +3304,25 @@ async def generateDeltaReport(analysisType: str, occurences: int, legs: int, int
 #     return getFileUploadStatusPercentage() 
 
 
-@app.post("/api/all_mdc_messages_input/{eq_id}")
-async def get_mdcMessageInput(eq_id:str):
+@app.post("/api/all_mdc_messages_input/")
+async def get_mdcMessageInput(eq_id: Optional[str]=""):
     mdcRaw_df = connect_database_mdc_message_input(eq_id)
     mdcRaw_df_json =  mdcRaw_df.to_json(orient='records')
     print(mdcRaw_df_json)
     return  mdcRaw_df_json
+
+@app.post("/api/delete_mdc_messages_input_by_eq_id/{eq_id}")
+async def delete_mdc_messages_input_by_eq_id(eq_id:str):
+    mdcRaw_df = db_delete_mdc_messages_input_by_eq_id(eq_id)
+    print(mdcRaw_df)
+    return  mdcRaw_df
+
+@app.post("/api/insert_mdc_messages_input/")
+async def insert_mdc_messages_input(rawdata: Request):
+    try : 
+        t = await rawdata.json()
+        data = db_insert_mdc_messages_input(t)
+        return data
+    except Exception as e: 
+        print(e)
+        return {'error': 'error in '+str(e)}
