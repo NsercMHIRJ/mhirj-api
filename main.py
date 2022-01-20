@@ -253,7 +253,7 @@ async def generateReport(analysisType: str, occurences: int, legs: int, intermit
         respObj = historyReport(occurences, legs, intermittent, consecutiveDays, ata, exclude_EqID, airline_operator, include_current_message, fromDate , toDate).to_json(orient='records')
         return respObj
     
-    respObj = dailyReport(occurences, legs, intermittent, consecutiveDays, ata, exclude_EqID, airline_operator, include_current_message, fromDate , toDate).to_json(orient='records')
+    respObj = dailyReport(occurences, legs, intermittent, consecutiveDays, ata, exclude_EqID, airline_operator, include_current_message, fromDate , toDate)
     return respObj
 
 
@@ -2589,7 +2589,7 @@ def connect_database_for_PM_ScatterPlot_static():
 """
 
 ## Landing Page Chart - Scatter Plot
-def connect_database_for_scatter_plot():
+def connect_database_for_scatter_plot(): ## todo- Scatter
 
     sql = "EXEC Getaircraftstatsv2"
 
