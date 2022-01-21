@@ -250,11 +250,11 @@ async def get_MDCRawData(fromDate,toDate, ata : Optional[str] = '', eqID : Optio
 async def generateReport(analysisType: str, occurences: int, legs: int, intermittent: int, consecutiveDays: int, ata: str, exclude_EqID:str, airline_operator: str, include_current_message: int, fromDate: str , toDate: str):
     print(fromDate, " ", toDate)
     if analysisType.lower() == "history":
-        respObj = historyReport(occurences, legs, intermittent, consecutiveDays, ata, exclude_EqID, airline_operator, include_current_message, fromDate , toDate)
-        return respObj.to_json(orient='records')
+        respObj = historyReport(occurences, legs, intermittent, consecutiveDays, ata, exclude_EqID, airline_operator, include_current_message, fromDate , toDate).to_json(orient='records')
+        return respObj
     
     respObj = dailyReport(occurences, legs, intermittent, consecutiveDays, ata, exclude_EqID, airline_operator, include_current_message, fromDate , toDate)
-    return respObj.to_json(orient='records')
+    return respObj
 
 
 #--------jamReport-----------------
@@ -2445,9 +2445,9 @@ async def get_CharThreeData(aircraft_no:int, equation_id:str, is_flight_phase_en
     return chart3Report(aircraft_no, equation_id, is_flight_phase_enabled, fromDate, toDate)
 
 # Chart 4
-# @app.post("/api/chart_four/{topCount}/{analysisType}/{occurences}/{legs}/{intermittent}/{consecutiveDays}/{ata}/{exclude_EqID}/{airline_operator}/{include_current_message}/{fromDate}/{toDate}")
-# async def get_ChartFourData(topCount: int, analysisType: str, occurences: int, legs: int, intermittent: int, consecutiveDays: int, ata: str, exclude_EqID:str, airline_operator: str, include_current_message: int, fromDate: str , toDate: str):
-#     return chart4Report(occurences, legs, intermittent, consecutiveDays, ata, exclude_EqID, airline_operator, include_current_message, fromDate , toDate, topCount, analysisType)
+@app.post("/api/chart_four/{topCount}/{analysisType}/{occurences}/{legs}/{intermittent}/{consecutiveDays}/{ata}/{exclude_EqID}/{airline_operator}/{include_current_message}/{fromDate}/{toDate}")
+async def get_ChartFourData(topCount: int, analysisType: str, occurences: int, legs: int, intermittent: int, consecutiveDays: int, ata: str, exclude_EqID:str, airline_operator: str, include_current_message: int, fromDate: str , toDate: str):
+    return chart4Report(occurences, legs, intermittent, consecutiveDays, ata, exclude_EqID, airline_operator, include_current_message, fromDate , toDate, topCount, analysisType)
 
 ## Chart 5
 def connect_database_for_chart5(aircraft_no, equation_id, is_flight_phase_enabled, from_dt, to_dt):
@@ -2589,7 +2589,7 @@ def connect_database_for_PM_ScatterPlot_static():
 """
 
 ## Landing Page Chart - Scatter Plot
-def connect_database_for_scatter_plot():
+def connect_database_for_scatter_plot(): ## todo- Scatter
 
     sql = "EXEC Getaircraftstatsv2"
 
