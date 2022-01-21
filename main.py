@@ -2589,47 +2589,47 @@ def connect_database_for_PM_ScatterPlot_static():
 """
 
 ## Landing Page Chart - Scatter Plot
-def connect_database_for_scatter_plot(): ## todo- Scatter
+# def connect_database_for_scatter_plot(): ## todo- Scatter
 
-    sql = "EXEC Getaircraftstatsv2"
+#     sql = "EXEC Getaircraftstatsv2"
 
-    print(sql)
-    try:
-        conn = pyodbc.connect(driver=db_driver, host=hostname, database=db_name,
-                              user=db_username, password=db_password)
-        scatter_chart_sql_df = pd.read_sql(sql, conn)
-        conn.close()
-        return scatter_chart_sql_df
-    except pyodbc.Error as err:
-        print("Couldn't connect to Server")
-        print("Error message:- " + str(err))
-@app.post("/api/scatter_chart_MDC_PM")
-async def get_ScatterChart_MDC_PM_Data():
-    scatter_chart_sql_df = connect_database_for_scatter_plot()
-    scatter_chart_sql_df_json = scatter_chart_sql_df.to_json(orient='records')
-    return scatter_chart_sql_df_json
+#     print(sql)
+#     try:
+#         conn = pyodbc.connect(driver=db_driver, host=hostname, database=db_name,
+#                               user=db_username, password=db_password)
+#         scatter_chart_sql_df = pd.read_sql(sql, conn)
+#         conn.close()
+#         return scatter_chart_sql_df
+#     except pyodbc.Error as err:
+#         print("Couldn't connect to Server")
+#         print("Error message:- " + str(err))
+# @app.post("/api/scatter_chart_MDC_PM")
+# async def get_ScatterChart_MDC_PM_Data():
+#     scatter_chart_sql_df = connect_database_for_scatter_plot()
+#     scatter_chart_sql_df_json = scatter_chart_sql_df.to_json(orient='records')
+#     return scatter_chart_sql_df_json
 
 
-def connect_database_for_scatter_plot_v2(from_date, to_date):
+# def connect_database_for_scatter_plot_v2(from_date, to_date):
 
-    sql = "EXEC Getaircraftstatsv2 '"+from_date+"', '"+to_date+"'"
-    print(sql)
-    try:
-        conn = pyodbc.connect(driver=db_driver, host=hostname, database=db_name,
-                              user=db_username, password=db_password)
-        scatter_chart_sql_df = pd.read_sql(sql, conn)
-        conn.close()
-        return scatter_chart_sql_df
-    except pyodbc.Error as err:
-        print("Couldn't connect to Server")
-        print("Error message:- " + str(err))
+#     sql = "EXEC Getaircraftstatsv2 '"+from_date+"', '"+to_date+"'"
+#     print(sql)
+#     try:
+#         conn = pyodbc.connect(driver=db_driver, host=hostname, database=db_name,
+#                               user=db_username, password=db_password)
+#         scatter_chart_sql_df = pd.read_sql(sql, conn)
+#         conn.close()
+#         return scatter_chart_sql_df
+#     except pyodbc.Error as err:
+#         print("Couldn't connect to Server")
+#         print("Error message:- " + str(err))
 
-#For reference -> http://localhost:8000/scatter_chart_MDC_PM_Data/2020-11-12
-@app.post("/api/scatter_chart_MDC_PM/{from_date}/{to_date}")
-async def get_ScatterChart_MDC_PM_Data(from_date:str, to_date:str):
-    scatter_chart_sql_df = connect_database_for_scatter_plot_v2(from_date, to_date)
-    scatter_chart_sql_df_json = scatter_chart_sql_df.to_json(orient='records')
-    return scatter_chart_sql_df_json
+# #For reference -> http://localhost:8000/scatter_chart_MDC_PM_Data/2020-11-12
+# @app.post("/api/scatter_chart_MDC_PM/{from_date}/{to_date}")
+# async def get_ScatterChart_MDC_PM_Data(from_date:str, to_date:str):
+#     scatter_chart_sql_df = connect_database_for_scatter_plot_v2(from_date, to_date)
+#     scatter_chart_sql_df_json = scatter_chart_sql_df.to_json(orient='records')
+#     return scatter_chart_sql_df_json
 
 
 ### Landing Chart B
@@ -2907,42 +2907,42 @@ async def get_Stacked_Chart_MDC_PM_Data(start_date:str,end_date:str,top_value:in
 
 
 #### Corelation Stored Proc Call
-def connect_database_for_corelation(from_dt, to_dt, equation_id, ata):
-    #equation_id = str(tuple(equation_id.replace(")", "").replace("(", "").replace("'", "").split(",")))
-    #if "ALL" not in ata:
-    #    ata = str(tuple(ata.replace(")", "").replace("(", "").replace("'", "").split(",")))
+# def connect_database_for_corelation(from_dt, to_dt, equation_id, ata):
+#     #equation_id = str(tuple(equation_id.replace(")", "").replace("(", "").replace("'", "").split(",")))
+#     #if "ALL" not in ata:
+#     #    ata = str(tuple(ata.replace(")", "").replace("(", "").replace("'", "").split(",")))
 
-    #equation_id = str(tuple(equation_id.replace(")","").replace("(","").replace("'","").split(",")))
-    #ata = str(tuple(ata.replace(")","").replace("(","").replace("'","").split(",")))
-    sql =""
+#     #equation_id = str(tuple(equation_id.replace(")","").replace("(","").replace("'","").split(",")))
+#     #ata = str(tuple(ata.replace(")","").replace("(","").replace("'","").split(",")))
+#     sql =""
 
-    sql += "select distinct [MaintTransID],[EQ_ID], [DateAndTime],[Failure_Flag],[MRB],[SquawkSource],Substring(ATA, 1,2) ATA,[Discrepancy],[CorrectiveAction] from [dbo].[MDC_PM_Correlated] where CONVERT(date,DateAndTime) between '" + from_dt + "'  AND '" + to_dt + "'"
-    #sql += "select distinct MaintTransID p_ID, Aircraft_tail_No, aircraftno, EQ_ID, EQ_DESCRIPTION, LRU,CAS, MDC_MESSAGE, Substring(ATA, 1,2) ATA, Discrepancy, CorrectiveAction, DateAndTime, Failure_Flag, SquawkSource from [dbo].[MDC_PM_Correlated] where Status = 3 AND CONVERT(date,DateAndTime) between '" + from_dt + "'  AND '" + to_dt + "'"
-    print("len of eq_id",equation_id)
-    if equation_id!="":
-        if ',' in equation_id:
-            equation_id = str(tuple(equation_id.replace(")", "").replace("(", "").split(",")))
-            equation_id = equation_id.replace(equation_id[len(equation_id)-2], '')
-            sql += "  AND EQ_ID IN " + equation_id
-        else : 
-            #equation_id = str(tuple(equation_id.replace(")", "").replace("(", "").replace("'", "").split(",")))
-            # if len(equation_id) >= 14:
-            #equation_id = equation_id.replace(equation_id[len(equation_id)-2], '')
-            sql += "  AND EQ_ID = " + equation_id
-    if "ALL" not in ata :
-        if ata!="":
-            sql += "  AND Substring(ATA, 1,2) IN " + ata
-    print(sql)
-    try:
-        conn = pyodbc.connect(driver=db_driver, host=hostname,
-                              database=db_name,
-                              user=db_username, password=db_password)
-        report_eqId_sql_df = pd.read_sql(sql, conn)
-        conn.close()
-        return report_eqId_sql_df
-    except pyodbc.Error as err:
-        print("Couldn't connect to Server")
-        print("Error message:- " + str(err))
+#     sql += "select distinct [MaintTransID],[EQ_ID], [DateAndTime],[Failure_Flag],[MRB],[SquawkSource],Substring(ATA, 1,2) ATA,[Discrepancy],[CorrectiveAction] from [dbo].[MDC_PM_Correlated] where CONVERT(date,DateAndTime) between '" + from_dt + "'  AND '" + to_dt + "'"
+#     #sql += "select distinct MaintTransID p_ID, Aircraft_tail_No, aircraftno, EQ_ID, EQ_DESCRIPTION, LRU,CAS, MDC_MESSAGE, Substring(ATA, 1,2) ATA, Discrepancy, CorrectiveAction, DateAndTime, Failure_Flag, SquawkSource from [dbo].[MDC_PM_Correlated] where Status = 3 AND CONVERT(date,DateAndTime) between '" + from_dt + "'  AND '" + to_dt + "'"
+#     print("len of eq_id",equation_id)
+#     if equation_id!="":
+#         if ',' in equation_id:
+#             equation_id = str(tuple(equation_id.replace(")", "").replace("(", "").split(",")))
+#             equation_id = equation_id.replace(equation_id[len(equation_id)-2], '')
+#             sql += "  AND EQ_ID IN " + equation_id
+#         else : 
+#             #equation_id = str(tuple(equation_id.replace(")", "").replace("(", "").replace("'", "").split(",")))
+#             # if len(equation_id) >= 14:
+#             #equation_id = equation_id.replace(equation_id[len(equation_id)-2], '')
+#             sql += "  AND EQ_ID = " + equation_id
+#     if "ALL" not in ata :
+#         if ata!="":
+#             sql += "  AND Substring(ATA, 1,2) IN " + ata
+#     print(sql)
+#     try:
+#         conn = pyodbc.connect(driver=db_driver, host=hostname,
+#                               database=db_name,
+#                               user=db_username, password=db_password)
+#         report_eqId_sql_df = pd.read_sql(sql, conn)
+#         conn.close()
+#         return report_eqId_sql_df
+#     except pyodbc.Error as err:
+#         print("Couldn't connect to Server")
+#         print("Error message:- " + str(err))
 
 @app.post("/api/corelation_new/{fromDate}/{toDate}/{equation_id}/{tail_no}")
 async def get_NewCorelation(fromDate: str, toDate: str, equation_id:str, tail_no:str):
@@ -2968,100 +2968,100 @@ def connect_database_for_corelation_new(from_dt, to_dt, equation_id, tail_no):
         print("Error message:- " + str(err))
 
 # for reference -> http://localhost:8000/corelation/11-11-2020/11-12-2020/B1-008003/27
-@app.post("/api/corelation/{fromDate}/{toDate}")
-async def get_CorelationData(fromDate: str, toDate: str, equation_id:Optional[str]="", ata:Optional[str]=""):
-    corelation_df = connect_database_for_corelation(fromDate, toDate, equation_id, ata)
-    corelation_df_json = corelation_df.to_json(orient='records')
-    return corelation_df_json
+# @app.post("/api/corelation/{fromDate}/{toDate}")
+# async def get_CorelationData(fromDate: str, toDate: str, equation_id:Optional[str]="", ata:Optional[str]=""):
+#     corelation_df = connect_database_for_corelation(fromDate, toDate, equation_id, ata)
+#     corelation_df_json = corelation_df.to_json(orient='records')
+#     return corelation_df_json
 
 
-def connect_database_for_corelation_pid(p_id):
+# def connect_database_for_corelation_pid(p_id):
     
-    sql = """SELECT 
-	[Aircraft_tail_No],
-	[EQ_ID],
-	[aircraftno],
-	[ATA_Description],
-	[LRU],
-	[CAS],
-	[MDC_MESSAGE],
-	[EQ_DESCRIPTION],
-	[ATA_Main],
-	[ATA_Sub]
-    FROM [dbo].[MDC_PM_Correlated] 
-    WHERE [MaintTransID] = %s
-    """ %(p_id)
+#     sql = """SELECT 
+# 	[Aircraft_tail_No],
+# 	[EQ_ID],
+# 	[aircraftno],
+# 	[ATA_Description],
+# 	[LRU],
+# 	[CAS],
+# 	[MDC_MESSAGE],
+# 	[EQ_DESCRIPTION],
+# 	[ATA_Main],
+# 	[ATA_Sub]
+#     FROM [dbo].[MDC_PM_Correlated] 
+#     WHERE [MaintTransID] = %s
+#     """ %(p_id)
 
-    print(sql)
+#     print(sql)
 
-    try:
-        conn = pyodbc.connect(driver=db_driver, host=hostname, database=db_name,
-                              user=db_username, password=db_password)
-        corelation_df = pd.read_sql(sql, conn)
-        print('query successful')
-        conn.close()
-        return corelation_df
-    except pyodbc.Error as err:
-        print("Couldn't connect to Server")
-        print("Error message:- " + str(err))
+#     try:
+#         conn = pyodbc.connect(driver=db_driver, host=hostname, database=db_name,
+#                               user=db_username, password=db_password)
+#         corelation_df = pd.read_sql(sql, conn)
+#         print('query successful')
+#         conn.close()
+#         return corelation_df
+#     except pyodbc.Error as err:
+#         print("Couldn't connect to Server")
+#         print("Error message:- " + str(err))
 
-@app.post("/api/corelation/{p_id}")
-async def get_CorelationDataPID(p_id: str):
-    corelation_df = connect_database_for_corelation_pid(p_id)
-    print('corelation func :',corelation_df)
-    corelation_df_json = corelation_df.to_json(orient='records')
-    return corelation_df_json
+# @app.post("/api/corelation/{p_id}")
+# async def get_CorelationDataPID(p_id: str):
+#     corelation_df = connect_database_for_corelation_pid(p_id)
+#     print('corelation func :',corelation_df)
+#     corelation_df_json = corelation_df.to_json(orient='records')
+#     return corelation_df_json
 
-def connect_database_for_corelation_pid2(p_id):
-    sql = """SELECT [mdc_ID], [EQ_ID], [aircraftno], [ATA_Description], [LRU], [DateAndTime], [MDC_Date], 
-	[MDC_MESSAGE], [EQ_DESCRIPTION], [CAS], [LRU_CODE], [LRU_NAME], [FAULT_LOGGED], [MDC_ATA], 
-	[mdc_ata_main], [mdc_ata_sub], [Status], [mdc_type]
-    FROM [dbo].[sample_corelation]
-    WHERE p_id = (%s)
-    ORDER BY MDC_Date""" % (p_id)
+# def connect_database_for_corelation_pid2(p_id):
+#     sql = """SELECT [mdc_ID], [EQ_ID], [aircraftno], [ATA_Description], [LRU], [DateAndTime], [MDC_Date], 
+# 	[MDC_MESSAGE], [EQ_DESCRIPTION], [CAS], [LRU_CODE], [LRU_NAME], [FAULT_LOGGED], [MDC_ATA], 
+# 	[mdc_ata_main], [mdc_ata_sub], [Status], [mdc_type]
+#     FROM [dbo].[sample_corelation]
+#     WHERE p_id = (%s)
+#     ORDER BY MDC_Date""" % (p_id)
 
-    print(sql)
+#     print(sql)
 
-    try:
-        conn = pyodbc.connect(driver=db_driver, host=hostname,
-                              database=db_name,
-                              user=db_username, password=db_password)
-        corelation_df = pd.read_sql(sql, conn)
-        print('query successful')
-        conn.close()
-        return corelation_df
-    except pyodbc.Error as err:
-        print("Couldn't connect to Server")
-        print("Error message:- " + str(err))
+#     try:
+#         conn = pyodbc.connect(driver=db_driver, host=hostname,
+#                               database=db_name,
+#                               user=db_username, password=db_password)
+#         corelation_df = pd.read_sql(sql, conn)
+#         print('query successful')
+#         conn.close()
+#         return corelation_df
+#     except pyodbc.Error as err:
+#         print("Couldn't connect to Server")
+#         print("Error message:- " + str(err))
 
 
-@app.post("/api/corelation/{p_id}")
-async def get_CorelationDataPID(p_id: str):
-    corelation_df = connect_database_for_corelation_pid(p_id)
-    print('corelation func :', corelation_df)
-    corelation_df_json = corelation_df.to_json(orient='records')
-    return corelation_df_json
+# @app.post("/api/corelation/{p_id}")
+# async def get_CorelationDataPID(p_id: str):
+#     corelation_df = connect_database_for_corelation_pid(p_id)
+#     print('corelation func :', corelation_df)
+#     corelation_df_json = corelation_df.to_json(orient='records')
+#     return corelation_df_json
 
 #Correlation_process_status
 #31st August
-def connect_correlation_process_status():
-    sql = "SELECT DISTINCT Correlation_Process_Status.ID,Correlation_Process_Status.Process,Correlation_Process_Status.Status,Correlation_Process_Status.Status_Message,Correlation_Process_Status.Date FROM Correlation_Process_Status ORDER BY Correlation_Process_Status.Date DESC"
+# def connect_correlation_process_status():
+#     sql = "SELECT DISTINCT Correlation_Process_Status.ID,Correlation_Process_Status.Process,Correlation_Process_Status.Status,Correlation_Process_Status.Status_Message,Correlation_Process_Status.Date FROM Correlation_Process_Status ORDER BY Correlation_Process_Status.Date DESC"
 
-    try:
-        conn = pyodbc.connect(driver=db_driver, host=hostname, database=db_name,
-                              user=db_username, password=db_password)
-        correlation_process_status = pd.read_sql(sql, conn)
-        #MDCdataDF.columns = column_names
-        return correlation_process_status
-    except pyodbc.Error as err:
-        print("Couldn't connect to Server")
-        print("Error message:- " + str(err))
+#     try:
+#         conn = pyodbc.connect(driver=db_driver, host=hostname, database=db_name,
+#                               user=db_username, password=db_password)
+#         correlation_process_status = pd.read_sql(sql, conn)
+#         #MDCdataDF.columns = column_names
+#         return correlation_process_status
+#     except pyodbc.Error as err:
+#         print("Couldn't connect to Server")
+#         print("Error message:- " + str(err))
 
-@app.post("/api/corelation_process_status")
-async def get_correlation_process_status():
-    correlation_process_status = connect_correlation_process_status()
-    correlation_process_status_json = correlation_process_status.to_json(orient='records')
-    return correlation_process_status_json
+# @app.post("/api/corelation_process_status")
+# async def get_correlation_process_status():
+#     correlation_process_status = connect_correlation_process_status()
+#     correlation_process_status_json = correlation_process_status.to_json(orient='records')
+#     return correlation_process_status_json
 
 def connect_database_for_eqId(all):
     sql = "SELECT DISTINCT MDC_MSGS.EQ_ID FROM MDC_MSGS"
@@ -3094,14 +3094,12 @@ async def get_eqIData(all:str):
 
 
 def connect_database_for_ata_main(all):
-#    sql = "SELECT DISTINCT Airline_MDC_Data.ATA_Main FROM Airline_MDC_Data"
     sql = "SELECT DISTINCT SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) AS ATA_Main FROM MDC_MSGS"
 
     try:
         conn = pyodbc.connect(driver=db_driver, host=hostname, database=db_name,
                               user=db_username, password=db_password)
         report_ata_main_sql_df = pd.read_sql(sql, conn)
-        #MDCdataDF.columns = column_names
         return report_ata_main_sql_df
     except pyodbc.Error as err:
         print("Couldn't connect to Server")
@@ -3122,17 +3120,12 @@ async def get_eqIData(all:str):
 #     f = open ('ata.json', "r")
 #     data = json.loads(f.read())
 #     data_string = json.dumps(data)
-#     return data_string
-
-# @app.post("/api/uploadfile_airline_mdc_raw_data/")
-# async def create_upload_file(file: UploadFile = File(...)):
-#     result = insertData(file)
-#     return {"result": result}      
+#     return data_string      
     
-@app.post("/api/uploadfile_input_message_data/")
-async def uploadfile_input_message_data(file: UploadFile = File(...)):
-    result = insertData_MDCMessageInputs(file)
-    return {"result": result} 
+# @app.post("/api/uploadfile_input_message/")
+# async def uploadfile_input_message(file: UploadFile = File(...)):
+#     result = insertData_MDCMessageInputs(file)
+#     return {"result": result} 
 
 # update input message data    
 def connect_database_for_update(Equation_ID,EICAS,Priority_,MHIRJ_ISE_inputs,MHIRJ_ISE_Recommended_Action,Additional_Comments,MEL_or_No_Dispatch):
@@ -3209,37 +3202,6 @@ async def update_data(Equation_ID:str, EICAS:str,Priority_:str, MHIRJ_ISE_inputs
     update_data = connect_database_for_update(Equation_ID,EICAS,Priority_,MHIRJ_ISE_inputs,MHIRJ_ISE_Recommended_Action,Additional_Comments,MEL_or_No_Dispatch)
     return update_data
 
-
-# delete from MDC messege input    
-
-# @app.post("/api/delete_MDC_Message_Input/")
-# async def delete():
-#     delete_data = connect_database_for_delete()
-#     return delete_data    
-
-# def connect_database_for_delete():
-   
-       
-#         conn = pyodbc.connect(driver=db_driver, host=hostname, database=db_name,
-#                               user=db_username, password=db_password)
-#         cursor = conn.cursor()  
-#         # TODO : delete from mdc_message where B1-EQ = 
-#         sql =" DELETE FROM MDCMessagesInputs_CSV_UPLOAD"
-#         print(sql)
- 
-#         cursor.execute(sql)
-#         conn.commit()
-#         conn.close()
-#         # return update_sql_df
-#         return "Delete from MDCMessagesInputs"  
-
-# #upload top message data     
-# @app.post("/api/uploadfile_top_message_data/")
-# async def create_upload_file2(file: UploadFile = File(...)):
-#     result = insertData_TopMessageSheet(file)
-#     return {"result": result}   
-
-
 ## Delta Report
 True_list = []
 False_list = []
@@ -3277,7 +3239,7 @@ def listOfJams():
     return listofJamMessages
 
 
-
+#delta
 @app.post(
     "/api/GenerateReport/{analysisType}/{occurences}/{legs}/{intermittent}/{consecutiveDays}/{ata}/{exclude_EqID}/{airline_operator}/{include_current_message}/{flag}/{prev_fromDate}/{prev_toDate}/{curr_fromDate}/{curr_toDate}")
 async def generateDeltaReport(analysisType: str, occurences: int, legs: int, intermittent: int, consecutiveDays: int,
@@ -3289,40 +3251,29 @@ async def generateDeltaReport(analysisType: str, occurences: int, legs: int, int
             return delta
         else:
             return None
-           
 
-	
-
-# blob storage
-# @app.post("/api/upload_PM_file/")
-# async def pm_upload_blob(file: UploadFile = File(...)):
-#     result = run_sample(file)
-#     return {"result": result}   
-
-# @app.get("/api/getMDCFileUploadStatus")
-# async def getMDCFileUploadStatus():
-#     return getFileUploadStatusPercentage() 
-
-
+#all mdc message input
 @app.post("/api/all_mdc_messages_input/")
 async def get_mdcMessageInput(eq_id: Optional[str]=""):
     mdcRaw_df = connect_database_mdc_message_input(eq_id)
     mdcRaw_df_json =  mdcRaw_df.to_json(orient='records')
     print(mdcRaw_df_json)
-    return  mdcRaw_df_json
+    return mdcRaw_df_json
 
-@app.post("/api/delete_mdc_messages_input_by_eq_id/{eq_id}")
-async def delete_mdc_messages_input_by_eq_id(eq_id:str):
-    mdcRaw_df = db_delete_mdc_messages_input_by_eq_id(eq_id)
-    print(mdcRaw_df)
-    return  mdcRaw_df
+# delete mdc message input 
+# @app.post("/api/delete_mdc_messages_input_by_eq_id/{eq_id}")
+# async def delete_mdc_messages_input_by_eq_id(eq_id:str):
+#     mdcRaw_df = db_delete_mdc_messages_input_by_eq_id(eq_id)
+#     print(mdcRaw_df)
+#     return  mdcRaw_df
 
-@app.post("/api/insert_mdc_messages_input/")
-async def insert_mdc_messages_input(rawdata: Request):
-    try : 
-        t = await rawdata.json()
-        data = db_insert_mdc_messages_input(t)
-        return data
-    except Exception as e: 
-        print(e)
-        return {'error': 'error in '+str(e)}
+# insert mdc message input
+# @app.post("/api/insert_mdc_messages_input/")
+# async def insert_mdc_messages_input(rawdata: Request):
+#     try : 
+#         t = await rawdata.json()
+#         data = db_insert_mdc_messages_input(t)
+#         return data
+#     except Exception as e: 
+#         print(e)
+#         return {'error': 'error in '+str(e)}
