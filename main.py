@@ -3128,29 +3128,94 @@ async def get_eqIData(all:str):
 #     return {"result": result} 
 
 # update input message data    
-def connect_database_for_update(Equation_ID,EICAS,Priority_,MHIRJ_ISE_inputs,MHIRJ_ISE_Recommended_Action,Additional_Comments,MEL_or_No_Dispatch):
+def connect_database_for_update(Equation_ID,LRU,ATA,Message_NO,Comp_ID,Message,Fault_Logged,Status,Message_Type,EICAS,Timer,Logic,Equation_Description,Occurrence_Flag,Days_Count,Priority,MHIRJ_ISE_Recommended_Action,Additional_Comments,MHIRJ_ISE_inputs,MEL_or_No_Dispatch,Keywords):
    # try:
          
-        conn = pyodbc.connect(driver=db_driver, host=hostname, database=db_name,
-                              user=db_username, password=db_password)
+        conn = pyodbc.connect(
+            Trusted_Connection='No',
+            driver='{ODBC Driver 17 for SQL Server}', host='aftermarket-mhirj.database.windows.net', database='MHIRJ_HUMBER',
+                              user='humber_rw', password='nP@yWw@!$4NxWeK6p*ttu3q6')
         cursor = conn.cursor()  
-        sql =" UPDATE  MDCMessagesInputs_CSV_UPLOAD SET "
+        sql =" UPDATE  MDCMessagesInputs SET "
 
         sqlConditions = ''
         numberOfConditions = 0
+        if  LRU.strip() :
+            numberOfConditions += 1
+            sql +=  " [LRU]=  '" + LRU + "' "
+
+
+        if  ATA.strip() :
+            numberOfConditions += 1
+            sql += " , " if numberOfConditions > 1 else sql
+            sql +=  " [ATA]=  '" + ATA + "' " 
+
+        if  Message_NO.strip() :
+            numberOfConditions += 1
+            sql += " , " if numberOfConditions > 1 else sql
+            sql +=  " [Message_NO]=  '" + Message_NO + "' "  
+
+        if  Comp_ID.strip() :
+            numberOfConditions += 1
+            sql += " , " if numberOfConditions > 1 else sql
+            sql +=  " [Comp_ID]=  '" + Comp_ID + "' " 
+
+        if  Message.strip() :
+            numberOfConditions += 1
+            sql += " , " if numberOfConditions > 1 else sql
+            sql +=  " [Message]=  '" + Message + "' "  
+
+
+        if  Fault_Logged.strip() :
+            numberOfConditions += 1
+            sql += " , " if numberOfConditions > 1 else sql
+            sql +=  " [Fault_Logged]=  '" + Fault_Logged + "' "    
+
+        if  Status.strip() :
+            numberOfConditions += 1
+            sql += " , " if numberOfConditions > 1 else sql
+            sql +=  " [Status]=  '" + Status + "' "    
+
+        if  Message_Type.strip() :
+            numberOfConditions += 1
+            sql += " , " if numberOfConditions > 1 else sql
+            sql +=  " [Message_Type]=  '" + Message_Type + "' "                      
+        
         if  EICAS.strip() :
             numberOfConditions += 1
+            sql += " , " if numberOfConditions > 1 else sql
             sql +=  " [EICAS]=  '" + EICAS + "' "
-                               
-        if  Priority_.strip() :
-            numberOfConditions += 1
-            sql += " , " if numberOfConditions > 1 else sql
-            sql +=  " [Priority_] = '" + Priority_ + "'"
 
-        if  MHIRJ_ISE_inputs.strip() :
+        if  Timer.strip() :
             numberOfConditions += 1
             sql += " , " if numberOfConditions > 1 else sql
-            sql +=  "[MHIRJ_ISE_inputs] = '" + MHIRJ_ISE_inputs + "'"
+            sql +=  " [Timer]=  '" + Timer + "' " 
+
+        if  Logic.strip() :
+            numberOfConditions += 1
+            sql += " , " if numberOfConditions > 1 else sql
+            sql +=  " [Logic]=  '" + Logic + "' " 
+
+        if  Equation_Description.strip() :
+            numberOfConditions += 1
+            sql += " , " if numberOfConditions > 1 else sql
+            sql +=  " [Equation_Description]=  '" + Equation_Description + "' " 
+
+        if  Occurrence_Flag.strip() :
+            numberOfConditions += 1
+            sql += " , " if numberOfConditions > 1 else sql
+            sql +=  " [Occurrence_Flag]=  '" + Occurrence_Flag + "' "   
+
+        if  Days_Count.strip() :
+            numberOfConditions += 1
+            sql += " , " if numberOfConditions > 1 else sql
+            sql +=  " [Days_Count]=  '" + Days_Count + "' "                    
+                               
+        if  Priority.strip() :
+            numberOfConditions += 1
+            sql += " , " if numberOfConditions > 1 else sql
+            sql +=  " [Priority] = '" + Priority + "'"
+
 
         if  MHIRJ_ISE_Recommended_Action.strip() :
             numberOfConditions += 1
@@ -3160,47 +3225,39 @@ def connect_database_for_update(Equation_ID,EICAS,Priority_,MHIRJ_ISE_inputs,MHI
         if  Additional_Comments.strip() :
             numberOfConditions += 1
             sql += " , " if numberOfConditions > 1 else sql
-            sql +=  "[Additional_Comments] = '" + Additional_Comments + "'"     
+            sql +=  "[Additional_Comments] = '" + Additional_Comments + "'"         
+
+        if  MHIRJ_ISE_inputs.strip() :
+            numberOfConditions += 1
+            sql += " , " if numberOfConditions > 1 else sql
+            sql +=  "[MHIRJ_ISE_inputs] = '" + MHIRJ_ISE_inputs + "'"     
 
 
         if  MEL_or_No_Dispatch.strip() :
             numberOfConditions += 1
             sql += " , " if numberOfConditions > 1 else sql
-            sql +=  "[MEL_or_No_Dispatch] = '" + MEL_or_No_Dispatch + "'"                
+            sql +=  "[MEL_or_No_Dispatch] = '" + MEL_or_No_Dispatch + "'"
+
+        if  Keywords.strip() :
+            numberOfConditions += 1
+            sql += " , " if numberOfConditions > 1 else sql
+            sql +=  "[Keywords] = '" + Keywords + "'"           
+            
+                     
  
         sql += "  WHERE [Equation_ID] = '" + Equation_ID + "'"
- 
-        # print("------ATA ----")
-        # print(ATA)
         print("---print sql builder----")
         print(sql)
  
         cursor.execute(sql)
-               
- 
-        # sql+= cursor.execute(" UPDATE  MDCMessagesInputs_CSV_UPLOAD SET [LRU]= ? , [ATA]=? WHERE [Equation_ID]=?",
-        #           LRU,
-        #           ATA,
-        #           equation_id
-        #         ) 
-       
- 
- 
-        # update_sql_df = pd.read_sql(sql, conn)
-        # MDCdataDF.columns = column_names
         conn.commit()
         conn.close()
-        # return update_sql_df
         return "Successfully UPDATE into MDCMessagesInputs"
- 
-    # except pyodbc.Error as err:
-    #     print("Couldn't connect to Server")
-    #     print("Error message:- " + str(err))
- 
-@app.post("/api/update_input_message_data/{Equation_ID}/{EICAS}/{Priority_}/{MHIRJ_ISE_inputs}/{MHIRJ_ISE_Recommended_Action}/{Additional_Comments}/{MEL_or_No_Dispatch}")
-async def update_data(Equation_ID:str, EICAS:str,Priority_:str, MHIRJ_ISE_inputs:str, MHIRJ_ISE_Recommended_Action:str ,Additional_Comments:str,MEL_or_No_Dispatch:str):
-    update_data = connect_database_for_update(Equation_ID,EICAS,Priority_,MHIRJ_ISE_inputs,MHIRJ_ISE_Recommended_Action,Additional_Comments,MEL_or_No_Dispatch)
-    return update_data
+
+@app.post("/api/update_input_message_data/{Equation_ID}/{LRU}/{ATA}/{Message_NO}/{Comp_ID}/{Message}/{Fault_Logged}/{Status}/{Message_Type}/{EICAS}/{Timer}/{Logic}/{Equation_Description}/{Occurrence_Flag}/{Days_Count}/{Priority}/{MHIRJ_ISE_Recommended_Action}/{Additional_Comments}/{MHIRJ_ISE_inputs}/{MEL_or_No_Dispatch}/{Keywords}")
+async def update_data(Equation_ID:str,LRU:str,ATA:str,Message_NO:str,Comp_ID:str,Message:str,Fault_Logged:str,Status:str,Message_Type:str, EICAS:str,Timer:str,Logic:str,Equation_Description:str,Occurrence_Flag:str,Days_Count:str,Priority:str, MHIRJ_ISE_Recommended_Action:str ,Additional_Comments:str,MHIRJ_ISE_inputs:str,MEL_or_No_Dispatch:str,Keywords:str):
+    update_data = connect_database_for_update(Equation_ID,LRU,ATA,Message_NO,Comp_ID,Message,Fault_Logged,Status,Message_Type, EICAS,Timer,Logic,Equation_Description,Occurrence_Flag,Days_Count,Priority, MHIRJ_ISE_Recommended_Action ,Additional_Comments,MHIRJ_ISE_inputs,MEL_or_No_Dispatch,Keywords)
+    return update_data   
 
 ## Delta Report
 True_list = []
