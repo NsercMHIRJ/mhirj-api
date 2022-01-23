@@ -1,0 +1,21 @@
+name: Deployment Workflow
+on:
+  push:
+    branches: [main]
+
+jobs:
+  job_one:
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps:
+    - name: deploying app
+      uses: appleboy/ssh-action@master
+      with:
+        host: 10.40.4.16
+        username: karan.gajjar.t1@mhirj.com
+        key: ${{ secrets.MHIRJ_SECRET }}
+        port: 22
+        script: |
+        cd mhirj-api
+        git pull origin main
+        git status
