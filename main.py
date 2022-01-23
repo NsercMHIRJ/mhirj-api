@@ -3317,6 +3317,10 @@ async def get_mdcMessageInput(eq_id: Optional[str]=""):
     print(mdcRaw_df_json)
     return mdcRaw_df_json
 
+@app.post("/api/testing_api/")
+async def testing_api():
+    return {"update":1}
+
 # delete mdc message input 
 # @app.post("/api/delete_mdc_messages_input_by_eq_id/{eq_id}")
 # async def delete_mdc_messages_input_by_eq_id(eq_id:str):
