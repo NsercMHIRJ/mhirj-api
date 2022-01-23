@@ -103,8 +103,8 @@ def historyReport(MaxAllowedOccurrences: int, MaxAllowedConsecLegs: int, MaxAllo
         flags_array.fillna(value= "", inplace= True)
 
         # Creating flags lists
-        flags_jams = MDCMessagesDF.loc[(MDCMessagesDF["Occurance_Flag"] == 1) & (MDCMessagesDF["Days_Count"] == 0)]["Equation_ID"]
-        flags_2in5 = MDCMessagesDF.loc[(MDCMessagesDF["Occurance_Flag"] == 2) & (MDCMessagesDF["Days_Count"] == 5)]["Equation_ID"]
+        flags_jams = MDCMessagesDF.loc[(MDCMessagesDF["Occurrence_Flag"] == 1) & (MDCMessagesDF["Days_Count"] == 0)]["Equation_ID"]
+        flags_2in5 = MDCMessagesDF.loc[(MDCMessagesDF["Occurrence_Flag"] == 2) & (MDCMessagesDF["Days_Count"] == 5)]["Equation_ID"]
 
         # create main table array
         MAINtable_array_temp = np.empty((1,20),object) # 21 = # of columns
@@ -209,10 +209,10 @@ def historyReport(MaxAllowedOccurrences: int, MaxAllowedConsecLegs: int, MaxAllo
                 MAINtable_array_temp[0,13] = str(flags_array.at[equation, aircraft])
                 #if the input is empty set the priority to 4
                 try:
-                    if MDCMessagesDF["Priority_"][MDCMessagesDF["Equation_ID"] == equation].item() == 0:
+                    if MDCMessagesDF["Priority"][MDCMessagesDF["Equation_ID"] == equation].item() == 0:
                         MAINtable_array_temp[0,14] = 4
                     else:
-                        MAINtable_array_temp[0,14] = MDCMessagesDF["Priority_"][MDCMessagesDF["Equation_ID"] == equation].item()
+                        MAINtable_array_temp[0,14] = MDCMessagesDF["Priority"][MDCMessagesDF["Equation_ID"] == equation].item()
                 except:
                     MAINtable_array_temp[0,14] = 4
 

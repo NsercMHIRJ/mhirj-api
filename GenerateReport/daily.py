@@ -143,7 +143,7 @@ def dailyReport(MaxAllowedOccurrences: int, MaxAllowedConsecLegs: int, MaxAllowe
         flags_array.fillna(value= "", inplace= True)
 
         # Creating flags lists
-        flags_jams = MDCMessagesDF.loc[(MDCMessagesDF["Occurance_Flag"] == 1) & (MDCMessagesDF["Days_Count"] == 0)]["Equation_ID"]
+        flags_jams = MDCMessagesDF.loc[(MDCMessagesDF["Occurrence_Flag"] == 1) & (MDCMessagesDF["Days_Count"] == 0)]["Equation_ID"]
 
         # go through AC/eqnID combinations for analysis
         for i in range(len(notEmptyLabelPairs)):
@@ -239,10 +239,10 @@ def dailyReport(MaxAllowedOccurrences: int, MaxAllowedConsecLegs: int, MaxAllowe
 
                 try:
                     #if the input is empty set the priority to 4
-                    if MDCMessagesDF["Priority "][MDCMessagesDF["Equation_ID"] == equation].item() == 0:
+                    if MDCMessagesDF["Priority"][MDCMessagesDF["Equation_ID"] == equation].item() == 0:
                         MAINtable_array_temp[0,12] = 4
                     else:
-                        MAINtable_array_temp[0,12] = MDCMessagesDF["Priority "][MDCMessagesDF["Equation_ID"] == equation].item()
+                        MAINtable_array_temp[0,12] = MDCMessagesDF["Priority"][MDCMessagesDF["Equation_ID"] == equation].item()
                 except: 
                     MAINtable_array_temp[0,12] = 4
 
