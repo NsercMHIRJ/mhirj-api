@@ -16,6 +16,6 @@ jobs:
         key: ${{ secrets.MHIRJ_SECRET }}
         port: 22
         script: |
-        cd mhirj-api
-        git pull origin main
-        git status
+          cd mhirj-api
+          git pull origin main
+          git status
