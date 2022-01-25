@@ -80,7 +80,7 @@ def dailyReport(MaxAllowedOccurrences: int, MaxAllowedConsecLegs: int, MaxAllowe
 
 
     currentRow = 0
-    MAINtable_array_temp = np.empty((1,17),object) # 18 for the date 
+    MAINtable_array_temp = np.empty((1,18),object) # 18 for the date 
     MAINtable_array = []
 
     for i in range(0, NumberofDays):
@@ -260,10 +260,10 @@ def dailyReport(MaxAllowedOccurrences: int, MaxAllowedConsecLegs: int, MaxAllowe
                         MAINtable_array_temp[0,12] = 1
 
                 # #check the content of MHIRJ ISE recommendation and add to array    
-                # if MDCMessagesDF["MEL or No-Dispatch"][MDCMessagesDF["Equation_ID"] == equation].item() == "0":
-                #     MAINtable_array_temp[0,15] = ""
-                # else:
-                #     MAINtable_array_temp[0,15] = MDCMessagesDF["MEL or No-Dispatch"][MDCMessagesDF["Equation_ID"] == equation].item()
+                if MDCMessagesDF["MEL_or_No_Dispatch"][MDCMessagesDF["Equation_ID"] == equation].item() == "0":
+                    MAINtable_array_temp[0,15] = ""
+                else:
+                    MAINtable_array_temp[0,15] = MDCMessagesDF["MEL_or_No_Dispatch"][MDCMessagesDF["Equation_ID"] == equation].item()
 
                 try:
                     #check content of "MHIRJ Input"
@@ -277,20 +277,20 @@ def dailyReport(MaxAllowedOccurrences: int, MaxAllowedConsecLegs: int, MaxAllowe
                 try:
                     #check the content of MHIRJ ISE recommendation and add to array    
                     if MDCMessagesDF["MHIRJ_ISE_Recommended_Action"][MDCMessagesDF["Equation_ID"] == equation].item() == "0":
-                        MAINtable_array_temp[0,15] = ""
+                        MAINtable_array_temp[0,16] = ""
                     else:
-                        MAINtable_array_temp[0,15] = MDCMessagesDF["MHIRJ_ISE_Recommended_Action"][MDCMessagesDF["Equation_ID"] == equation].item()
+                        MAINtable_array_temp[0,16] = MDCMessagesDF["MHIRJ_ISE_Recommended_Action"][MDCMessagesDF["Equation_ID"] == equation].item()
                 except:
-                    MAINtable_array_temp[0,15] = ""
+                    MAINtable_array_temp[0,16] = ""
 
                 try:
                     #check content of "additional"
                     if MDCMessagesDF["Additional_Comments"][MDCMessagesDF["Equation_ID"] == equation].item() == "0":
-                        MAINtable_array_temp[0,16] = ""
+                        MAINtable_array_temp[0,17] = ""
                     else:
-                        MAINtable_array_temp[0,16] = MDCMessagesDF["Additional_Comments"][MDCMessagesDF["Equation_ID"] == equation].item()
+                        MAINtable_array_temp[0,17] = MDCMessagesDF["Additional_Comments"][MDCMessagesDF["Equation_ID"] == equation].item()
                 except:
-                    MAINtable_array_temp[0,16] = ""
+                    MAINtable_array_temp[0,17] = ""
 
                 #Check for the equation in the Top Messages sheet
                 TopCounter = 0
@@ -327,7 +327,7 @@ def dailyReport(MaxAllowedOccurrences: int, MaxAllowedConsecLegs: int, MaxAllowe
     TitlesArrayDaily = ["Date", "AC SN", "EICAS Message", "LRU", "ATA", "B1-Equation", "Type",
                         "Equation Description", "Total Occurences", "Consecutive FL",
                         "INTERMITNT", "Reason(s) for flag", "Priority", "Known Top Message - Recommended Documents",
-                        "MHIRJ ISE Input", "MHIRJ ISE Recommendation", "Additional Comments"]
+                        "MHIRJ ISE Input", "MEL or No-Dispatch", "MHIRJ ISE Recommendation", "Additional Comments"]
 
     # Converts the Numpy Array to Dataframe to manipulate
     #pd.set_option('display.max_rows', None)
@@ -338,7 +338,7 @@ def dailyReport(MaxAllowedOccurrences: int, MaxAllowedConsecLegs: int, MaxAllowe
     OutputTableDaily = OutputTableDaily[["AC_TN", "Date", "AC SN", "EICAS Message", "LRU", "ATA", "B1-Equation", "Type",
             "Equation Description", "Total Occurences", "Consecutive FL",
             "INTERMITNT", "Reason(s) for flag", "Priority", "Known Top Message - Recommended Documents",
-            "MHIRJ ISE Input", "MHIRJ ISE Recommendation", "Additional Comments"]] # AC_TN added to output table which means that column order has to be re ordered
+            "MHIRJ ISE Input", "MEL or No-Dispatch", "MHIRJ ISE Recommendation", "Additional Comments"]] # AC_TN added to output table which means that column order has to be re ordered
     listofJamMessages = list()
     # all_jam_messages = connect_to_fetch_all_jam_messages()
     # for each_jam_message in all_jam_messages['Jam_Message']:

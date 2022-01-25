@@ -19,7 +19,7 @@ def chart4Report(occurences, legs, intermittent, consecutiveDays, ata, exclude_E
         print("history: ", OutputTableHistory.columns)
         Dataforchart = OutputTableHistory["ATA"]
         labels = Dataforchart.value_counts().index
-        countsofATAs = Dataforchart.value_counts().sort_values().tail(20)
+        countsofATAs = Dataforchart.value_counts().sort_values().tail(int(topCount))
 
         #Image settings
         spacing = np.arange(len(countsofATAs))
