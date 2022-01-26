@@ -305,7 +305,7 @@ def connect_database_MDCdata(ata, excl_eqid, include_current_message, from_dt, t
 def connect_database_for_corelation(from_dt, to_dt, equation_id, tail_no):
     sql =""
 
-    sql += "SELECT DISTINCT [MaintTransID],[DateAndTime],[Failure_Flag],[MRB],[SquawkSource],[Discrepancy],[CorrectiveAction] FROM [dbo].[MDC_PM_Correlated] WHERE CONVERT(date,DateAndTime) BETWEEN '" + from_dt + "'  AND '" + to_dt + "'"
+    sql += "SELECT DISTINCT [ATA_Main],[ATA_Sub],[MaintTransID],[DateAndTime],[Failure_Flag],[MRB],[SquawkSource],[Discrepancy],[CorrectiveAction] FROM [dbo].[MDC_PM_Correlated] WHERE CONVERT(date,DateAndTime) BETWEEN '" + from_dt + "'  AND '" + to_dt + "'"
     
     if equation_id : 
         sql+= " AND EQ_ID = '"+equation_id+"'"
@@ -319,6 +319,37 @@ def connect_database_for_corelation(from_dt, to_dt, equation_id, tail_no):
         report_eqId_sql_df = pd.read_sql(sql, conn)
         conn.close()
         return report_eqId_sql_df
+    except pyodbc.Error as err:
+        print("Couldn't connect to Server")
+        print("Error message:- " + str(err))
+        return {"message":str(err)}
+
+def connect_database_for_corelation_pid(p_id):
+    
+    sql = """SELECT 
+	[Aircraft_tail_No],
+	[EQ_ID],
+	[aircraftno],
+	[ATA_Description],
+	[LRU],
+	[CAS],
+	[MDC_MESSAGE],
+	[EQ_DESCRIPTION],
+	[ATA_Main],
+	[ATA_Sub]
+    FROM [dbo].[MDC_PM_Correlated] 
+    WHERE [MaintTransID] = %s
+    """ %(p_id)
+
+    print(sql)
+
+    try:
+        conn = pyodbc.connect(driver=driver_vdi, host=host_vdi,
+                              database=database_vdi,
+                              user=user_vdi, password=password_vdi)
+        corelation_df = pd.read_sql(sql, conn)
+        conn.close()
+        return corelation_df
     except pyodbc.Error as err:
         print("Couldn't connect to Server")
         print("Error message:- " + str(err))
