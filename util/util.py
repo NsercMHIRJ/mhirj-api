@@ -305,7 +305,7 @@ def connect_database_MDCdata(ata, excl_eqid, include_current_message, from_dt, t
 def connect_database_for_corelation(from_dt, to_dt, equation_id, tail_no):
     sql =""
 
-    sql += "SELECT DISTINCT [ATA_Main],[ATA_Sub],[MaintTransID],[DateAndTime],[Failure_Flag],[MRB],[SquawkSource],[Discrepancy],[CorrectiveAction] FROM [dbo].[MDC_PM_Correlated] WHERE CONVERT(date,DateAndTime) BETWEEN '" + from_dt + "'  AND '" + to_dt + "'"
+    sql += "SELECT DISTINCT [ATA_Main],[ATA_Sub],[MaintTransID],[DateAndTime],[Failure_Flag],[MRB],[SquawkSource],[Discrepancy],[CorrectiveAction] FROM [dbo].[MDC_PM_Correlated_Test] WHERE CONVERT(date,DateAndTime) BETWEEN '" + from_dt + "'  AND '" + to_dt + "'"
     
     if equation_id : 
         sql+= " AND EQ_ID = '"+equation_id+"'"
@@ -337,7 +337,7 @@ def connect_database_for_corelation_pid(p_id):
 	[EQ_DESCRIPTION],
 	[ATA_Main],
 	[ATA_Sub]
-    FROM [dbo].[MDC_PM_Correlated] 
+    FROM [dbo].[MDC_PM_Correlated_Test] 
     WHERE [MaintTransID] = %s
     """ %(p_id)
 
@@ -350,6 +350,28 @@ def connect_database_for_corelation_pid(p_id):
         corelation_df = pd.read_sql(sql, conn)
         conn.close()
         return corelation_df
+    except pyodbc.Error as err:
+        print("Couldn't connect to Server")
+        print("Error message:- " + str(err))
+        return {"message":str(err)}
+
+def connect_database_for_corelation_ata(from_dt, to_dt, equation_id, ata):
+    sql =""
+
+    sql += "SELECT DISTINCT [ATA_Main],[ATA_Sub],[MaintTransID],[DateAndTime],[Failure_Flag],[MRB],[SquawkSource],[Discrepancy],[CorrectiveAction] FROM [dbo].[MDC_PM_Correlated_Test] WHERE CONVERT(date,DateAndTime) BETWEEN '" + from_dt + "'  AND '" + to_dt + "'"
+    
+    if equation_id : 
+        sql+= " AND EQ_ID = '"+equation_id+"'"
+    if ata : 
+        sql += " AND ATA_Main ='"+ata+"'"
+    print(sql)
+    try:
+        conn = pyodbc.connect(driver=driver_vdi, host=host_vdi,
+                              database=database_vdi,
+                              user=user_vdi, password=password_vdi)
+        sql_df = pd.read_sql(sql, conn)
+        conn.close()
+        return sql_df
     except pyodbc.Error as err:
         print("Couldn't connect to Server")
         print("Error message:- " + str(err))

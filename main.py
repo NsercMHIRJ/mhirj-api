@@ -32,7 +32,7 @@ from fastapi import File, UploadFile
 from crud import *
 #from pm_upload import *
 import uvicorn
-from util.util import connect_database_for_corelation, connect_database_for_corelation_pid, connect_database_mdc_message_input , connect_database_MDCdata , connect_to_fetch_all_ata , connect_to_fetch_all_eqids, db_delete_mdc_messages_input_by_eq_id, db_insert_mdc_messages_input
+from util.util import connect_database_for_corelation, connect_database_for_corelation_ata, connect_database_for_corelation_pid, connect_database_mdc_message_input , connect_database_MDCdata , connect_to_fetch_all_ata , connect_to_fetch_all_eqids, db_delete_mdc_messages_input_by_eq_id, db_insert_mdc_messages_input
 from GenerateReport.jamReport import jamReport
 # from GenerateReport.jamReport import MDCdataDF
 from GenerateReport.jamReport import mdcDF
@@ -2944,18 +2944,19 @@ async def get_Stacked_Chart_MDC_PM_Data(start_date:str,end_date:str,top_value:in
 #         print("Couldn't connect to Server")
 #         print("Error message:- " + str(err))
 
-@app.post("/api/corelation/{fromDate}/{toDate}")
-async def getCorelationData(fromDate: str, toDate: str, equation_id:Optional[str]="", tail_no:Optional[str]=""):
+@app.post("/api/corelation_tail/{fromDate}/{toDate}/{equation_id}/{tail_no}")
+async def getCorelationData(fromDate: str, toDate: str, equation_id, tail_no):
     corelation_df = connect_database_for_corelation(fromDate, toDate, equation_id, tail_no)
     corelation_df_json = corelation_df.to_json(orient='records')
     return corelation_df_json
 
 # for reference -> http://localhost:8000/corelation/11-11-2020/11-12-2020/B1-008003/27
-# @app.post("/api/corelation/{fromDate}/{toDate}")
-# async def get_CorelationData(fromDate: str, toDate: str, equation_id:Optional[str]="", ata:Optional[str]=""):
-#     corelation_df = connect_database_for_corelation(fromDate, toDate, equation_id, ata)
-#     corelation_df_json = corelation_df.to_json(orient='records')
-#     return corelation_df_json
+@app.post("/api/corelation_ata/{fromDate}/{toDate}/{equation_id}/{ata}")
+#async def getCorelationDataATA(fromDate: str, toDate: str, equation_id:Optional[str]="", ata:Optional[str]=""):
+async def getCorelationDataATA(fromDate: str, toDate: str, equation_id:str, ata:str):
+    corelation_df = connect_database_for_corelation_ata(fromDate, toDate, equation_id, ata)
+    corelation_df_json = corelation_df.to_json(orient='records')
+    return corelation_df_json
 
 
 @app.post("/api/corelation_pid/{p_id}")
