@@ -80,7 +80,7 @@ def dailyReport(MaxAllowedOccurrences: int, MaxAllowedConsecLegs: int, MaxAllowe
 
 
     currentRow = 0
-    MAINtable_array_temp = np.empty((1,18),object) # 18 for the date 
+    MAINtable_array_temp = np.empty((1,19),object) # 18 for the date 
     MAINtable_array = []
 
     for i in range(0, NumberofDays):
@@ -212,85 +212,85 @@ def dailyReport(MaxAllowedOccurrences: int, MaxAllowedConsecLegs: int, MaxAllowe
                     MAINtable_array_temp[0,2] = MDCMessagesDF["EICAS"][MDCMessagesDF["Equation_ID"] == equation].item() #EICAS
                 except: 
                     MAINtable_array_temp[0,2] = "No Data"
-                # MAINtable_array_temp[0,3] = MDCMessagesDF["Message"][MDCMessagesDF["Equation_ID"] == equation].item() #Messge
+                MAINtable_array_temp[0,3] = MDCMessagesDF["Message"][MDCMessagesDF["Equation_ID"] == equation].item() #Messge
                 try:
-                    MAINtable_array_temp[0,3] = MDCMessagesDF["LRU"][MDCMessagesDF["Equation_ID"] == equation].item() #LRU
+                    MAINtable_array_temp[0,4] = MDCMessagesDF["LRU"][MDCMessagesDF["Equation_ID"] == equation].item() #LRU
                 except:
-                    MAINtable_array_temp[0,3] = "No Data"
-                try:
-                    MAINtable_array_temp[0,4] = MDCMessagesDF["ATA"][MDCMessagesDF["Equation_ID"] == equation].item() #ATA
-                except: 
                     MAINtable_array_temp[0,4] = "No Data"
-                MAINtable_array_temp[0,5] = equation #Eqn ID
                 try:
-                    MAINtable_array_temp[0,6] = MDCMessagesDF["Message Type"][MDCMessagesDF["Equation_ID"] == equation].item()
+                    MAINtable_array_temp[0,5] = MDCMessagesDF["ATA"][MDCMessagesDF["Equation_ID"] == equation].item() #ATA
                 except: 
-                    MAINtable_array_temp[0,6] = "No Data"
-
+                    MAINtable_array_temp[0,5] = "No Data"
+                MAINtable_array_temp[0,6] = equation #Eqn ID
                 try:
-                    MAINtable_array_temp[0,7] = MDCMessagesDF["Equation Description"][MDCMessagesDF["Equation_ID"] == equation].item()
+                    MAINtable_array_temp[0,7] = MDCMessagesDF["Message Type"][MDCMessagesDF["Equation_ID"] == equation].item()
                 except: 
                     MAINtable_array_temp[0,7] = "No Data"
-                MAINtable_array_temp[0,8] = total_occ_DF.at[equation, aircraft]
+
+                try:
+                    MAINtable_array_temp[0,8] = MDCMessagesDF["Equation Description"][MDCMessagesDF["Equation_ID"] == equation].item()
+                except: 
+                    MAINtable_array_temp[0,8] = "No Data"
+                MAINtable_array_temp[0,9] = total_occ_DF.at[equation, aircraft]
                 
-                MAINtable_array_temp[0,9] = consec_legs.at[equation, aircraft]
-                MAINtable_array_temp[0,10] = max_intermittent.at[equation, aircraft]
-                MAINtable_array_temp[0,11] = str(flags_array.at[equation, aircraft])
+                MAINtable_array_temp[0,10] = consec_legs.at[equation, aircraft]
+                MAINtable_array_temp[0,11] = max_intermittent.at[equation, aircraft]
+                MAINtable_array_temp[0,12] = str(flags_array.at[equation, aircraft])
 
                 try:
                     #if the input is empty set the priority to 4
                     if MDCMessagesDF["Priority"][MDCMessagesDF["Equation_ID"] == equation].item() == 0:
-                        MAINtable_array_temp[0,12] = 4
+                        MAINtable_array_temp[0,13] = 4
                     else:
-                        MAINtable_array_temp[0,12] = MDCMessagesDF["Priority"][MDCMessagesDF["Equation_ID"] == equation].item()
+                        MAINtable_array_temp[0,13] = MDCMessagesDF["Priority"][MDCMessagesDF["Equation_ID"] == equation].item()
                 except: 
-                    MAINtable_array_temp[0,12] = 4
+                    MAINtable_array_temp[0,13] = 4
 
                 #For B1-006424 & B1-006430 Could MDC Trend tool assign Priority 3 if logged on A/C below 10340, 15317. Priority 1 if logged on 10340, 15317, 19001 and up
                 if equation == "B1-006424" or equation == "B1-006430":
                     if int(aircraft) <= 10340 and int(aircraft) > 10000:
-                        MAINtable_array_temp[0,12] = 3
+                        MAINtable_array_temp[0,13] = 3
                     elif int(aircraft) > 10340 and int(aircraft) < 11000:
-                        MAINtable_array_temp[0,12] = 1
+                        MAINtable_array_temp[0,13] = 1
                     elif int(aircraft) <= 15317 and int(aircraft) > 15000:
-                        MAINtable_array_temp[0,12] = 3
+                        MAINtable_array_temp[0,13] = 3
                     elif int(aircraft) > 15317 and int(aircraft) < 16000:
-                        MAINtable_array_temp[0,12] = 1
+                        MAINtable_array_temp[0,13] = 1
                     elif int(aircraft) >= 19001 and int(aircraft) < 20000:
-                        MAINtable_array_temp[0,12] = 1
+                        MAINtable_array_temp[0,13] = 1
 
                 # #check the content of MHIRJ ISE recommendation and add to array    
                 if MDCMessagesDF["MEL_or_No_Dispatch"][MDCMessagesDF["Equation_ID"] == equation].item() == "0":
-                    MAINtable_array_temp[0,15] = ""
+                    MAINtable_array_temp[0,16] = ""
                 else:
-                    MAINtable_array_temp[0,15] = MDCMessagesDF["MEL_or_No_Dispatch"][MDCMessagesDF["Equation_ID"] == equation].item()
+                    MAINtable_array_temp[0,16] = MDCMessagesDF["MEL_or_No_Dispatch"][MDCMessagesDF["Equation_ID"] == equation].item()
 
                 try:
                     #check content of "MHIRJ Input"
                     if MDCMessagesDF["MHIRJ_ISE_inputs"][MDCMessagesDF["Equation_ID"] == equation].item() == "0":
-                        MAINtable_array_temp[0,14] = ""
+                        MAINtable_array_temp[0,15] = ""
                     else:
-                        MAINtable_array_temp[0,14] = MDCMessagesDF["MHIRJ_ISE_inputs"][MDCMessagesDF["Equation_ID"] == equation].item()
+                        MAINtable_array_temp[0,15] = MDCMessagesDF["MHIRJ_ISE_inputs"][MDCMessagesDF["Equation_ID"] == equation].item()
                 except:
-                    MAINtable_array_temp[0,14] = ""
+                    MAINtable_array_temp[0,15] = ""
                 
                 try:
                     #check the content of MHIRJ ISE recommendation and add to array    
                     if MDCMessagesDF["MHIRJ_ISE_Recommended_Action"][MDCMessagesDF["Equation_ID"] == equation].item() == "0":
-                        MAINtable_array_temp[0,16] = ""
+                        MAINtable_array_temp[0,17] = ""
                     else:
-                        MAINtable_array_temp[0,16] = MDCMessagesDF["MHIRJ_ISE_Recommended_Action"][MDCMessagesDF["Equation_ID"] == equation].item()
+                        MAINtable_array_temp[0,17] = MDCMessagesDF["MHIRJ_ISE_Recommended_Action"][MDCMessagesDF["Equation_ID"] == equation].item()
                 except:
-                    MAINtable_array_temp[0,16] = ""
+                    MAINtable_array_temp[0,17] = ""
 
                 try:
                     #check content of "additional"
                     if MDCMessagesDF["Additional_Comments"][MDCMessagesDF["Equation_ID"] == equation].item() == "0":
-                        MAINtable_array_temp[0,17] = ""
+                        MAINtable_array_temp[0,18] = ""
                     else:
-                        MAINtable_array_temp[0,17] = MDCMessagesDF["Additional_Comments"][MDCMessagesDF["Equation_ID"] == equation].item()
+                        MAINtable_array_temp[0,18] = MDCMessagesDF["Additional_Comments"][MDCMessagesDF["Equation_ID"] == equation].item()
                 except:
-                    MAINtable_array_temp[0,17] = ""
+                    MAINtable_array_temp[0,18] = ""
 
                 #Check for the equation in the Top Messages sheet
                 TopCounter = 0
@@ -301,7 +301,7 @@ def dailyReport(MaxAllowedOccurrences: int, MaxAllowedConsecLegs: int, MaxAllowe
                     if equation == TopMessagesArray[TopCounter,4]:
 
                         #Found the equation in the Top Messages Sheet. Put the information in the report
-                        MAINtable_array_temp[0,13] = "Known Nuissance: " + str(TopMessagesArray[TopCounter, 13]) \
+                        MAINtable_array_temp[0,14] = "Known Nuissance: " + str(TopMessagesArray[TopCounter, 13]) \
                         + " / In-Service Document: " + str(TopMessagesArray[TopCounter,11]) \
                         + " / FIM Task: " + str(TopMessagesArray[TopCounter,10]) \
                         + " / Remarks: " + str(TopMessagesArray[TopCounter,14])
@@ -311,7 +311,7 @@ def dailyReport(MaxAllowedOccurrences: int, MaxAllowedConsecLegs: int, MaxAllowe
 
                     else:
                         #Not equal, go to next equation
-                        MAINtable_array_temp[0,13] = ""
+                        MAINtable_array_temp[0,14] = ""
                         TopCounter += 1
                 # End while
 
@@ -324,7 +324,7 @@ def dailyReport(MaxAllowedOccurrences: int, MaxAllowedConsecLegs: int, MaxAllowe
                 #Move to next Row on Main page for next flag
                 currentRow = currentRow + 1
 
-    TitlesArrayDaily = ["Date", "AC SN", "EICAS Message", "LRU", "ATA", "B1-Equation", "Type",
+    TitlesArrayDaily = ["Date", "AC SN", "EICAS Message","MDC Message", "LRU", "ATA", "B1-Equation", "Type",
                         "Equation Description", "Total Occurences", "Consecutive FL",
                         "INTERMITNT", "Reason(s) for flag", "Priority", "Known Top Message - Recommended Documents",
                         "MHIRJ ISE Input", "MEL or No-Dispatch", "MHIRJ ISE Recommendation", "Additional Comments"]
@@ -335,7 +335,7 @@ def dailyReport(MaxAllowedOccurrences: int, MaxAllowedConsecLegs: int, MaxAllowe
 
     OutputTableDaily = pd.DataFrame(data= MAINtable_array, columns= TitlesArrayDaily).fillna(" ").sort_values(by= ["Date", "Type", "Priority"])
     OutputTableDaily = OutputTableDaily.merge(AircraftTailPairDF, on= "AC SN") # Tail # added
-    OutputTableDaily = OutputTableDaily[["AC_TN", "Date", "AC SN", "EICAS Message", "LRU", "ATA", "B1-Equation", "Type",
+    OutputTableDaily = OutputTableDaily[["AC_TN", "Date", "AC SN", "EICAS Message", "MDC Message", "LRU", "ATA", "B1-Equation", "Type",
             "Equation Description", "Total Occurences", "Consecutive FL",
             "INTERMITNT", "Reason(s) for flag", "Priority", "Known Top Message - Recommended Documents",
             "MHIRJ ISE Input", "MEL or No-Dispatch", "MHIRJ ISE Recommendation", "Additional Comments"]] # AC_TN added to output table which means that column order has to be re ordered
