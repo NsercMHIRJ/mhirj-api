@@ -221,22 +221,26 @@ def insertData_MDCMessageInputs(file):
    # df = to_df(file)
    print(df.columns)
    print("MDCMESS::\n",df)
+   df.columns = df.columns.str.replace('Priority ', 'Priority')
    df.columns = df.columns.str.replace(' ', '_')
-   df.columns = df.columns.str.replace('#', 'NO')
+   df.columns = df.columns.str.replace('#', 'No')
    df.columns = df.columns.str.replace('-', '_')
+
    # Connect to SQL Server
    print("MDC INPUT ::: ",df.columns)
-   conn = pyodbc.connect(driver=db_driver, host=hostname, database=db_name,
-                             user=db_username, password=db_password)
+   conn = pyodbc.connect(
+            Trusted_Connection='No',
+            driver='{ODBC Driver 17 for SQL Server}', host='aftermarket-mhirj.database.windows.net', database='MHIRJ_HUMBER',
+                              user='humber_rw', password='nP@yWw@!$4NxWeK6p*ttu3q6')
    cursor = conn.cursor()
  
    ##### CREATE TABLE QUERY for MDCMessageInputs.csv
    cursor.execute('''
-   IF OBJECT_ID('dbo.MDCMessagesInputs_CSV_UPLOAD', 'U') IS NULL
-   CREATE TABLE [dbo].[MDCMessagesInputs_CSV_UPLOAD](
+   IF OBJECT_ID('dbo.MDCMessagesInputs_test', 'U') IS NULL
+   CREATE TABLE [dbo].[MDCMessagesInputs_test](
    [LRU] [varchar](max) NULL,
    [ATA] [varchar](max) NULL,
-   [Message_NO] [varchar](max) NULL,
+   [Message_No] [varchar](max) NULL,
    [Comp_ID] [varchar](max) NULL,
    [Message] [varchar](max) NULL,
    [Fault_Logged] [varchar](max) NULL,
@@ -249,11 +253,13 @@ def insertData_MDCMessageInputs(file):
    [Equation_ID] [varchar](255) NULL,
    [Occurrence_Flag] [nvarchar](max) NULL,
    [Days_Count] [nvarchar](max) NULL,
-   [Priority_] [varchar](4000) NULL,
+   [Priority] [varchar](4000) NULL,
    [MHIRJ_ISE_Recommended_Action] [varchar](4000) NULL,
    [Additional_Comments] [varchar](4000) NULL,
    [MHIRJ_ISE_inputs] [varchar](4000) NULL,
-   [MEL_or_No_Dispatch] [varchar](4000) NULL
+   [MEL_or_No_Dispatch] [varchar](4000) NULL,
+   [Keywords] [varchar](4000) NULL
+
    )
    ''')
    conn.commit()
@@ -262,10 +268,10 @@ def insertData_MDCMessageInputs(file):
    for index,row in df.iterrows():
        print("DATA INPUT : ",row.LRU)
        cursor.execute('''
-       INSERT INTO [dbo].[MDCMessagesInputs_CSV_UPLOAD](
+       INSERT INTO [dbo].[MDCMessagesInputs_test](
        [LRU],
        [ATA],
-       [Message_NO],
+       [Message_No],
        [Comp_ID],
        [Message],
        [Fault_Logged],
@@ -278,18 +284,19 @@ def insertData_MDCMessageInputs(file):
        [Equation_ID],
        [Occurrence_Flag],
        [Days_Count],
-       [Priority_],
+       [Priority],
        [MHIRJ_ISE_Recommended_Action],
        [Additional_Comments],
        [MHIRJ_ISE_inputs],
-       [MEL_or_No_Dispatch]
+       [MEL_or_No_Dispatch],
+       [Keywords]
        )
        VALUES
-       (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+       (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
        ''',
        row.LRU,
        row.ATA,
-       row.Message_NO,
+       row.Message_No,
        row.Comp_ID,
        row.Message,
        row.Fault_Logged,
@@ -302,11 +309,12 @@ def insertData_MDCMessageInputs(file):
        row.Equation_ID,
        row.Occurrence_Flag,
        row.Days_Count,
-       row.Priority_,
+       row.Priority,
        row.MHIRJ_ISE_Recommended_Action,
        row.Additional_Comments,
        row.MHIRJ_ISE_inputs,
-       row.MEL_or_No_Dispatch
+       row.MEL_or_No_Dispatch,
+       row.Keywords
        )
        conn.commit()
    return "Successfully inserted into MDCMessagesInputs"

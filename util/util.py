@@ -359,11 +359,21 @@ def connect_database_for_corelation_ata(from_dt, to_dt, equation_id, ata):
     sql =""
 
     sql += "SELECT DISTINCT [ATA_Main],[ATA_Sub],[MaintTransID],[DateAndTime],[Failure_Flag],[MRB],[SquawkSource],[Discrepancy],[CorrectiveAction] FROM [dbo].[MDC_PM_Correlated_Test] WHERE CONVERT(date,DateAndTime) BETWEEN '" + from_dt + "'  AND '" + to_dt + "'"
-    
-    if equation_id : 
-        sql+= " AND EQ_ID = '"+equation_id+"'"
-    if ata : 
-        sql += " AND ATA_Main ='"+ata+"'"
+    #if "ALL" not in ata:
+#     #    ata = str(tuple(ata.replace(")", "").replace("(", "").replace("'", "").split(",")))
+
+
+    print("len of eq_id",equation_id)
+    if equation_id!="":
+        equation_id = str(tuple(equation_id.replace(")","").replace("(","").replace("'","").split(",")))
+        if len(equation_id) <= 14:
+            equation_id = equation_id.replace(equation_id[len(equation_id)-2], '')
+        sql += "  AND EQ_ID IN " + equation_id
+    if "ALL" not in ata :
+        if ata!="":
+            sql += "  AND ATA_Main IN " + ata
+    if ata:
+        ata = str(tuple(ata.replace(")","").replace("(","").replace("'","").split(",")))
     print(sql)
     try:
         conn = pyodbc.connect(driver=driver_vdi, host=host_vdi,
