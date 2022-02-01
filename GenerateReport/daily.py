@@ -212,7 +212,12 @@ def dailyReport(MaxAllowedOccurrences: int, MaxAllowedConsecLegs: int, MaxAllowe
                     MAINtable_array_temp[0,2] = MDCMessagesDF["EICAS"][MDCMessagesDF["Equation_ID"] == equation].item() #EICAS
                 except: 
                     MAINtable_array_temp[0,2] = "No Data"
-                MAINtable_array_temp[0,3] = MDCMessagesDF["Message"][MDCMessagesDF["Equation_ID"] == equation].item() #Messge
+                
+                try:
+                    MAINtable_array_temp[0,3] = MDCMessagesDF["Message"][MDCMessagesDF["Equation_ID"] == equation].item() #Message
+                except:
+                    MAINtable_array_temp[0,3] = "No Data" #Message
+
                 try:
                     MAINtable_array_temp[0,4] = MDCMessagesDF["LRU"][MDCMessagesDF["Equation_ID"] == equation].item() #LRU
                 except:
@@ -259,11 +264,14 @@ def dailyReport(MaxAllowedOccurrences: int, MaxAllowedConsecLegs: int, MaxAllowe
                     elif int(aircraft) >= 19001 and int(aircraft) < 20000:
                         MAINtable_array_temp[0,13] = 1
 
-                # #check the content of MHIRJ ISE recommendation and add to array    
-                if MDCMessagesDF["MEL_or_No_Dispatch"][MDCMessagesDF["Equation_ID"] == equation].item() == "0":
+                try:
+                    # #check the content of MHIRJ ISE recommendation and add to array    
+                    if MDCMessagesDF["MEL_or_No_Dispatch"][MDCMessagesDF["Equation_ID"] == equation].item() == "0":
+                        MAINtable_array_temp[0,16] = ""
+                    else:
+                        MAINtable_array_temp[0,16] = MDCMessagesDF["MEL_or_No_Dispatch"][MDCMessagesDF["Equation_ID"] == equation].item()
+                except:
                     MAINtable_array_temp[0,16] = ""
-                else:
-                    MAINtable_array_temp[0,16] = MDCMessagesDF["MEL_or_No_Dispatch"][MDCMessagesDF["Equation_ID"] == equation].item()
 
                 try:
                     #check content of "MHIRJ Input"
@@ -339,7 +347,10 @@ def dailyReport(MaxAllowedOccurrences: int, MaxAllowedConsecLegs: int, MaxAllowe
             "Equation Description", "Total Occurences", "Consecutive FL",
             "INTERMITNT", "Reason(s) for flag", "Priority", "Known Top Message - Recommended Documents",
             "MHIRJ ISE Input", "MEL or No-Dispatch", "MHIRJ ISE Recommendation", "Additional Comments"]] # AC_TN added to output table which means that column order has to be re ordered
-    listofJamMessages = list()
+    listofJamMessages = ["B1-309178","B1-309179","B1-309180","B1-060044","B1-060045","B1-007973",
+                     "B1-060017","B1-006551","B1-240885","B1-006552","B1-006553","B1-006554",
+                     "B1-006555","B1-007798","B1-007772","B1-240938","B1-007925","B1-007905",
+                     "B1-007927","B1-007915","B1-007926","B1-007910","B1-007928","B1-007920"]
     # all_jam_messages = connect_to_fetch_all_jam_messages()
     # for each_jam_message in all_jam_messages['Jam_Message']:
     #     listofJamMessages.append(each_jam_message)
