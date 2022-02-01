@@ -2951,9 +2951,9 @@ async def getCorelationData(fromDate: str, toDate: str, equation_id, tail_no):
     return corelation_df_json
 
 # for reference -> http://localhost:8000/corelation/11-11-2020/11-12-2020/B1-008003/27
-@app.post("/api/corelation_ata/{fromDate}/{toDate}/{equation_id}/{ata}")
-#async def getCorelationDataATA(fromDate: str, toDate: str, equation_id:Optional[str]="", ata:Optional[str]=""):
-async def getCorelationDataATA(fromDate: str, toDate: str, equation_id:str, ata:str):
+@app.post("/api/corelation_ata/{fromDate}/{toDate}")
+async def getCorelationDataATA(fromDate: str, toDate: str, equation_id:Optional[str]="", ata:Optional[str]=""):
+#async def getCorelationDataATA(fromDate: str, toDate: str, equation_id:str, ata:str):
     corelation_df = connect_database_for_corelation_ata(fromDate, toDate, equation_id, ata)
     corelation_df_json = corelation_df.to_json(orient='records')
     return corelation_df_json
