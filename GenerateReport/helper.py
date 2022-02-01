@@ -8,7 +8,7 @@ import datetime
 conn2 = pyodbc.connect(
             Trusted_Connection='No',
             driver='{ODBC Driver 17 for SQL Server}', host='aftermarket-mhirj.database.windows.net', database='MHIRJ_HUMBER',
-                              user='humber_rw', password='nP@yWw@!$4NxWeK6p*ttu3q6')
+                              user='****', password='****')
 # conn = pyodbc.connect(driver=DB_RW().db_driver, host=DB_RW().hostname, database=DB_RW().db_name,
 #                               user=DB_RW().db_username, password=DB_RW().db_password)
 conn = pyodbc.connect(driver=App().db_driver, host=App().hostname, database=App().db_name,
