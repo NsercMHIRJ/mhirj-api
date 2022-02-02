@@ -368,7 +368,8 @@ def connect_database_for_corelation_ata(from_dt, to_dt, equation_id, ata):
         equation_id = str(tuple(equation_id.replace(")","").replace("(","").replace("'","").split(",")))
         if len(equation_id) <= 14:
             equation_id = equation_id.replace(equation_id[len(equation_id)-2], '')
-        sql += "  AND EQ_ID IN " + equation_id
+        if "NONE" not in equation_id:
+            sql += "  AND EQ_ID NOT IN " + equation_id
     if "ALL" not in ata :
         if ata!="":
             sql += "  AND ATA_Main IN " + ata
