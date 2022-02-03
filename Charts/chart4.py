@@ -8,11 +8,11 @@ def chart4Report(occurences, legs, intermittent, consecutiveDays, ata, exclude_E
     outputjson = ""
     if analysisType.lower() == "history":
         outputjson = historyReport(occurences, legs, intermittent, consecutiveDays, ata, exclude_EqID, airline_operator, include_current_message, fromDate , toDate)
-        outputjson = outputjson.to_json(orient='records')
     else:
         outputjson = dailyReport(occurences, legs, intermittent, consecutiveDays, ata, exclude_EqID, airline_operator, include_current_message, fromDate , toDate)
     
-    
+    outputjson = outputjson.to_json(orient='records')
+
     if outputjson != "":
         data = json.loads(outputjson)
         OutputTableHistory = pd.json_normalize(data)

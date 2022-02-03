@@ -76,8 +76,8 @@ def Toreport(Flagsreport, HistoryReport,MDCdataDF,include_current_message,list_o
                      unavailable.append(ab)
                      print("------exception----------")
 
-                # newrow = indexedreport.loc[(AircraftSN, Bcode), ["AC_TN", "ATA", "LRU", "MDC Message", "Type","EICAS Message", "MEL or No-Dispatch", "MHIRJ Input", "MHIRJ Recommendation", "Additional Comments"]].to_frame().transpose()
-                newrow = indexedreport.loc[(AircraftSN, Bcode), ["AC_TN", "ATA", "LRU", "Type","EICAS Message", "MEL or No-Dispatch", "MHIRJ Input", "MHIRJ Recommendation", "Additional Comments"]].to_frame().transpose()
+                newrow = indexedreport.loc[(AircraftSN, Bcode), ["AC_TN", "ATA", "LRU", "MDC Message", "Type","EICAS Message", "MEL or No-Dispatch", "MHIRJ Input", "MHIRJ Recommendation", "Additional Comments"]].to_frame().transpose()
+                # newrow = indexedreport.loc[(AircraftSN, Bcode), ["AC_TN", "ATA", "LRU", "Type","EICAS Message", "MEL or No-Dispatch", "MHIRJ Input", "MHIRJ Recommendation", "Additional Comments"]].to_frame().transpose()
                 print("--this is new row---")
                 print(newrow)
                 newrow.insert(loc= 0, column= "AC SN", value= AircraftSN)
@@ -85,8 +85,8 @@ def Toreport(Flagsreport, HistoryReport,MDCdataDF,include_current_message,list_o
                 newrow.insert(loc= 8, column= "Date From", value= DatesfoundinMDCdata.min().date()) #.date()removes the time data from datetime format
                 newrow.insert(loc= 9, column= "Date To", value= DatesfoundinMDCdata.max().date())
                 newrow.insert(loc= 10, column= "SKW action WIP", value= "")
-                # newrow = newrow.rename(columns= {"AC SN":"MSN", "MDC Message": "Message", "EICAS Message":"Potential FDE"})
-                newrow = newrow.rename(columns= {"AC SN":"MSN", "EICAS Message":"Potential FDE"})
+                newrow = newrow.rename(columns= {"AC SN":"MSN", "MDC Message": "Message", "EICAS Message":"Potential FDE"})
+                # newrow = newrow.rename(columns= {"AC SN":"MSN", "EICAS Message":"Potential FDE"})
 
                 # append the new row to the existing report
                 Flagsreport = Flagsreport.append(newrow, ignore_index= True)

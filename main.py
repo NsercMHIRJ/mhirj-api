@@ -253,7 +253,7 @@ async def generateReport(analysisType: str, occurences: int, legs: int, intermit
         respObj = historyReport(occurences, legs, intermittent, consecutiveDays, ata, exclude_EqID, airline_operator, include_current_message, fromDate , toDate).to_json(orient='records')
         return respObj
     
-    respObj = dailyReport(occurences, legs, intermittent, consecutiveDays, ata, exclude_EqID, airline_operator, include_current_message, fromDate , toDate)
+    respObj = dailyReport(occurences, legs, intermittent, consecutiveDays, ata, exclude_EqID, airline_operator, include_current_message, fromDate , toDate).to_json(orient='records')
     return respObj
 
 
@@ -265,15 +265,15 @@ async def generateJamsReport(analysisType: str, occurences: int, legs: int, inte
                         fromDate: str, toDate: str, ACSN_chosen:int):
    
    if (analysisType.lower() == "history"):
-       OutputTableHistory = historyReport(occurences, legs, intermittent, consecutiveDays, ata, exclude_EqID, airline_operator, include_current_message, fromDate , toDate)
+       OutputTable = historyReport(occurences, legs, intermittent, consecutiveDays, ata, exclude_EqID, airline_operator, include_current_message, fromDate , toDate)
        mdcDataDF=mdcDF(occurences, legs, intermittent, consecutiveDays, ata, exclude_EqID, airline_operator, include_current_message, fromDate , toDate)
-       resObj= jamReport(OutputTableHistory, ACSN_chosen,mdcDataDF)
+       resObj= jamReport(OutputTable, ACSN_chosen,mdcDataDF)
        return resObj.to_json(orient='records')
 
    elif (analysisType.lower() == "daily"):
-        OutputTableDaily = dailyReport(occurences, legs, intermittent, consecutiveDays, ata, exclude_EqID, airline_operator, include_current_message, fromDate , toDate)
+        OutputTable = dailyReport(occurences, legs, intermittent, consecutiveDays, ata, exclude_EqID, airline_operator, include_current_message, fromDate , toDate)
         mdcDataDF=mdcDF(occurences, legs, intermittent, consecutiveDays, ata, exclude_EqID, airline_operator, include_current_message, fromDate , toDate)
-        resObj= jamReport(OutputTableDaily, ACSN_chosen,mdcDataDF)
+        resObj= jamReport(OutputTable, ACSN_chosen,mdcDataDF)
         return resObj.to_json(orient='records')
 
 
@@ -3075,10 +3075,10 @@ async def get_eqIData(all:str):
 #     data_string = json.dumps(data)
 #     return data_string      
     
-# @app.post("/api/uploadfile_input_message/")
-# async def uploadfile_input_message(file: UploadFile = File(...)):
-#     result = insertData_MDCMessageInputs(file)
-#     return {"result": result} 
+@app.post("/api/uploadfile_input_message/")
+async def uploadfile_input_message(file: UploadFile = File(...)):
+    result = insertData_MDCMessageInputs(file)
+    return {"result": result} 
 
 # update input message data    
 def connect_database_for_update(Equation_ID,LRU,ATA,Message_No,Comp_ID,Message,Fault_Logged,Status,Message_Type,EICAS,Timer,Logic,Equation_Description,Occurrence_Flag,Days_Count,Priority,MHIRJ_ISE_Recommended_Action,Additional_Comments,MHIRJ_ISE_inputs,MEL_or_No_Dispatch,Keywords):

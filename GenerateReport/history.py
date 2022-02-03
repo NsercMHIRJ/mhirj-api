@@ -309,7 +309,10 @@ def historyReport(MaxAllowedOccurrences: int, MaxAllowedConsecLegs: int, MaxAllo
                     "INTERMITNT", "Date from", "Date to", "Reason(s) for flag", "Priority", "Known Top Message - Recommended Documents", "MEL or No-Dispatch",
                     "MHIRJ Input", "MHIRJ Recommendation", "Additional Comments"]].sort_values(by= ["Type", "Priority"]) # AC_TN added to output table which means that column order has to be re orderedb8632868 2076
         
-        listofJamMessages = list()
+        listofJamMessages = ["B1-309178","B1-309179","B1-309180","B1-060044","B1-060045","B1-007973",
+                     "B1-060017","B1-006551","B1-240885","B1-006552","B1-006553","B1-006554",
+                     "B1-006555","B1-007798","B1-007772","B1-240938","B1-007925","B1-007905",
+                     "B1-007927","B1-007915","B1-007926","B1-007910","B1-007928","B1-007920"]
         # all_jam_messages = connect_to_fetch_all_jam_messages()
         # for each_jam_message in all_jam_messages['Jam_Message']:
         #     listofJamMessages.append(each_jam_message)

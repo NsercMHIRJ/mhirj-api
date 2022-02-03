@@ -20,7 +20,7 @@ listofJamMessages = ["B1-309178","B1-309179","B1-309180","B1-060044","B1-060045"
 
 
  
-def jamReport(OutputTableHistory, ACSN_chosen,MDCdataDF,listofmessages= listofJamMessages):
+def jamReport(OutputTable, ACSN_chosen,MDCdataDF,listofmessages= listofJamMessages):
 
 #    listofJamMessages = list()
 #    all_jam_messages = connect_to_fetch_all_jam_messages()
@@ -31,14 +31,14 @@ def jamReport(OutputTableHistory, ACSN_chosen,MDCdataDF,listofmessages= listofJa
    print("------dataoffilter-----")
    print(datatofilter)
    print("---b1--------")
-   print(OutputTableHistory["B1-Equation"])
-   isin = OutputTableHistory["B1-Equation"].isin(listofmessages)
+   print(OutputTable["B1-Equation"])
+   isin = OutputTable["B1-Equation"].isin(listofmessages)
    print("------isin----------")
    print(isin)
 
   
  
-   filter1 = OutputTableHistory[isin][["AC SN", "B1-Equation"]]
+   filter1 = OutputTable[isin][["AC SN", "B1-Equation"]]
    print("----filter---------------")
    print(filter1)
    listoftuplesACID = list(zip(filter1["AC SN"], filter1["B1-Equation"]))
