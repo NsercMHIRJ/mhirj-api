@@ -364,7 +364,7 @@ def dailyReport(MaxAllowedOccurrences: int, MaxAllowedConsecLegs: int, MaxAllowe
 
     OutputTableDaily_json = OutputTableDaily.to_json(orient='records')
 
-    return OutputTableDaily_json
+    return OutputTableDaily
 
 
 

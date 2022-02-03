@@ -253,7 +253,7 @@ async def generateReport(analysisType: str, occurences: int, legs: int, intermit
         respObj = historyReport(occurences, legs, intermittent, consecutiveDays, ata, exclude_EqID, airline_operator, include_current_message, fromDate , toDate).to_json(orient='records')
         return respObj
     
-    respObj = dailyReport(occurences, legs, intermittent, consecutiveDays, ata, exclude_EqID, airline_operator, include_current_message, fromDate , toDate)
+    respObj = dailyReport(occurences, legs, intermittent, consecutiveDays, ata, exclude_EqID, airline_operator, include_current_message, fromDate , toDate).to_json(orient='records')
     return respObj
 
 
