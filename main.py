@@ -3075,10 +3075,10 @@ async def get_eqIData(all:str):
 #     data_string = json.dumps(data)
 #     return data_string      
     
-# @app.post("/api/uploadfile_input_message/")
-# async def uploadfile_input_message(file: UploadFile = File(...)):
-#     result = insertData_MDCMessageInputs(file)
-#     return {"result": result} 
+@app.post("/api/uploadfile_input_message/")
+async def uploadfile_input_message(file: UploadFile = File(...)):
+    result = insertData_MDCMessageInputs(file)
+    return {"result": result} 
 
 # update input message data    
 def connect_database_for_update(Equation_ID,LRU,ATA,Message_No,Comp_ID,Message,Fault_Logged,Status,Message_Type,EICAS,Timer,Logic,Equation_Description,Occurrence_Flag,Days_Count,Priority,MHIRJ_ISE_Recommended_Action,Additional_Comments,MHIRJ_ISE_inputs,MEL_or_No_Dispatch,Keywords):
