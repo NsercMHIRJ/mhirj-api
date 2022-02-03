@@ -265,15 +265,15 @@ async def generateJamsReport(analysisType: str, occurences: int, legs: int, inte
                         fromDate: str, toDate: str, ACSN_chosen:int):
    
    if (analysisType.lower() == "history"):
-       OutputTableHistory = historyReport(occurences, legs, intermittent, consecutiveDays, ata, exclude_EqID, airline_operator, include_current_message, fromDate , toDate)
+       OutputTable = historyReport(occurences, legs, intermittent, consecutiveDays, ata, exclude_EqID, airline_operator, include_current_message, fromDate , toDate)
        mdcDataDF=mdcDF(occurences, legs, intermittent, consecutiveDays, ata, exclude_EqID, airline_operator, include_current_message, fromDate , toDate)
-       resObj= jamReport(OutputTableHistory, ACSN_chosen,mdcDataDF)
+       resObj= jamReport(OutputTable, ACSN_chosen,mdcDataDF)
        return resObj.to_json(orient='records')
 
    elif (analysisType.lower() == "daily"):
-        OutputTableDaily = dailyReport(occurences, legs, intermittent, consecutiveDays, ata, exclude_EqID, airline_operator, include_current_message, fromDate , toDate)
+        OutputTable = dailyReport(occurences, legs, intermittent, consecutiveDays, ata, exclude_EqID, airline_operator, include_current_message, fromDate , toDate)
         mdcDataDF=mdcDF(occurences, legs, intermittent, consecutiveDays, ata, exclude_EqID, airline_operator, include_current_message, fromDate , toDate)
-        resObj= jamReport(OutputTableDaily, ACSN_chosen,mdcDataDF)
+        resObj= jamReport(OutputTable, ACSN_chosen,mdcDataDF)
         return resObj.to_json(orient='records')
 
 
