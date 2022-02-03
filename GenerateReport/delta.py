@@ -60,11 +60,11 @@ def deltaReport(occurences, legs, intermittent, consecutiveDays, ata, exclude_Eq
     i = 0
     delta = list()
     for item in prev_history_nums.values:
-        tmpData = {'Tail#': item[0], 'AC SN': item[1], 'EICAS Related': item[2], 'LRU': item[3], 'ATA': item[4],
-            'B1-Equation': item[5], 'Type': item[6], 'Equation Description': item[7], 'Total Occurrences': item[8] , 'Consecutive Days': item[9],
-            'Consecutive FL': item[10], 'INTERMITNT': item[11], 'Date From': str(item[12]), 'Date To': str(item[13]), 'Reason(s) for flag': item[14],
-            'Priority': item[15], 'MHIRJ Known Message': item[16], 'Mel or No-Dispatch': item[17], 'MHIRJ Input': item[18], 'MHIRJ Recommended Action': item[19], 
-            'MHIRJ Additional Comment': item[20], 'Jam': item[21]}
+        tmpData = {'Tail#': item[0], 'AC SN': item[1], 'EICAS Related': item[2], 'MDC Message': item[3],'LRU': item[4], 'ATA': item[5],
+            'B1-Equation': item[6], 'Type': item[7], 'Equation Description': item[8], 'Total Occurrences': item[9] , 'Consecutive Days': item[10],
+            'Consecutive FL': item[11], 'INTERMITNT': item[12], 'Date From': str(item[13]), 'Date To': str(item[14]), 'Reason(s) for flag': item[15],
+            'Priority': item[16], 'MHIRJ Known Message': item[17], 'Mel or No-Dispatch': item[18], 'MHIRJ Input': item[19], 'MHIRJ Recommended Action': item[20], 
+            'MHIRJ Additional Comment': item[21], 'Jam': item[22]}
         if i < curr_history_dataframe.loc[False_list].values.size:
             if item[0] in curr_history_dataframe.loc[False_list].values:
                 if item[5] in listofJamMessages:
