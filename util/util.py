@@ -17,10 +17,16 @@ user_vdi='humber_rw'
 password_vdi='nP@yWw@!$4NxWeK6p*ttu3q6'
 
 def connect_database_mdc_message_input(eq_id):
-    if eq_id:
-        sql = "SELECT * from [dbo].[MDCMessagesInputs] c WHERE c.Equation_ID='" + eq_id + "' "
+    sql = "SELECT * from [dbo].[MDCMessagesInputs] c"
+    if eq_id!="":
+        equation_id = str(tuple(eq_id.replace(")","").replace("(","").replace("'","").split(",")))
+        if len(equation_id) <= 14:
+            equation_id = equation_id.replace(equation_id[len(equation_id)-2], '')
+        if "NONE" not in equation_id:
+            sql += "  Where c.Equation_ID IN " + equation_id
     else :
         sql = "SELECT * from [dbo].[MDCMessagesInputs]"
+    print(sql)
     try:
         conn = pyodbc.connect(
             Trusted_Connection='No',
