@@ -185,3 +185,31 @@ def connect_db_MDCdata_chartb_ata(ata,from_dt, to_dt):
         print("Error message:- " + str(err))
 
 
+def connect_db_MDCdata_chartb_static():
+    end_date = datetime.datetime.utcnow()
+    start_date = end_date - datetime.timedelta(days=10)
+
+    end_date = datetime.datetime.strftime(end_date, '%m-%d-%Y')
+    start_date = datetime.datetime.strftime(start_date, '%m-%d-%Y')
+    sql = "SELECT AC_SN,AC_TN,EQ_ID,SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) AS ATA_Main FROM MDC_MSGS WHERE  MSG_Date BETWEEN '" + start_date + " 00:00:00 ' AND '" + end_date + " 23:59:59 '"
+
+    # sql = "SELECT * FROM MDC_MSGS WHERE MSG_Date BETWEEN '"+start_date+"' AND '"+end_date+"'"
+    column_names = ["AC_MODEL", "AC_SN", "AC_TN",
+                    "OPERATOR", "MSG_TYPE", "MDC_SOFTWARE", "MDT_VERSION", "MSG_Date",
+                    "FLIGHT_NUM","FLIGHT_LEG", "FLIGHT_PHASE", "ATA", "ATA_NAME", "LRU",
+                    "COMP_ID", "MSG_TXT","EQ_ID", "INTERMITNT", "EVENT_NOTE",
+                    "EQ_TS_NOTE","SOURCE", "MSG_ID", "FALSE_MSG","BOOKMARK","msg_status"]
+    print(sql)
+    try:
+        conn = pyodbc.connect(driver=App().db_driver, host=App().hostname, database=App().db_name,
+                              user=App().db_username, password=App().db_password)
+        MDCdataDF_chartb = pd.read_sql(sql, conn)
+        # MDCdataDF_chartb.columns = column_names
+        conn.close()
+        return MDCdataDF_chartb
+    except pyodbc.Error as err:
+        print("Couldn't connect to Server")
+        # print("Error message:- " + strLanding_Chart_B(err))
+
+
+

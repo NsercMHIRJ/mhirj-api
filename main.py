@@ -5,6 +5,7 @@ from Charts.chart5 import chart5Report
 from Charts.chart2 import chart_two
 from Charts.chart1 import chart_one
 from Charts.stacked import stacked_chart
+from Charts.Landing_chartB import Landing_chartB
 
 
 from GenerateReport.daily import dailyReport
@@ -2652,79 +2653,85 @@ def connect_database_for_PM_ScatterPlot_static():
 
 ### Landing Chart B
 
-def connect_db_MDCdata_chartb_static():
-    end_date = datetime.datetime.utcnow()
-    start_date = end_date - datetime.timedelta(days=10)
+# def connect_db_MDCdata_chartb_static():
+#     end_date = datetime.datetime.utcnow()
+#     start_date = end_date - datetime.timedelta(days=10)
 
-    end_date = datetime.datetime.strftime(end_date, '%m-%d-%Y')
-    start_date = datetime.datetime.strftime(start_date, '%m-%d-%Y')
-    sql = "SELECT AC_SN,AC_TN,EQ_ID,SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) AS ATA_Main FROM MDC_MSGS WHERE  MSG_Date BETWEEN '" + start_date + " 00:00:00 ' AND '" + end_date + " 23:59:59 '"
+#     end_date = datetime.datetime.strftime(end_date, '%m-%d-%Y')
+#     start_date = datetime.datetime.strftime(start_date, '%m-%d-%Y')
+#     sql = "SELECT AC_SN,AC_TN,EQ_ID,SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) AS ATA_Main FROM MDC_MSGS WHERE  MSG_Date BETWEEN '" + start_date + " 00:00:00 ' AND '" + end_date + " 23:59:59 '"
 
-    # sql = "SELECT * FROM MDC_MSGS WHERE MSG_Date BETWEEN '"+start_date+"' AND '"+end_date+"'"
-    column_names = ["AC_MODEL", "AC_SN", "AC_TN",
-                    "OPERATOR", "MSG_TYPE", "MDC_SOFTWARE", "MDT_VERSION", "MSG_Date",
-                    "FLIGHT_NUM","FLIGHT_LEG", "FLIGHT_PHASE", "ATA", "ATA_NAME", "LRU",
-                    "COMP_ID", "MSG_TXT","EQ_ID", "INTERMITNT", "EVENT_NOTE",
-                    "EQ_TS_NOTE","SOURCE", "MSG_ID", "FALSE_MSG","BOOKMARK","msg_status"]
-    print(sql)
-    try:
-        conn = pyodbc.connect(driver=db_driver, host=hostname, database=db_name,
-                              user=db_username, password=db_password)
-        MDCdataDF_chartb = pd.read_sql(sql, conn)
-        # MDCdataDF_chartb.columns = column_names
-        conn.close()
-        return MDCdataDF_chartb
-    except pyodbc.Error as err:
-        print("Couldn't connect to Server")
-        # print("Error message:- " + strLanding_Chart_B(err))
+#     # sql = "SELECT * FROM MDC_MSGS WHERE MSG_Date BETWEEN '"+start_date+"' AND '"+end_date+"'"
+#     column_names = ["AC_MODEL", "AC_SN", "AC_TN",
+#                     "OPERATOR", "MSG_TYPE", "MDC_SOFTWARE", "MDT_VERSION", "MSG_Date",
+#                     "FLIGHT_NUM","FLIGHT_LEG", "FLIGHT_PHASE", "ATA", "ATA_NAME", "LRU",
+#                     "COMP_ID", "MSG_TXT","EQ_ID", "INTERMITNT", "EVENT_NOTE",
+#                     "EQ_TS_NOTE","SOURCE", "MSG_ID", "FALSE_MSG","BOOKMARK","msg_status"]
+#     print(sql)
+#     try:
+#         conn = pyodbc.connect(driver=db_driver, host=hostname, database=db_name,
+#                               user=db_username, password=db_password)
+#         MDCdataDF_chartb = pd.read_sql(sql, conn)
+#         # MDCdataDF_chartb.columns = column_names
+#         conn.close()
+#         return MDCdataDF_chartb
+#     except pyodbc.Error as err:
+#         print("Couldn't connect to Server")
+#         # print("Error message:- " + strLanding_Chart_B(err))
 
-# for reference -> http://localhost:8000/Landing_Chart_B
+#Landing chartB
 @app.post("/api/Landing_Chart_B")
 async def get_Chart_B():
-    # MDCdataDF_chartb = connect_db_MDCdata_chartb_static()
-    try:
-        Topvalues2 = 10
-        MDCdataDF = connect_db_MDCdata_chartb_static()
-        AircraftTailPairDF = MDCdataDF[["AC_SN", "AC_TN"]].drop_duplicates(ignore_index= True) # unique pairs of AC SN and Tail# for use in analysis
-        print("---------------test--------------")
-        print(AircraftTailPairDF)
-        AircraftTailPairDF.columns = ["AC SN","Tail"] # re naming the columns to match History/Daily analysis output
-        print("---------------test2--------------")
-        print(AircraftTailPairDF.columns)
-        chartADF = pd.merge(left = MDCdataDF[["AC_SN","ATA_Main", "EQ_ID"]], right = AircraftTailPairDF, left_on="AC_SN", right_on="AC SN")
-        print("---------------test3--------------")
-        print(chartADF)
-        chartADF["AC_SN"] = chartADF["AC_SN"] + " / " + chartADF["Tail"]
-        print("---------------test4--------------")
-        print(chartADF["AC_SN"])
-        chartADF.drop(labels = ["AC SN", "Tail"], axis = 1, inplace = True)
-        MessageCountbyAircraftATA = chartADF.groupby(["AC_SN","ATA_Main"]).count()
-        print("----test5-----------")
-        print(MessageCountbyAircraftATA)
-        # https://towardsdatascience.com/stacked-bar-charts-with-pythons-matplotlib-f4020e4eb4a7
-        # https://stackoverflow.com/questions/44309507/stacked-bar-plot-using-matplotlib
-        # transpose the indexes. where the ATA label becomes the column and the aircraft is row. counts are middle
-        TransposedMessageCountbyAircraftATA = MessageCountbyAircraftATA["EQ_ID"].unstack()
-        # fill Null values with 0
-        TransposedMessageCountbyAircraftATA.fillna(value= 0, inplace= True)
+    Landing_ChartB =  Landing_chartB()
+    return Landing_ChartB
 
-        # sum all the counts by row, plus create a new column called sum
-        TransposedMessageCountbyAircraftATA["Sum"] = TransposedMessageCountbyAircraftATA.sum(axis=1)
+# for reference -> http://localhost:8000/Landing_Chart_B
+# @app.post("/api/Landing_Chart_B")
+# async def get_Chart_B():
+#     # MDCdataDF_chartb = connect_db_MDCdata_chartb_static()
+#     try:
+#         Topvalues2 = 10
+#         MDCdataDF = connect_db_MDCdata_chartb_static()
+#         AircraftTailPairDF = MDCdataDF[["AC_SN", "AC_TN"]].drop_duplicates(ignore_index= True) # unique pairs of AC SN and Tail# for use in analysis
+#         print("---------------test--------------")
+#         print(AircraftTailPairDF)
+#         AircraftTailPairDF.columns = ["AC SN","Tail"] # re naming the columns to match History/Daily analysis output
+#         print("---------------test2--------------")
+#         print(AircraftTailPairDF.columns)
+#         chartADF = pd.merge(left = MDCdataDF[["AC_SN","ATA_Main", "EQ_ID"]], right = AircraftTailPairDF, left_on="AC_SN", right_on="AC SN")
+#         print("---------------test3--------------")
+#         print(chartADF)
+#         chartADF["AC_SN"] = chartADF["AC_SN"] + " / " + chartADF["Tail"]
+#         print("---------------test4--------------")
+#         print(chartADF["AC_SN"])
+#         chartADF.drop(labels = ["AC SN", "Tail"], axis = 1, inplace = True)
+#         MessageCountbyAircraftATA = chartADF.groupby(["AC_SN","ATA_Main"]).count()
+#         print("----test5-----------")
+#         print(MessageCountbyAircraftATA)
+#         # https://towardsdatascience.com/stacked-bar-charts-with-pythons-matplotlib-f4020e4eb4a7
+#         # https://stackoverflow.com/questions/44309507/stacked-bar-plot-using-matplotlib
+#         # transpose the indexes. where the ATA label becomes the column and the aircraft is row. counts are middle
+#         TransposedMessageCountbyAircraftATA = MessageCountbyAircraftATA["EQ_ID"].unstack()
+#         # fill Null values with 0
+#         TransposedMessageCountbyAircraftATA.fillna(value= 0, inplace= True)
 
-        # sort the dataframe by the values of sum, and from the topvalues2 the user chooses
-        TransposedMessageCountbyAircraftATA = TransposedMessageCountbyAircraftATA.sort_values("Sum").tail(Topvalues2)
-        TransposedMessageCountbyAircraftATA = TransposedMessageCountbyAircraftATA.sort_values("Sum", ascending=False)
+#         # sum all the counts by row, plus create a new column called sum
+#         TransposedMessageCountbyAircraftATA["Sum"] = TransposedMessageCountbyAircraftATA.sum(axis=1)
 
-        # create a final dataframe for plotting without the new column created before
-        TransposedMessageCountbyAircraftATAfinalPLOT = TransposedMessageCountbyAircraftATA.drop(["Sum"], axis=1)
-        print('TransposedMessageCountbyAircraftATAfinalPLOT colums : ',TransposedMessageCountbyAircraftATAfinalPLOT.columns)
-        #totals = TransposedMessageCountbyAircraftATA["Sum"]
-        print("total in landing chart B is : ",TransposedMessageCountbyAircraftATAfinalPLOT)
-        # TransposedMessageCountbyAircraftATAfinalPLOT = TransposedMessageCountbyAircraftATAfinalPLOT.sort_values(by='ATA Main',ascending=False)
-        chart_b_df_json = TransposedMessageCountbyAircraftATAfinalPLOT.to_json(orient='index')
-        return chart_b_df_json
-    except Exception as es :
- 	    print(es)
+#         # sort the dataframe by the values of sum, and from the topvalues2 the user chooses
+#         TransposedMessageCountbyAircraftATA = TransposedMessageCountbyAircraftATA.sort_values("Sum").tail(Topvalues2)
+#         TransposedMessageCountbyAircraftATA = TransposedMessageCountbyAircraftATA.sort_values("Sum", ascending=False)
+
+#         # create a final dataframe for plotting without the new column created before
+#         TransposedMessageCountbyAircraftATAfinalPLOT = TransposedMessageCountbyAircraftATA.drop(["Sum"], axis=1)
+#         print('TransposedMessageCountbyAircraftATAfinalPLOT colums : ',TransposedMessageCountbyAircraftATAfinalPLOT.columns)
+#         #totals = TransposedMessageCountbyAircraftATA["Sum"]
+#         print("total in landing chart B is : ",TransposedMessageCountbyAircraftATAfinalPLOT)
+#         # TransposedMessageCountbyAircraftATAfinalPLOT = TransposedMessageCountbyAircraftATAfinalPLOT.sort_values(by='ATA Main',ascending=False)
+#         chart_b_df_json = TransposedMessageCountbyAircraftATAfinalPLOT.to_json(orient='index')
+#         return chart_b_df_json
+#     except Exception as es :
+#  	    print(es)
     
 
 
