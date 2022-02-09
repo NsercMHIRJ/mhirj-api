@@ -3,6 +3,8 @@
 from Charts.chart4 import chart4Report
 from Charts.chart5 import chart5Report
 from Charts.chart2 import chart_two
+from Charts.chart1 import chart_one
+
 
 from GenerateReport.daily import dailyReport
 from GenerateReport.history import historyReport
@@ -2334,53 +2336,59 @@ async def get_ChartOneData(top_n:int, aircraftNo:int, fromDate: str , toDate: st
     return chart1_sql_df_json
 '''
 
-## Chart 1
-def connect_database_for_chart1(n, aircraft_no, ata_main, from_dt, to_dt):
-    all_ata_str_list = []
-    if ata_main == 'ALL':
-        all_ata = connect_to_fetch_all_ata(from_dt, to_dt)
+# ## Chart 1
+# def connect_database_for_chart1(n, aircraft_no, ata_main, from_dt, to_dt):
+#     all_ata_str_list = []
+#     if ata_main == 'ALL':
+#         all_ata = connect_to_fetch_all_ata(from_dt, to_dt)
 
-        all_ata_str = "("
-        all_ata_list = all_ata['ATA_Main'].tolist()
-        for each_ata in all_ata_list:
-            all_ata_str_list.append(str(each_ata))
-            all_ata_str += "'"+str(each_ata)+"'"
-            if each_ata != all_ata_list[-1]:
-                all_ata_str += ","
-            else:
-                all_ata_str += ")"
-        print(all_ata_str)
+#         all_ata_str = "("
+#         all_ata_list = all_ata['ATA_Main'].tolist()
+#         for each_ata in all_ata_list:
+#             all_ata_str_list.append(str(each_ata))
+#             all_ata_str += "'"+str(each_ata)+"'"
+#             if each_ata != all_ata_list[-1]:
+#                 all_ata_str += ","
+#             else:
+#                 all_ata_str += ")"
+#         print(all_ata_str)
 
-    if ata_main == 'ALL':
-        sql = "SELECT DISTINCT TOP "+str(n)+" Count(EQUATIONS.MSG_NB) AS "'total_message'", MDC_MSGS. EQ_ID, EQUATIONS.MSG_NB, EQUATIONS.CAS, MDC_MSGS.LRU, MDC_MSGS.ATA FROM MDC_MSGS INNER JOIN EQUATIONS ON MDC_MSGS.ATA = EQUATIONS.ATA AND MDC_MSGS.EQ_ID = EQUATIONS.EQ_ID WHERE MDC_MSGS.AC_SN = "+str(aircraft_no)+" AND SUBSTRING(MDC_MSGS.ATA, 0, CHARINDEX('-', MDC_MSGS.ATA)) IN " + str(all_ata_str) + " AND MDC_MSGS.MSG_Date BETWEEN '"+from_dt+"' AND '"+to_dt+"' GROUP BY MDC_MSGS.EQ_ID, EQUATIONS.MSG_NB, EQUATIONS.CAS, MDC_MSGS.LRU, MDC_MSGS.ATA ORDER BY Count(EQUATIONS.MSG_NB) DESC"
-        print(sql)
-    else:
-        sql = "SELECT DISTINCT TOP "+str(n)+" Count(EQUATIONS.MSG_NB) AS "'total_message'", MDC_MSGS. EQ_ID, EQUATIONS.MSG_NB, EQUATIONS.CAS, MDC_MSGS.LRU, MDC_MSGS.ATA FROM MDC_MSGS INNER JOIN EQUATIONS ON MDC_MSGS.ATA = EQUATIONS.ATA AND MDC_MSGS.EQ_ID = EQUATIONS.EQ_ID WHERE MDC_MSGS.AC_SN = "+str(aircraft_no)+" AND SUBSTRING(MDC_MSGS.ATA, 0, CHARINDEX('-', MDC_MSGS.ATA)) = " + str(ata_main) + " AND MDC_MSGS.MSG_Date BETWEEN '"+from_dt+"' AND '"+to_dt+"' GROUP BY MDC_MSGS.EQ_ID, EQUATIONS.MSG_NB, EQUATIONS.CAS, MDC_MSGS.LRU, MDC_MSGS.ATA ORDER BY Count(EQUATIONS.MSG_NB) DESC"
-        print(sql)
+#     if ata_main == 'ALL':
+#         sql = "SELECT DISTINCT TOP "+str(n)+" Count(EQUATIONS.MSG_NB) AS "'total_message'", MDC_MSGS. EQ_ID, EQUATIONS.MSG_NB, EQUATIONS.CAS, MDC_MSGS.LRU, MDC_MSGS.ATA FROM MDC_MSGS INNER JOIN EQUATIONS ON MDC_MSGS.ATA = EQUATIONS.ATA AND MDC_MSGS.EQ_ID = EQUATIONS.EQ_ID WHERE MDC_MSGS.AC_SN = "+str(aircraft_no)+" AND SUBSTRING(MDC_MSGS.ATA, 0, CHARINDEX('-', MDC_MSGS.ATA)) IN " + str(all_ata_str) + " AND MDC_MSGS.MSG_Date BETWEEN '"+from_dt+"' AND '"+to_dt+"' GROUP BY MDC_MSGS.EQ_ID, EQUATIONS.MSG_NB, EQUATIONS.CAS, MDC_MSGS.LRU, MDC_MSGS.ATA ORDER BY Count(EQUATIONS.MSG_NB) DESC"
+#         print(sql)
+#     else:
+#         sql = "SELECT DISTINCT TOP "+str(n)+" Count(EQUATIONS.MSG_NB) AS "'total_message'", MDC_MSGS. EQ_ID, EQUATIONS.MSG_NB, EQUATIONS.CAS, MDC_MSGS.LRU, MDC_MSGS.ATA FROM MDC_MSGS INNER JOIN EQUATIONS ON MDC_MSGS.ATA = EQUATIONS.ATA AND MDC_MSGS.EQ_ID = EQUATIONS.EQ_ID WHERE MDC_MSGS.AC_SN = "+str(aircraft_no)+" AND SUBSTRING(MDC_MSGS.ATA, 0, CHARINDEX('-', MDC_MSGS.ATA)) = " + str(ata_main) + " AND MDC_MSGS.MSG_Date BETWEEN '"+from_dt+"' AND '"+to_dt+"' GROUP BY MDC_MSGS.EQ_ID, EQUATIONS.MSG_NB, EQUATIONS.CAS, MDC_MSGS.LRU, MDC_MSGS.ATA ORDER BY Count(EQUATIONS.MSG_NB) DESC"
+#         print(sql)
  
-    try:
-        conn = pyodbc.connect(driver=db_driver, host=hostname, database=db_name,
-                              user=db_username, password=db_password)
-        chart1_sql_df = pd.read_sql(sql, conn)
-        #MDCdataDF.columns = column_names
-        return chart1_sql_df
-    except pyodbc.Error as err:
-        print("Couldn't connect to Server")
-        print("Error message:- " + str(err))
+#     try:
+#         conn = pyodbc.connect(driver=db_driver, host=hostname, database=db_name,
+#                               user=db_username, password=db_password)
+#         chart1_sql_df = pd.read_sql(sql, conn)
+#         #MDCdataDF.columns = column_names
+#         return chart1_sql_df
+#     except pyodbc.Error as err:
+#         print("Couldn't connect to Server")
+#         print("Error message:- " + str(err))
 
 
+# @app.post("/api/chart_one/{top_n}/{aircraftNo}/{ata_main}/{fromDate}/{toDate}")
+# async def get_ChartOneData(top_n:int, aircraftNo:int, ata_main:str, fromDate: str , toDate: str):
+#     chart1_sql_df = connect_database_for_chart1(top_n, aircraftNo, ata_main, fromDate, toDate)
+#     chart1_sql_df_json = chart1_sql_df.to_json(orient='records')
+#     return chart1_sql_df_json
+
+
+# @app.post("/api/chart_one/{top_n}/{aircraftNo}/{ata_main}/{fromDate}/{toDate}")
+# async def get_ChartOneData(top_n:int, aircraftNo:int, ata_main:str, fromDate: str , toDate: str):
+#     chart1_sql_df = connect_database_for_chart1(top_n, aircraftNo, ata_main, fromDate, toDate)
+#     chart1_sql_df_json = chart1_sql_df.to_json(orient='records')
+#     return chart1_sql_df_json
+
+#Chart 1
 @app.post("/api/chart_one/{top_n}/{aircraftNo}/{ata_main}/{fromDate}/{toDate}")
 async def get_ChartOneData(top_n:int, aircraftNo:int, ata_main:str, fromDate: str , toDate: str):
-    chart1_sql_df = connect_database_for_chart1(top_n, aircraftNo, ata_main, fromDate, toDate)
-    chart1_sql_df_json = chart1_sql_df.to_json(orient='records')
-    return chart1_sql_df_json
-
-
-@app.post("/api/chart_one/{top_n}/{aircraftNo}/{ata_main}/{fromDate}/{toDate}")
-async def get_ChartOneData(top_n:int, aircraftNo:int, ata_main:str, fromDate: str , toDate: str):
-    chart1_sql_df = connect_database_for_chart1(top_n, aircraftNo, ata_main, fromDate, toDate)
-    chart1_sql_df_json = chart1_sql_df.to_json(orient='records')
-    return chart1_sql_df_json
+    chart1 =  chart_one(top_n, aircraftNo,ata_main,fromDate,toDate)
+    return chart1
 
 #Chart 2 
 @app.post("/api/chart_two/{top_values}/{ata}/{fromDate}/{toDate}")

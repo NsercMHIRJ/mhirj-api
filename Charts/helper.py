@@ -109,3 +109,38 @@ def connect_database_for_chart2(n, ata, from_dt, to_dt):
     except pyodbc.Error as err:
        print("Couldn't connect to Server")
        print("Error message:- " + str(err))
+
+## Chart 1
+def connect_database_for_chart1(n, aircraft_no, ata_main, from_dt, to_dt):
+    all_ata_str_list = []
+    if ata_main == 'ALL':
+        all_ata = connect_to_fetch_all_ata(from_dt, to_dt)
+
+        all_ata_str = "("
+        all_ata_list = all_ata['ATA_Main'].tolist()
+        for each_ata in all_ata_list:
+            all_ata_str_list.append(str(each_ata))
+            all_ata_str += "'"+str(each_ata)+"'"
+            if each_ata != all_ata_list[-1]:
+                all_ata_str += ","
+            else:
+                all_ata_str += ")"
+        print(all_ata_str)
+
+    if ata_main == 'ALL':
+        sql = "SELECT DISTINCT TOP "+str(n)+" Count(EQUATIONS.MSG_NB) AS "'total_message'", MDC_MSGS. EQ_ID, EQUATIONS.MSG_NB, EQUATIONS.CAS, MDC_MSGS.LRU, MDC_MSGS.ATA FROM MDC_MSGS INNER JOIN EQUATIONS ON MDC_MSGS.ATA = EQUATIONS.ATA AND MDC_MSGS.EQ_ID = EQUATIONS.EQ_ID WHERE MDC_MSGS.AC_SN = "+str(aircraft_no)+" AND SUBSTRING(MDC_MSGS.ATA, 0, CHARINDEX('-', MDC_MSGS.ATA)) IN " + str(all_ata_str) + " AND MDC_MSGS.MSG_Date BETWEEN '"+from_dt+"' AND '"+to_dt+"' GROUP BY MDC_MSGS.EQ_ID, EQUATIONS.MSG_NB, EQUATIONS.CAS, MDC_MSGS.LRU, MDC_MSGS.ATA ORDER BY Count(EQUATIONS.MSG_NB) DESC"
+        print(sql)
+    else:
+        sql = "SELECT DISTINCT TOP "+str(n)+" Count(EQUATIONS.MSG_NB) AS "'total_message'", MDC_MSGS. EQ_ID, EQUATIONS.MSG_NB, EQUATIONS.CAS, MDC_MSGS.LRU, MDC_MSGS.ATA FROM MDC_MSGS INNER JOIN EQUATIONS ON MDC_MSGS.ATA = EQUATIONS.ATA AND MDC_MSGS.EQ_ID = EQUATIONS.EQ_ID WHERE MDC_MSGS.AC_SN = "+str(aircraft_no)+" AND SUBSTRING(MDC_MSGS.ATA, 0, CHARINDEX('-', MDC_MSGS.ATA)) = " + str(ata_main) + " AND MDC_MSGS.MSG_Date BETWEEN '"+from_dt+"' AND '"+to_dt+"' GROUP BY MDC_MSGS.EQ_ID, EQUATIONS.MSG_NB, EQUATIONS.CAS, MDC_MSGS.LRU, MDC_MSGS.ATA ORDER BY Count(EQUATIONS.MSG_NB) DESC"
+        print(sql)
+ 
+    try:
+        conn = pyodbc.connect(driver=App().db_driver, host=App().hostname, database=App().db_name,
+                              user=App().db_username, password=App().db_password)
+        chart1_sql_df = pd.read_sql(sql, conn)
+        #MDCdataDF.columns = column_names
+        return chart1_sql_df
+    except pyodbc.Error as err:
+        print("Couldn't connect to Server")
+        print("Error message:- " + str(err))
+
