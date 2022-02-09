@@ -4,6 +4,7 @@ from Charts.chart4 import chart4Report
 from Charts.chart5 import chart5Report
 from Charts.chart2 import chart_two
 from Charts.chart1 import chart_one
+from Charts.stacked import stacked_chart
 
 
 from GenerateReport.daily import dailyReport
@@ -2760,107 +2761,114 @@ def connect_to_fetch_all_ata(from_dt, to_dt):
         print("Couldn't connect to Server")
         print("Error message:- " + str(err))
         
-def connect_db_MDCdata_chartb_ata(ata,from_dt, to_dt):
-    all_ata_str_list = []
-    if ata == 'ALL':
-       all_ata = connect_to_fetch_all_ata(from_dt, to_dt)
+# def connect_db_MDCdata_chartb_ata(ata,from_dt, to_dt):
+#     all_ata_str_list = []
+#     if ata == 'ALL':
+#        all_ata = connect_to_fetch_all_ata(from_dt, to_dt)
  
-       all_ata_str = "("
-       all_ata_list = all_ata['ATA_Main'].tolist()
-       for each_ata in all_ata_list:
-           all_ata_str_list.append(str(each_ata))
-           all_ata_str += "'"+str(each_ata)+"'"
-           if each_ata != all_ata_list[-1]:
-               all_ata_str += ","
-           else:
-               all_ata_str += ")"
-       print(all_ata_str)
+#        all_ata_str = "("
+#        all_ata_list = all_ata['ATA_Main'].tolist()
+#        for each_ata in all_ata_list:
+#            all_ata_str_list.append(str(each_ata))
+#            all_ata_str += "'"+str(each_ata)+"'"
+#            if each_ata != all_ata_list[-1]:
+#                all_ata_str += ","
+#            else:
+#                all_ata_str += ")"
+#        print(all_ata_str)
 
-    if ata == 'ALL': 
-        sql = "SELECT AC_SN,AC_TN,EQ_ID,SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) AS ATA_Main FROM MDC_MSGS WHERE SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) IN " + str(all_ata_str) +" and  MSG_Date BETWEEN '" + from_dt + " 00:00:00 ' AND '" + to_dt + " 23:59:59 '"
+#     if ata == 'ALL': 
+#         sql = "SELECT AC_SN,AC_TN,EQ_ID,SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) AS ATA_Main FROM MDC_MSGS WHERE SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) IN " + str(all_ata_str) +" and  MSG_Date BETWEEN '" + from_dt + " 00:00:00 ' AND '" + to_dt + " 23:59:59 '"
 
-    else:   
-        sql = "SELECT AC_SN,AC_TN,EQ_ID,SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) AS ATA_Main FROM MDC_MSGS WHERE SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) IN " + str(ata) +" and  MSG_Date BETWEEN '" + from_dt + " 00:00:00 ' AND '" + to_dt + " 23:59:59 '"
-    column_names = ["AC_MODEL", "AC_SN", "AC_TN",
-                    "OPERATOR", "MSG_TYPE", "MDC_SOFTWARE", "MDT_VERSION", "MSG_Date",
-                    "FLIGHT_NUM","FLIGHT_LEG", "FLIGHT_PHASE", "ATA", "ATA_NAME", "LRU",
-                    "COMP_ID", "MSG_TXT","EQ_ID", "INTERMITNT", "EVENT_NOTE",
-                    "EQ_TS_NOTE","SOURCE", "MSG_ID", "FALSE_MSG","BOOKMARK","msg_status"]
-    print(sql)
-    try:
-        conn = pyodbc.connect(driver=db_driver, host=hostname, database=db_name,
-                              user=db_username, password=db_password)
-        MDCdataDF_chartb = pd.read_sql(sql, conn)
-        # MDCdataDF_chartb.columns = column_names
-        conn.close()
-        return MDCdataDF_chartb
-    except pyodbc.Error as err:
-        print("Couldn't connect to Server")
-        print("Error message:- " + str(err))
+#     else:   
+#         sql = "SELECT AC_SN,AC_TN,EQ_ID,SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) AS ATA_Main FROM MDC_MSGS WHERE SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) IN " + str(ata) +" and  MSG_Date BETWEEN '" + from_dt + " 00:00:00 ' AND '" + to_dt + " 23:59:59 '"
+#     column_names = ["AC_MODEL", "AC_SN", "AC_TN",
+#                     "OPERATOR", "MSG_TYPE", "MDC_SOFTWARE", "MDT_VERSION", "MSG_Date",
+#                     "FLIGHT_NUM","FLIGHT_LEG", "FLIGHT_PHASE", "ATA", "ATA_NAME", "LRU",
+#                     "COMP_ID", "MSG_TXT","EQ_ID", "INTERMITNT", "EVENT_NOTE",
+#                     "EQ_TS_NOTE","SOURCE", "MSG_ID", "FALSE_MSG","BOOKMARK","msg_status"]
+#     print(sql)
+#     try:
+#         conn = pyodbc.connect(driver=db_driver, host=hostname, database=db_name,
+#                               user=db_username, password=db_password)
+#         MDCdataDF_chartb = pd.read_sql(sql, conn)
+#         # MDCdataDF_chartb.columns = column_names
+#         conn.close()
+#         return MDCdataDF_chartb
+#     except pyodbc.Error as err:
+#         print("Couldn't connect to Server")
+#         print("Error message:- " + str(err))
 
-# for reference -> http://localhost:8000/Landing_Chart_B/15/11-11-2020/11-17-2020
 @app.post("/api/Landing_Chart_B/{ata}/{top_n}/{from_dt}/{to_dt}")
 async def get_Chart_B(ata:str,top_n: int,from_dt: str, to_dt: str):
-    try:
-        Topvalues2 = top_n
-        if Topvalues2>50:
-            Topvalues2=50
+    stacked =  stacked_chart(ata, top_n,from_dt,to_dt)
+    return stacked
+
+
+
+# for reference -> http://localhost:8000/Landing_Chart_B/15/11-11-2020/11-17-2020
+# @app.post("/api/Landing_Chart_B/{ata}/{top_n}/{from_dt}/{to_dt}")
+# async def get_Chart_B(ata:str,top_n: int,from_dt: str, to_dt: str):
+#     try:
+#         Topvalues2 = top_n
+#         if Topvalues2>50:
+#             Topvalues2=50
         
-        MDCdataDF = connect_db_MDCdata_chartb_ata(ata,from_dt, to_dt)
-        AircraftTailPairDF = MDCdataDF[["AC_SN", "AC_TN"]].drop_duplicates(ignore_index= True) # unique pairs of AC SN and Tail# for use in analysis
-        print("---------------test--------------")
-        print(AircraftTailPairDF)
-        AircraftTailPairDF.columns = ["AC SN","Tail"] # re naming the columns to match History/Daily analysis output
-        print("---------------test2--------------")
-        print(AircraftTailPairDF.columns)
-        chartADF = pd.merge(left = MDCdataDF[["AC_SN","ATA_Main", "EQ_ID"]], right = AircraftTailPairDF, left_on="AC_SN", right_on="AC SN")
-        print("---------------test3--------------")
-        print(chartADF)
-        chartADF["AC_SN"] = chartADF["AC_SN"] + " / " + chartADF["Tail"]
-        print("---------------test4--------------")
-        print(chartADF["AC_SN"])
-        chartADF.drop(labels = ["AC SN", "Tail"], axis = 1, inplace = True)
-        MessageCountbyAircraftATA = chartADF.groupby(["AC_SN","ATA_Main"]).count()
-        print("----test5-----------")
-        print(MessageCountbyAircraftATA)
-        # https://towardsdatascience.com/stacked-bar-charts-with-pythons-matplotlib-f4020e4eb4a7
-        # https://stackoverflow.com/questions/44309507/stacked-bar-plot-using-matplotlib
-        # transpose the indexes. where the ATA label becomes the column and the aircraft is row. counts are middle
-        TransposedMessageCountbyAircraftATA = MessageCountbyAircraftATA["EQ_ID"].unstack()
-        # fill Null values with 0
-        TransposedMessageCountbyAircraftATA.fillna(value= 0, inplace= True)
+#         MDCdataDF = connect_db_MDCdata_chartb_ata(ata,from_dt, to_dt)
+#         AircraftTailPairDF = MDCdataDF[["AC_SN", "AC_TN"]].drop_duplicates(ignore_index= True) # unique pairs of AC SN and Tail# for use in analysis
+#         print("---------------test--------------")
+#         print(AircraftTailPairDF)
+#         AircraftTailPairDF.columns = ["AC SN","Tail"] # re naming the columns to match History/Daily analysis output
+#         print("---------------test2--------------")
+#         print(AircraftTailPairDF.columns)
+#         chartADF = pd.merge(left = MDCdataDF[["AC_SN","ATA_Main", "EQ_ID"]], right = AircraftTailPairDF, left_on="AC_SN", right_on="AC SN")
+#         print("---------------test3--------------")
+#         print(chartADF)
+#         chartADF["AC_SN"] = chartADF["AC_SN"] + " / " + chartADF["Tail"]
+#         print("---------------test4--------------")
+#         print(chartADF["AC_SN"])
+#         chartADF.drop(labels = ["AC SN", "Tail"], axis = 1, inplace = True)
+#         MessageCountbyAircraftATA = chartADF.groupby(["AC_SN","ATA_Main"]).count()
+#         print("----test5-----------")
+#         print(MessageCountbyAircraftATA)
+#         # https://towardsdatascience.com/stacked-bar-charts-with-pythons-matplotlib-f4020e4eb4a7
+#         # https://stackoverflow.com/questions/44309507/stacked-bar-plot-using-matplotlib
+#         # transpose the indexes. where the ATA label becomes the column and the aircraft is row. counts are middle
+#         TransposedMessageCountbyAircraftATA = MessageCountbyAircraftATA["EQ_ID"].unstack()
+#         # fill Null values with 0
+#         TransposedMessageCountbyAircraftATA.fillna(value= 0, inplace= True)
 
-        # sum all the counts by row, plus create a new column called sum
-        TransposedMessageCountbyAircraftATA["Sum"] = TransposedMessageCountbyAircraftATA.sum(axis=1)
+#         # sum all the counts by row, plus create a new column called sum
+#         TransposedMessageCountbyAircraftATA["Sum"] = TransposedMessageCountbyAircraftATA.sum(axis=1)
 
-        # sort the dataframe by the values of sum, and from the topvalues2 the user chooses
-        TransposedMessageCountbyAircraftATA = TransposedMessageCountbyAircraftATA.sort_values("Sum").tail(Topvalues2)
-        TransposedMessageCountbyAircraftATA = TransposedMessageCountbyAircraftATA.sort_values("Sum", ascending=False)
+#         # sort the dataframe by the values of sum, and from the topvalues2 the user chooses
+#         TransposedMessageCountbyAircraftATA = TransposedMessageCountbyAircraftATA.sort_values("Sum").tail(Topvalues2)
+#         TransposedMessageCountbyAircraftATA = TransposedMessageCountbyAircraftATA.sort_values("Sum", ascending=False)
 
-        # create a final dataframe for plotting without the new column created before
-        TransposedMessageCountbyAircraftATAfinalPLOT = TransposedMessageCountbyAircraftATA.drop(["Sum"], axis=1)
-        print('TransposedMessageCountbyAircraftATAfinalPLOT colums : ',TransposedMessageCountbyAircraftATAfinalPLOT.columns)
-        #totals = TransposedMessageCountbyAircraftATA["Sum"]
-        print("total in landing chart B is : ",TransposedMessageCountbyAircraftATAfinalPLOT)
-        # TransposedMessageCountbyAircraftATAfinalPLOT = TransposedMessageCountbyAircraftATAfinalPLOT.sort_values(by='ATA Main',ascending=False)
-        chart_b_df_json = TransposedMessageCountbyAircraftATAfinalPLOT.to_json(orient='index')
-	    #return chart_b_df_json
-        # #image settings
-        # ax8 = TransposedMessageCountbyAircraftATAfinalPLOT.plot(kind='barh', stacked=True, figsize=(16, 9))
-        # ax8.set_ylabel('Aircraft Serial Number')
-        # ax8.set_title('Magnitude of messages in data')
-        # ax8.grid(b= True, which= "both", axis= "x", alpha= 0.3)
-        # rects8 = ax8.containers[-1] 
+#         # create a final dataframe for plotting without the new column created before
+#         TransposedMessageCountbyAircraftATAfinalPLOT = TransposedMessageCountbyAircraftATA.drop(["Sum"], axis=1)
+#         print('TransposedMessageCountbyAircraftATAfinalPLOT colums : ',TransposedMessageCountbyAircraftATAfinalPLOT.columns)
+#         #totals = TransposedMessageCountbyAircraftATA["Sum"]
+#         print("total in landing chart B is : ",TransposedMessageCountbyAircraftATAfinalPLOT)
+#         # TransposedMessageCountbyAircraftATAfinalPLOT = TransposedMessageCountbyAircraftATAfinalPLOT.sort_values(by='ATA Main',ascending=False)
+#         chart_b_df_json = TransposedMessageCountbyAircraftATAfinalPLOT.to_json(orient='index')
+# 	    #return chart_b_df_json
+#         # #image settings
+#         # ax8 = TransposedMessageCountbyAircraftATAfinalPLOT.plot(kind='barh', stacked=True, figsize=(16, 9))
+#         # ax8.set_ylabel('Aircraft Serial Number')
+#         # ax8.set_title('Magnitude of messages in data')
+#         # ax8.grid(b= True, which= "both", axis= "x", alpha= 0.3)
+#         # rects8 = ax8.containers[-1] 
 
 
-        # # here to add column labeling
-        # for i, total in enumerate(totals):
-        #     ax8.text(totals[i], rects8[i].get_y() +0.15 , round(total), ha='left')
+#         # # here to add column labeling
+#         # for i, total in enumerate(totals):
+#         #     ax8.text(totals[i], rects8[i].get_y() +0.15 , round(total), ha='left')
             
-        # plt.show()
-        return chart_b_df_json
-    except Exception as es :
- 	    print(es)
+#         # plt.show()
+#         return chart_b_df_json
+#     except Exception as es :
+#  	    print(es)
 
 
 

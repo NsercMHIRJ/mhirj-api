@@ -144,3 +144,44 @@ def connect_database_for_chart1(n, aircraft_no, ata_main, from_dt, to_dt):
         print("Couldn't connect to Server")
         print("Error message:- " + str(err))
 
+
+#stacked chart
+def connect_db_MDCdata_chartb_ata(ata,from_dt, to_dt):
+    all_ata_str_list = []
+    if ata == 'ALL':
+       all_ata = connect_to_fetch_all_ata(from_dt, to_dt)
+ 
+       all_ata_str = "("
+       all_ata_list = all_ata['ATA_Main'].tolist()
+       for each_ata in all_ata_list:
+           all_ata_str_list.append(str(each_ata))
+           all_ata_str += "'"+str(each_ata)+"'"
+           if each_ata != all_ata_list[-1]:
+               all_ata_str += ","
+           else:
+               all_ata_str += ")"
+       print(all_ata_str)
+
+    if ata == 'ALL': 
+        sql = "SELECT AC_SN,AC_TN,EQ_ID,SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) AS ATA_Main FROM MDC_MSGS WHERE SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) IN " + str(all_ata_str) +" and  MSG_Date BETWEEN '" + from_dt + " 00:00:00 ' AND '" + to_dt + " 23:59:59 '"
+
+    else:   
+        sql = "SELECT AC_SN,AC_TN,EQ_ID,SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) AS ATA_Main FROM MDC_MSGS WHERE SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) IN " + str(ata) +" and  MSG_Date BETWEEN '" + from_dt + " 00:00:00 ' AND '" + to_dt + " 23:59:59 '"
+    column_names = ["AC_MODEL", "AC_SN", "AC_TN",
+                    "OPERATOR", "MSG_TYPE", "MDC_SOFTWARE", "MDT_VERSION", "MSG_Date",
+                    "FLIGHT_NUM","FLIGHT_LEG", "FLIGHT_PHASE", "ATA", "ATA_NAME", "LRU",
+                    "COMP_ID", "MSG_TXT","EQ_ID", "INTERMITNT", "EVENT_NOTE",
+                    "EQ_TS_NOTE","SOURCE", "MSG_ID", "FALSE_MSG","BOOKMARK","msg_status"]
+    print(sql)
+    try:
+        conn = pyodbc.connect(driver=App().db_driver, host=App().hostname, database=App().db_name,
+                              user=App().db_username, password=App().db_password)
+        MDCdataDF_chartb = pd.read_sql(sql, conn)
+        # MDCdataDF_chartb.columns = column_names
+        conn.close()
+        return MDCdataDF_chartb
+    except pyodbc.Error as err:
+        print("Couldn't connect to Server")
+        print("Error message:- " + str(err))
+
+
