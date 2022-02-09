@@ -80,3 +80,32 @@ def connect_database_for_charts(aircraft_no, equation_id, CurrentFlightPhaseEnab
     except pyodbc.Error as err:
         print("Couldn't connect to Server")
         print("Error message:- " + str(err))
+
+
+
+## Chart 2
+def connect_database_for_chart2(n, ata, from_dt, to_dt):
+    if len(ata) == 2:
+        sql = "SELECT AC_SN,AC_TN,ATA,SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) AS ATA_Main FROM MDC_MSGS WHERE SUBSTRING(ATA, 0, CHARINDEX('-', ATA))="+ata+" AND MSG_Date BETWEEN '"+from_dt+"' AND '"+to_dt+"'"
+    elif len(ata) == 5:  
+       sql = "SELECT AC_SN,AC_TN,ATA,SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) AS ATA_Main FROM MDC_MSGS where  ATA='"+ata+"'   AND MSG_Date BETWEEN '"+from_dt+"' AND '"+to_dt+"' "
+  
+    column_names = ["AC_MODEL", "AC_SN", "AC_TN",
+                    "OPERATOR", "MSG_TYPE", "MDC_SOFTWARE", "MDT_VERSION", "MSG_Date",
+                    "FLIGHT_NUM","FLIGHT_LEG", "FLIGHT_PHASE", "ATA", "ATA_NAME", "LRU",
+                    "COMP_ID", "MSG_TXT","EQ_ID", "INTERMITNT", "EVENT_NOTE",
+                    "EQ_TS_NOTE","SOURCE", "MSG_ID", "FALSE_MSG","BOOKMARK","msg_status"]
+    print(sql)
+  
+    try:
+       conn = pyodbc.connect(driver=App().db_driver, host=App().hostname, database=App().db_name,
+                              user=App().db_username, password=App().db_password)
+       chart2_sql_df = pd.read_sql(sql, conn)
+       # MDCdataDF.columns = column_names
+       # chart2_sql_df.columns = column_names
+ 
+       conn.close()
+       return chart2_sql_df
+    except pyodbc.Error as err:
+       print("Couldn't connect to Server")
+       print("Error message:- " + str(err))

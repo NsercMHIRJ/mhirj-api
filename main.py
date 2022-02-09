@@ -2,6 +2,8 @@
 #!/usr/bin/bash
 from Charts.chart4 import chart4Report
 from Charts.chart5 import chart5Report
+from Charts.chart2 import chart_two
+
 from GenerateReport.daily import dailyReport
 from GenerateReport.history import historyReport
 from Charts.chart3 import chart3Report
@@ -2380,61 +2382,68 @@ async def get_ChartOneData(top_n:int, aircraftNo:int, ata_main:str, fromDate: st
     chart1_sql_df_json = chart1_sql_df.to_json(orient='records')
     return chart1_sql_df_json
 
-## Chart 2
-def connect_database_for_chart2(n, ata, from_dt, to_dt):
-    if len(ata) == 2:
-        sql = "SELECT AC_SN,AC_TN,ATA,SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) AS ATA_Main FROM MDC_MSGS WHERE SUBSTRING(ATA, 0, CHARINDEX('-', ATA))="+ata+" AND MSG_Date BETWEEN '"+from_dt+"' AND '"+to_dt+"'"
-    elif len(ata) == 5:  
-       sql = "SELECT AC_SN,AC_TN,ATA,SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) AS ATA_Main FROM MDC_MSGS where  ATA='"+ata+"'   AND MSG_Date BETWEEN '"+from_dt+"' AND '"+to_dt+"' "
-  
-    column_names = ["AC_MODEL", "AC_SN", "AC_TN",
-                    "OPERATOR", "MSG_TYPE", "MDC_SOFTWARE", "MDT_VERSION", "MSG_Date",
-                    "FLIGHT_NUM","FLIGHT_LEG", "FLIGHT_PHASE", "ATA", "ATA_NAME", "LRU",
-                    "COMP_ID", "MSG_TXT","EQ_ID", "INTERMITNT", "EVENT_NOTE",
-                    "EQ_TS_NOTE","SOURCE", "MSG_ID", "FALSE_MSG","BOOKMARK","msg_status"]
-    print(sql)
-  
-    try:
-       conn = pyodbc.connect(driver=db_driver, host=hostname, database=db_name,
-                             user=db_username, password=db_password)
-       chart2_sql_df = pd.read_sql(sql, conn)
-       # MDCdataDF.columns = column_names
-       # chart2_sql_df.columns = column_names
- 
-       conn.close()
-       return chart2_sql_df
-    except pyodbc.Error as err:
-       print("Couldn't connect to Server")
-       print("Error message:- " + str(err))
- 
+#Chart 2 
 @app.post("/api/chart_two/{top_values}/{ata}/{fromDate}/{toDate}")
 async def get_ChartwoData(top_values:int, ata:str, fromDate: str , toDate: str):
-  ATAtoStudy=ata
-  Topvalues2=top_values
-  MDCdataDF = connect_database_for_chart2(top_values, ata, fromDate, toDate)
-  AircraftTailPairDF = MDCdataDF[["AC_SN", "AC_TN"]].drop_duplicates(ignore_index= True) # unique pairs of AC SN and Tail# for use in analysis
-  AircraftTailPairDF.columns = ["AC SN","Tail"] # re naming the columns to match History/Daily analysis output
-  chart2DF = pd.merge(left = MDCdataDF[["AC_SN","ATA_Main", "ATA"]], right = AircraftTailPairDF, left_on="AC_SN", right_on="AC SN")
-  chart2DF["AC_SN"] = chart2DF["AC_SN"] + " / " + chart2DF["Tail"]
-  chart2DF.drop(labels = ["AC SN", "Tail"], axis = 1, inplace = True)
+    chart2 =  chart_two(top_values, ata,fromDate,toDate)
+    return chart2
+
+
+# ## Chart 2
+# def connect_database_for_chart2(n, ata, from_dt, to_dt):
+#     if len(ata) == 2:
+#         sql = "SELECT AC_SN,AC_TN,ATA,SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) AS ATA_Main FROM MDC_MSGS WHERE SUBSTRING(ATA, 0, CHARINDEX('-', ATA))="+ata+" AND MSG_Date BETWEEN '"+from_dt+"' AND '"+to_dt+"'"
+#     elif len(ata) == 5:  
+#        sql = "SELECT AC_SN,AC_TN,ATA,SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) AS ATA_Main FROM MDC_MSGS where  ATA='"+ata+"'   AND MSG_Date BETWEEN '"+from_dt+"' AND '"+to_dt+"' "
   
-  if len(ATAtoStudy) == 2:
-     print(len(ATAtoStudy))
-     # Convert 2 Dig ATA array to Dataframe to analyze
-     TwoDigATA_DF = chart2DF.drop("ATA", axis = 1).copy()
-     # Count the occurrence of each ata in each aircraft
-     ATAOccurrenceDF = TwoDigATA_DF.value_counts().unstack()
-     Plottinglabels = ATAOccurrenceDF[ATAtoStudy].sort_values().dropna().tail(Topvalues2) # Aircraft Labels
+#     column_names = ["AC_MODEL", "AC_SN", "AC_TN",
+#                     "OPERATOR", "MSG_TYPE", "MDC_SOFTWARE", "MDT_VERSION", "MSG_Date",
+#                     "FLIGHT_NUM","FLIGHT_LEG", "FLIGHT_PHASE", "ATA", "ATA_NAME", "LRU",
+#                     "COMP_ID", "MSG_TXT","EQ_ID", "INTERMITNT", "EVENT_NOTE",
+#                     "EQ_TS_NOTE","SOURCE", "MSG_ID", "FALSE_MSG","BOOKMARK","msg_status"]
+#     print(sql)
+  
+#     try:
+#        conn = pyodbc.connect(driver=db_driver, host=hostname, database=db_name,
+#                              user=db_username, password=db_password)
+#        chart2_sql_df = pd.read_sql(sql, conn)
+#        # MDCdataDF.columns = column_names
+#        # chart2_sql_df.columns = column_names
+ 
+#        conn.close()
+#        return chart2_sql_df
+#     except pyodbc.Error as err:
+#        print("Couldn't connect to Server")
+#        print("Error message:- " + str(err))
+ 
+# @app.post("/api/chart_two/{top_values}/{ata}/{fromDate}/{toDate}")
+# async def get_ChartwoData(top_values:int, ata:str, fromDate: str , toDate: str):
+#   ATAtoStudy=ata
+#   Topvalues2=top_values
+#   MDCdataDF = connect_database_for_chart2(top_values, ata, fromDate, toDate)
+#   AircraftTailPairDF = MDCdataDF[["AC_SN", "AC_TN"]].drop_duplicates(ignore_index= True) # unique pairs of AC SN and Tail# for use in analysis
+#   AircraftTailPairDF.columns = ["AC SN","Tail"] # re naming the columns to match History/Daily analysis output
+#   chart2DF = pd.merge(left = MDCdataDF[["AC_SN","ATA_Main", "ATA"]], right = AircraftTailPairDF, left_on="AC_SN", right_on="AC SN")
+#   chart2DF["AC_SN"] = chart2DF["AC_SN"] + " / " + chart2DF["Tail"]
+#   chart2DF.drop(labels = ["AC SN", "Tail"], axis = 1, inplace = True)
+  
+#   if len(ATAtoStudy) == 2:
+#      print(len(ATAtoStudy))
+#      # Convert 2 Dig ATA array to Dataframe to analyze
+#      TwoDigATA_DF = chart2DF.drop("ATA", axis = 1).copy()
+#      # Count the occurrence of each ata in each aircraft
+#      ATAOccurrenceDF = TwoDigATA_DF.value_counts().unstack()
+#      Plottinglabels = ATAOccurrenceDF[ATAtoStudy].sort_values().dropna().tail(Topvalues2) # Aircraft Labels
     
-  elif len(ATAtoStudy) == 5:
-   # Convert 4 Dig ATA array to Dataframe to analyze
-   FourDigATA_DF = chart2DF.drop("ATA_Main", axis = 1).copy()
-   # Count the occurrence of each ata in each aircraft
-   ATAOccurrenceDF = FourDigATA_DF.value_counts().unstack()
-   Plottinglabels = ATAOccurrenceDF[ATAtoStudy].sort_values().dropna().tail(Topvalues2) # Aircraft Labels
+#   elif len(ATAtoStudy) == 5:
+#    # Convert 4 Dig ATA array to Dataframe to analyze
+#    FourDigATA_DF = chart2DF.drop("ATA_Main", axis = 1).copy()
+#    # Count the occurrence of each ata in each aircraft
+#    ATAOccurrenceDF = FourDigATA_DF.value_counts().unstack()
+#    Plottinglabels = ATAOccurrenceDF[ATAtoStudy].sort_values().dropna().tail(Topvalues2) # Aircraft Labels
    
-  chart2_sql_df_json = Plottinglabels.to_json(orient='index')
-  return chart2_sql_df_json
+#   chart2_sql_df_json = Plottinglabels.to_json(orient='index')
+#   return chart2_sql_df_json
 
 
 
