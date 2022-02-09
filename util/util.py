@@ -16,6 +16,8 @@ database_vdi='MHIRJ_HUMBER'
 user_vdi='humber_rw'
 password_vdi='nP@yWw@!$4NxWeK6p*ttu3q6'
 
+CORELATION_TABLE = "MDC_PM_Correlated_without_ata"
+
 def connect_database_mdc_message_input(eq_id):
     sql = "SELECT * from [dbo].[MDCMessagesInputs] c"
     if eq_id!="":
@@ -308,13 +310,14 @@ def connect_database_MDCdata(ata, excl_eqid, include_current_message, from_dt, t
     #     print("Error message:- " + str(err))
         
 #corelation connect database 
-def connect_database_for_corelation(from_dt, to_dt, equation_id, tail_no):
+def connect_database_for_corelation_tail(from_dt, to_dt, equation_id, tail_no,status):
     sql =""
 
-    sql += "SELECT DISTINCT [ATA_Main],[ATA_Sub],[MaintTransID],[DateAndTime],[Failure_Flag],[MRB],[SquawkSource],[Discrepancy],[CorrectiveAction] FROM [dbo].[MDC_PM_Correlated_Test] WHERE CONVERT(date,DateAndTime) BETWEEN '" + from_dt + "'  AND '" + to_dt + "'"
+    #sql += "SELECT DISTINCT [ATA_Main],[ATA_Sub],[MaintTransID],[DateAndTime],[Failure_Flag],[MRB],[SquawkSource],[Discrepancy],[CorrectiveAction] FROM [dbo]. " +CORELATION_TABLE+ " WHERE CONVERT(date,DateAndTime) BETWEEN '" + from_dt + "'  AND '" + to_dt + "'"
+    sql += "SELECT DISTINCT [ATA_Main],[Discrepancy],[CorrectiveAction],[MaintTransID],[TransDate],[PM_ATA] FROM [dbo]. " +CORELATION_TABLE+ " WHERE CONVERT(date,MDC_Date) BETWEEN '" + from_dt + "'  AND '" + to_dt + "' and status='"+str(status)+"'"
     
     if equation_id : 
-        sql+= " AND EQ_ID = '"+equation_id+"'"
+        sql+= " AND Equation_ID = '"+equation_id+"'"
     if tail_no : 
         sql += " AND Aircraft_tail_No ='"+tail_no+"'"
     print(sql)
@@ -330,22 +333,37 @@ def connect_database_for_corelation(from_dt, to_dt, equation_id, tail_no):
         print("Error message:- " + str(err))
         return {"message":str(err)}
 
-def connect_database_for_corelation_pid(p_id):
+def connect_database_for_corelation_pid(p_id,status):
     
+    # sql = """SELECT 
+	# [Aircraft_tail_No],
+	# [EQ_ID],
+	# [aircraftno],
+	# [ATA_Description],
+	# [LRU],
+	# [CAS],
+	# [MDC_MESSAGE],
+	# [EQ_DESCRIPTION],
+	# [ATA_Main],
+	# [ATA_Sub]
+    # FROM [dbo].[MDC_PM_Correlated_Test] 
+    # WHERE [MaintTransID] = %s
+    # """ %(p_id)
     sql = """SELECT 
 	[Aircraft_tail_No],
-	[EQ_ID],
-	[aircraftno],
+	[Equation_ID],
+	[Aircraft_No],
 	[ATA_Description],
 	[LRU],
 	[CAS],
 	[MDC_MESSAGE],
-	[EQ_DESCRIPTION],
+	[Equation_DESCRIPTION],
 	[ATA_Main],
-	[ATA_Sub]
-    FROM [dbo].[MDC_PM_Correlated_Test] 
+	[MEL_or_No_Dispatch]
+    FROM [dbo].%s 
     WHERE [MaintTransID] = %s
-    """ %(p_id)
+    AND Status = %s
+    """ %(CORELATION_TABLE,p_id,status)
 
     print(sql)
 
@@ -361,21 +379,23 @@ def connect_database_for_corelation_pid(p_id):
         print("Error message:- " + str(err))
         return {"message":str(err)}
 
-def connect_database_for_corelation_ata(from_dt, to_dt, equation_id, ata):
+def connect_database_for_corelation_ata(from_dt, to_dt, status, equation_id, ata):
     sql =""
 
-    sql += "SELECT DISTINCT [ATA_Main],[ATA_Sub],[MaintTransID],[DateAndTime],[Failure_Flag],[MRB],[SquawkSource],[Discrepancy],[CorrectiveAction] FROM [dbo].[MDC_PM_Correlated_Test] WHERE CONVERT(date,DateAndTime) BETWEEN '" + from_dt + "'  AND '" + to_dt + "'"
+    #sql += "SELECT DISTINCT [ATA_Main],[ATA_Sub],[MaintTransID],[DateAndTime],[Failure_Flag],[MRB],[SquawkSource],[Discrepancy],[CorrectiveAction] FROM [dbo].[MDC_PM_Correlated_Test] WHERE CONVERT(date,DateAndTime) BETWEEN '" + from_dt + "'  AND '" + to_dt + "'"
+    sql += "SELECT DISTINCT [ATA_Main],[Discrepancy],[CorrectiveAction],[MaintTransID],[TransDate],[PM_ATA] FROM [dbo]. " +CORELATION_TABLE+ " WHERE CONVERT(date,MDC_Date) BETWEEN '" + from_dt + "'  AND '" + to_dt + "' and status='"+str(status)+"'"
+
     #if "ALL" not in ata:
 #     #    ata = str(tuple(ata.replace(")", "").replace("(", "").replace("'", "").split(",")))
 
 
-    print("len of eq_id",equation_id)
+    #print("len of eq_id",equation_id)
     if equation_id!="":
         equation_id = str(tuple(equation_id.replace(")","").replace("(","").replace("'","").split(",")))
         if len(equation_id) <= 14:
             equation_id = equation_id.replace(equation_id[len(equation_id)-2], '')
         if "NONE" not in equation_id:
-            sql += "  AND EQ_ID NOT IN " + equation_id
+            sql += "  AND Equation_ID NOT IN " + equation_id
     if "ALL" not in ata :
         if ata!="":
             sql += "  AND ATA_Main IN " + ata
