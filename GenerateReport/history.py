@@ -130,7 +130,7 @@ def historyReport(MaxAllowedOccurrences: int, MaxAllowedConsecLegs: int, MaxAllo
             # run 
             consec_days.at[equation, aircraft] = LongestConseq(unique_arr= dates, days_legs= "days")
             consec_legs.at[equation, aircraft] = LongestConseq(unique_arr= legs, days_legs= "legs")
-            print("err ", aircraft, type(aircraft))
+            # print("err ", aircraft, type(aircraft))
             max_intermittent.at[equation, float(aircraft)] = max(intermitt)
             
             def f(x):

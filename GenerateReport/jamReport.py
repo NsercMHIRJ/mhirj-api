@@ -31,10 +31,20 @@ def jamReport(OutputTable, ACSN_chosen,MDCdataDF,listofmessages= listofJamMessag
    print("------dataoffilter-----")
    print(datatofilter)
    print("---b1--------")
-   print(OutputTable["B1-Equation"])
-   isin = OutputTable["B1-Equation"].isin(listofmessages)
-   print("------isin----------")
-   print(isin)
+
+   test_jam = OutputTable.loc[OutputTable['AC SN'] == str(ACSN_chosen),'is_jam'].values[0]
+   print(test_jam)
+
+   if test_jam:
+   
+        isin = OutputTable["B1-Equation"].isin(listofmessages)
+        print("------isin----------")
+        print(isin)
+
+   else :  
+        isin = ~OutputTable["B1-Equation"].isin(listofmessages)
+        print("------isin----------")
+        print(isin) 
 
   
  
