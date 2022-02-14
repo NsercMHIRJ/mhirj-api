@@ -80,36 +80,36 @@ def connect_database_MDCdata(ata, excl_eqid, airline_operator, include_current_m
     # If we do not want to include current message -> exclude null FLIGHT_PHASE and null INTERMITNTs
     if include_current_message == 0:    
         if ata == 'ALL' and excl_eqid == 'NONE':
-            sql = "SELECT mg.AC_SN, mg.AC_TN, mg.FLIGHT_LEG, mg.ATA, mg.ATA_NAME, mg.LRU, mg.MSG_Date, mg.msg_status, mg.FLIGHT_PHASE, mg.MSG_TYPE, mg.INTERMITNT, mg.EQ_ID, mg.SOURCE, SUBSTRING(mg.ATA, 0, CHARINDEX('-', mg.ATA)) AS ATA_Main, SUBSTRING(mg.ATA, 4,4) AS ATA_SUB, mg.MSG_ID FROM MDC_MSGS mg WHERE SUBSTRING(mg.ATA, 0, CHARINDEX('-', mg.ATA)) IN " + str(all_ata_str) + " AND EQ_ID IN " + str(
+            sql = "SELECT mg.AC_SN, mg.AC_TN, mg.FLIGHT_LEG, mg.ATA, mg.ATA_NAME, mg.LRU, mg.MSG_Date, mg.msg_status, mg.FLIGHT_PHASE, mg.MSG_TYPE, mg.INTERMITNT, mg.EQ_ID, mg.SOURCE, SUBSTRING(mg.ATA, 0, CHARINDEX('-', mg.ATA)) AS ATA_Main, SUBSTRING(mg.ATA, 4,4) AS ATA_SUB, mg.MSG_ID,mg.FLIGHT_NUM FROM MDC_MSGS mg WHERE SUBSTRING(mg.ATA, 0, CHARINDEX('-', mg.ATA)) IN " + str(all_ata_str) + " AND EQ_ID IN " + str(
                 all_eqid_str) + " AND FLIGHT_PHASE IS NOT NULL AND INTERMITNT IS NOT NULL AND MSG_Date BETWEEN '" + from_dt + "' AND '" + to_dt + "'"
         elif excl_eqid == 'NONE':
-            sql = "SELECT mg.AC_SN, mg.AC_TN, mg.FLIGHT_LEG, mg.ATA, mg.ATA_NAME, mg.LRU, mg.MSG_Date, mg.msg_status, mg.FLIGHT_PHASE, mg.MSG_TYPE, mg.INTERMITNT, mg.EQ_ID, mg.SOURCE, SUBSTRING(mg.ATA, 0, CHARINDEX('-', mg.ATA)) AS ATA_Main, SUBSTRING(mg.ATA, 4,4) AS ATA_SUB, mg.MSG_ID FROM MDC_MSGS mg  WHERE SUBSTRING(mg.ATA, 0, CHARINDEX('-', mg.ATA)) IN " + str(ata) + " AND EQ_ID IN " + str(
+            sql = "SELECT mg.AC_SN, mg.AC_TN, mg.FLIGHT_LEG, mg.ATA, mg.ATA_NAME, mg.LRU, mg.MSG_Date, mg.msg_status, mg.FLIGHT_PHASE, mg.MSG_TYPE, mg.INTERMITNT, mg.EQ_ID, mg.SOURCE, SUBSTRING(mg.ATA, 0, CHARINDEX('-', mg.ATA)) AS ATA_Main, SUBSTRING(mg.ATA, 4,4) AS ATA_SUB, mg.MSG_ID ,mg.FLIGHT_NUM FROM MDC_MSGS mg  WHERE SUBSTRING(mg.ATA, 0, CHARINDEX('-', mg.ATA)) IN " + str(ata) + " AND EQ_ID IN " + str(
                 all_eqid_str) + " AND FLIGHT_PHASE IS NOT NULL AND INTERMITNT IS NOT NULL AND MSG_Date BETWEEN '" + from_dt + "' AND '" + to_dt + "'"
         elif ata == 'ALL':
-            sql = "SELECT mg.AC_SN, mg.AC_TN, mg.FLIGHT_LEG, mg.ATA, mg.ATA_NAME, mg.LRU, mg.MSG_Date, mg.msg_status, mg.FLIGHT_PHASE, mg.MSG_TYPE, mg.INTERMITNT, mg.EQ_ID, mg.SOURCE, SUBSTRING(mg.ATA, 0, CHARINDEX('-', mg.ATA)) AS ATA_Main, SUBSTRING(mg.ATA, 4,4) AS ATA_SUB,  mg.MSG_ID FROM MDC_MSGS mg   WHERE SUBSTRING(mg.ATA, 0, CHARINDEX('-', mg.ATA)) IN " + str(all_ata_str) + " AND EQ_ID NOT IN " + str(
+            sql = "SELECT mg.AC_SN, mg.AC_TN, mg.FLIGHT_LEG, mg.ATA, mg.ATA_NAME, mg.LRU, mg.MSG_Date, mg.msg_status, mg.FLIGHT_PHASE, mg.MSG_TYPE, mg.INTERMITNT, mg.EQ_ID, mg.SOURCE, SUBSTRING(mg.ATA, 0, CHARINDEX('-', mg.ATA)) AS ATA_Main, SUBSTRING(mg.ATA, 4,4) AS ATA_SUB,  mg.MSG_ID,mg.FLIGHT_NUM FROM MDC_MSGS mg   WHERE SUBSTRING(mg.ATA, 0, CHARINDEX('-', mg.ATA)) IN " + str(all_ata_str) + " AND EQ_ID NOT IN " + str(
                 excl_eqid) + " AND FLIGHT_PHASE IS NOT NULL AND INTERMITNT IS NOT NULL AND MSG_Date BETWEEN '" + from_dt + "' AND '" + to_dt + "'"
         else:
-            sql = "SELECT mg.AC_SN, mg.AC_TN, mg.FLIGHT_LEG, mg.ATA, mg.ATA_NAME, mg.LRU, mg.MSG_Date, mg.msg_status, mg.FLIGHT_PHASE, mg.MSG_TYPE, mg.INTERMITNT, mg.EQ_ID, mg.SOURCE, SUBSTRING(mg.ATA, 0, CHARINDEX('-', mg.ATA)) AS ATA_Main, SUBSTRING(mg.ATA, 4,4) AS ATA_SUB,  mg.MSG_ID FROM MDC_MSGS mg   WHERE SUBSTRING(mg.ATA, 0, CHARINDEX('-', mg.ATA)) IN " + str(ata) + " AND EQ_ID NOT IN " + str(
+            sql = "SELECT mg.AC_SN, mg.AC_TN, mg.FLIGHT_LEG, mg.ATA, mg.ATA_NAME, mg.LRU, mg.MSG_Date, mg.msg_status, mg.FLIGHT_PHASE, mg.MSG_TYPE, mg.INTERMITNT, mg.EQ_ID, mg.SOURCE, SUBSTRING(mg.ATA, 0, CHARINDEX('-', mg.ATA)) AS ATA_Main, SUBSTRING(mg.ATA, 4,4) AS ATA_SUB,  mg.MSG_ID,mg.FLIGHT_NUM FROM MDC_MSGS mg   WHERE SUBSTRING(mg.ATA, 0, CHARINDEX('-', mg.ATA)) IN " + str(ata) + " AND EQ_ID NOT IN " + str(
                 excl_eqid) + " AND FLIGHT_PHASE IS NOT NULL AND INTERMITNT IS NOT NULL AND MSG_Date BETWEEN '" + from_dt + "' AND '" + to_dt + "'"
 
     elif include_current_message == 1:
         if ata == 'ALL' and excl_eqid =='NONE':
-            sql = "SELECT mg.AC_SN, mg.AC_TN, mg.FLIGHT_LEG, mg.ATA, mg.ATA_NAME, mg.LRU, mg.MSG_Date, mg.msg_status, mg.FLIGHT_PHASE, mg.MSG_TYPE, mg.INTERMITNT, mg.EQ_ID, mg.SOURCE, SUBSTRING(mg.ATA, 0, CHARINDEX('-', mg.ATA)) AS ATA_Main, SUBSTRING(mg.ATA, 4,4) AS ATA_SUB,  mg.MSG_ID FROM MDC_MSGS mg   WHERE SUBSTRING(mg.ATA, 0, CHARINDEX('-', mg.ATA)) IN " + str(all_ata_str) + " AND EQ_ID IN " + str(
+            sql = "SELECT  mg.AC_SN, mg.AC_TN, mg.FLIGHT_LEG, mg.ATA, mg.ATA_NAME, mg.LRU, mg.MSG_Date, mg.msg_status, mg.FLIGHT_PHASE, mg.MSG_TYPE, mg.INTERMITNT, mg.EQ_ID, mg.SOURCE, SUBSTRING(mg.ATA, 0, CHARINDEX('-', mg.ATA)) AS ATA_Main, SUBSTRING(mg.ATA, 4,4) AS ATA_SUB,  mg.MSG_ID,mg.FLIGHT_NUM FROM MDC_MSGS mg   WHERE SUBSTRING(mg.ATA, 0, CHARINDEX('-', mg.ATA)) IN " + str(all_ata_str) + " AND EQ_ID IN " + str(
                 all_eqid_str) + " AND MSG_Date BETWEEN '" + from_dt + "' AND '" + to_dt + "'"
         elif ata == 'ALL':
-            sql = "SELECT mg.AC_SN, mg.AC_TN, mg.FLIGHT_LEG, mg.ATA, mg.ATA_NAME, mg.LRU, mg.MSG_Date, mg.msg_status, mg.FLIGHT_PHASE, mg.MSG_TYPE, mg.INTERMITNT, mg.EQ_ID, mg.SOURCE, SUBSTRING(mg.ATA, 0, CHARINDEX('-', mg.ATA)) AS ATA_Main, SUBSTRING(mg.ATA, 4,4) AS ATA_SUB,  mg.MSG_ID FROM MDC_MSGS mg   WHERE SUBSTRING(mg.ATA, 0, CHARINDEX('-', mg.ATA)) IN " + str(all_ata_str) + " AND EQ_ID NOT IN " + str(
+            sql = "SELECT mg.AC_SN, mg.AC_TN, mg.FLIGHT_LEG, mg.ATA, mg.ATA_NAME, mg.LRU, mg.MSG_Date, mg.msg_status, mg.FLIGHT_PHASE, mg.MSG_TYPE, mg.INTERMITNT, mg.EQ_ID, mg.SOURCE, SUBSTRING(mg.ATA, 0, CHARINDEX('-', mg.ATA)) AS ATA_Main, SUBSTRING(mg.ATA, 4,4) AS ATA_SUB,  mg.MSG_ID,mg.FLIGHT_NUM FROM MDC_MSGS mg   WHERE SUBSTRING(mg.ATA, 0, CHARINDEX('-', mg.ATA)) IN " + str(all_ata_str) + " AND EQ_ID NOT IN " + str(
                 excl_eqid) + " AND MSG_Date BETWEEN '" + from_dt + "' AND '" + to_dt + "'"
         elif excl_eqid == 'NONE':
-            sql = "SELECT mg.AC_SN, mg.AC_TN, mg.FLIGHT_LEG, mg.ATA, mg.ATA_NAME, mg.LRU, mg.MSG_Date, mg.msg_status, mg.FLIGHT_PHASE, mg.MSG_TYPE, mg.INTERMITNT, mg.EQ_ID, mg.SOURCE, SUBSTRING(mg.ATA, 0, CHARINDEX('-', mg.ATA)) AS ATA_Main, SUBSTRING(mg.ATA, 4,4) AS ATA_SUB,  mg.MSG_ID FROM MDC_MSGS mg   WHERE SUBSTRING(mg.ATA, 0, CHARINDEX('-', mg.ATA)) IN " + str(ata) + " AND EQ_ID IN " + str(
+            sql = "SELECT mg.AC_SN, mg.AC_TN, mg.FLIGHT_LEG, mg.ATA, mg.ATA_NAME, mg.LRU, mg.MSG_Date, mg.msg_status, mg.FLIGHT_PHASE, mg.MSG_TYPE, mg.INTERMITNT, mg.EQ_ID, mg.SOURCE, SUBSTRING(mg.ATA, 0, CHARINDEX('-', mg.ATA)) AS ATA_Main, SUBSTRING(mg.ATA, 4,4) AS ATA_SUB,  mg.MSG_ID,mg.FLIGHT_NUM FROM MDC_MSGS mg   WHERE SUBSTRING(mg.ATA, 0, CHARINDEX('-', mg.ATA)) IN " + str(ata) + " AND EQ_ID IN " + str(
                 all_eqid_str) + " AND MSG_Date BETWEEN '" + from_dt + "' AND '" + to_dt + "'"
         else:
-            sql = "SELECT mg.AC_SN, mg.AC_TN, mg.FLIGHT_LEG, mg.ATA, mg.ATA_NAME, mg.LRU, mg.MSG_Date, mg.msg_status, mg.FLIGHT_PHASE, mg.MSG_TYPE, mg.INTERMITNT, mg.EQ_ID, mg.SOURCE, SUBSTRING(mg.ATA, 0, CHARINDEX('-', mg.ATA)) AS ATA_Main, SUBSTRING(mg.ATA, 4,4) AS ATA_SUB,  mg.MSG_ID FROM MDC_MSGS mg   WHERE SUBSTRING(mg.ATA, 0, CHARINDEX('-', mg.ATA)) IN " + str(ata) + " AND EQ_ID NOT IN " + str(
+            sql = "SELECT mg.AC_SN, mg.AC_TN, mg.FLIGHT_LEG, mg.ATA, mg.ATA_NAME, mg.LRU, mg.MSG_Date, mg.msg_status, mg.FLIGHT_PHASE, mg.MSG_TYPE, mg.INTERMITNT, mg.EQ_ID, mg.SOURCE, SUBSTRING(mg.ATA, 0, CHARINDEX('-', mg.ATA)) AS ATA_Main, SUBSTRING(mg.ATA, 4,4) AS ATA_SUB,  mg.MSG_ID,mg.FLIGHT_NUM FROM MDC_MSGS mg   WHERE SUBSTRING(mg.ATA, 0, CHARINDEX('-', mg.ATA)) IN " + str(ata) + " AND EQ_ID NOT IN " + str(
                 excl_eqid) + " AND MSG_Date BETWEEN '" + from_dt + "' AND '" + to_dt + "'"
 
     column_names = ["AC_SN", "AC_TN", "FLIGHT_LEG",
                "ATA_Main", "ATA_SUB", "ATA", "ATA_NAME", "LRU",
                "MSG_Date", "msg_status", "FLIGHT_PHASE", "MSG_TYPE",
-               "INTERMITNT", "EQ_ID", "SOURCE", "MSG_ID"]
+               "INTERMITNT", "EQ_ID", "SOURCE", "MSG_ID","FLIGHT_NUM"]
     print(sql)
     try:
         MDCdataDF = pd.read_sql(sql, conn)
@@ -119,6 +119,7 @@ def connect_database_MDCdata(ata, excl_eqid, airline_operator, include_current_m
     except pyodbc.Error as err:
         print("Couldn't connect to Server")
         print("Error message:- " + str(err))
+
 
 
 def connect_database_MDCmessagesInputs():
