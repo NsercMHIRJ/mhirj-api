@@ -64,8 +64,12 @@ def jamReport(OutputTable, ACSN_chosen,MDCdataDF,listofmessages= listofJamMessag
    FinalDF = datatofilter3.loc[pd.IndexSlice[listoftuplesACFL], :]
    print("----------finaldf---------------")
    print(FinalDF)
-   FinalDF_history_json = (FinalDF.loc[str(ACSN_chosen)])
+   FinalDF_history = (FinalDF.loc[str(ACSN_chosen)])
    print("--------json jam-----------")
+   print(FinalDF_history)
+#    print (FinalDF_history_json.reset_index().to_json(orient='records'))
+   FinalDF_history_json = FinalDF_history.reset_index()
+   print("---final history---------")
    print(FinalDF_history_json)
 
    return FinalDF_history_json
