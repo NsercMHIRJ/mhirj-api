@@ -137,7 +137,7 @@ def historyReport(MaxAllowedOccurrences: int, MaxAllowedConsecLegs: int, MaxAllo
                 return np.int(x)
 
             f2 = np.vectorize(f)
-            
+            # or (len(legs) and all(v for v in legs) and f2(legs).any() > 32600) \
             if total_occ_DF.at[equation, aircraft] >= MaxAllowedOccurrences \
             or consec_days.at[equation, aircraft] >= MaxAllowedConsecDays \
             or consec_legs.at[equation, aircraft] >= MaxAllowedConsecLegs \
@@ -203,7 +203,7 @@ def historyReport(MaxAllowedOccurrences: int, MaxAllowedConsecLegs: int, MaxAllo
                 MAINtable_array_temp[0,8] = total_occ_DF.at[equation, aircraft]
                 MAINtable_array_temp[0,9] = consec_days.at[equation, aircraft]
                 MAINtable_array_temp[0,10] = consec_legs.at[equation, aircraft]
-                MAINtable_array_temp[0,11] = max_intermittent.at[equation, aircraft]
+                MAINtable_array_temp[0,11] = max_intermittent.at[equation, float(aircraft)]
                 MAINtable_array_temp[0,12] = dates.min()
                 MAINtable_array_temp[0,13] = dates.max()
                 MAINtable_array_temp[0,14] = str(flags_array.at[equation, aircraft])

@@ -121,6 +121,7 @@ def connect_database_MDCdata(ata, excl_eqid, airline_operator, include_current_m
         print("Error message:- " + str(err))
 
 
+
 def connect_database_MDCmessagesInputs():
     global MDCMessagesDF
     sql = "SELECT * FROM MDCMessagesInputs" #MDCMessagesInputs_CSV_UPLOAD
