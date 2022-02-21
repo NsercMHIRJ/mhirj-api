@@ -233,42 +233,44 @@ def insertData_MDCMessageInputs(file):
             driver='{ODBC Driver 17 for SQL Server}', host='aftermarket-mhirj.database.windows.net', database='MHIRJ_HUMBER',
                               user='humber_rw', password='nP@yWw@!$4NxWeK6p*ttu3q6')
    cursor = conn.cursor()
- 
-   ##### CREATE TABLE QUERY for MDCMessageInputs.csv
-   cursor.execute('''
-   IF OBJECT_ID('dbo.MDCMessagesInputs_test', 'U') IS NULL
-   CREATE TABLE [dbo].[MDCMessagesInputs_test](
-   [LRU] [varchar](max) NULL,
-   [ATA] [varchar](max) NULL,
-   [Message_No] [varchar](max) NULL,
-   [Comp_ID] [varchar](max) NULL,
-   [Message] [varchar](max) NULL,
-   [Fault_Logged] [varchar](max) NULL,
-   [Status] [varchar](max) NULL,
-   [Message_Type] [varchar](max) NULL,
-   [EICAS] [varchar](4000) NULL,
-   [Timer] [nvarchar](max) NULL,
-   [Logic] [nvarchar](max) NULL,
-   [Equation_Description] [varchar](4000) NULL,
-   [Equation_ID] [varchar](255) NULL,
-   [Occurrence_Flag] [nvarchar](max) NULL,
-   [Days_Count] [nvarchar](max) NULL,
-   [Priority] [varchar](4000) NULL,
-   [MHIRJ_ISE_Recommended_Action] [varchar](4000) NULL,
-   [Additional_Comments] [varchar](4000) NULL,
-   [MHIRJ_ISE_inputs] [varchar](4000) NULL,
-   [MEL_or_No_Dispatch] [varchar](4000) NULL,
-   [Keywords] [varchar](4000) NULL
 
-   )
-   ''')
-   conn.commit()
+   cursor.execute("DELETE FROM MDCMessagesInputs")
+   conn.commit();
+   ##### CREATE TABLE QUERY for MDCMessageInputs.csv
+#    cursor.execute('''
+#    IF OBJECT_ID('dbo.MDCMessagesInputs_test', 'U') IS NULL
+#    CREATE TABLE [dbo].[MDCMessagesInputs_test](
+#    [LRU] [varchar](max) NULL,
+#    [ATA] [varchar](max) NULL,
+#    [Message_No] [varchar](max) NULL,
+#    [Comp_ID] [varchar](max) NULL,
+#    [Message] [varchar](max) NULL,
+#    [Fault_Logged] [varchar](max) NULL,
+#    [Status] [varchar](max) NULL,
+#    [Message_Type] [varchar](max) NULL,
+#    [EICAS] [varchar](4000) NULL,
+#    [Timer] [nvarchar](max) NULL,
+#    [Logic] [nvarchar](max) NULL,
+#    [Equation_Description] [varchar](4000) NULL,
+#    [Equation_ID] [varchar](255) NULL,
+#    [Occurrence_Flag] [nvarchar](max) NULL,
+#    [Days_Count] [nvarchar](max) NULL,
+#    [Priority] [varchar](4000) NULL,
+#    [MHIRJ_ISE_Recommended_Action] [varchar](4000) NULL,
+#    [Additional_Comments] [varchar](4000) NULL,
+#    [MHIRJ_ISE_inputs] [varchar](4000) NULL,
+#    [MEL_or_No_Dispatch] [varchar](4000) NULL,
+#    [Keywords] [varchar](4000) NULL
+
+#    )
+#    ''')
+#    conn.commit()
  
    #INSERT DATAFRAME INTO TABLE
    for index,row in df.iterrows():
        print("DATA INPUT : ",row.LRU)
        cursor.execute('''
-       INSERT INTO [dbo].[MDCMessagesInputs_test](
+       INSERT INTO [dbo].[MDCMessagesInputs](
        [LRU],
        [ATA],
        [Message_No],
