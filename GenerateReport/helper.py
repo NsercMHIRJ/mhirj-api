@@ -225,9 +225,8 @@ def LongestConseq(unique_arr, days_legs):
         for i in range(len(unique_arr)):
             try:
 
-                if (i > 0 and int(unique_arr[i]) == int(unique_arr[i - 1])):
+                if (i > 0 and int(unique_arr[i]) == int(unique_arr[i - 1]) - 1):
                     count += 1
-
                 # Reset the count
                 else:
                     count = 1
