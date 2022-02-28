@@ -138,7 +138,7 @@ def connect_database_MDCmessagesInputs():
 
 def connect_database_MDCmessagesInputs_jamReport():
     global MDCMessagesDF
-    sql = "SELECT LRU,Message,EICAS,Equation_Description,Priority,MHIRJ_ISE_Recommended_Action,Additional_Comments,MHIRJ_ISE_inputs,MEL_or_No_Dispatch,Keywords,Equation_ID FROM MDCMessagesInputs" #MDCMessagesInputs_CSV_UPLOAD
+    sql = "SELECT Message,EICAS,Equation_Description,Priority,MHIRJ_ISE_Recommended_Action,Additional_Comments,MHIRJ_ISE_inputs,MEL_or_No_Dispatch,Keywords,Equation_ID FROM MDCMessagesInputs" #MDCMessagesInputs_CSV_UPLOAD
 
     try:
         MDCMessagesDF = pd.read_sql(sql, conn2)
