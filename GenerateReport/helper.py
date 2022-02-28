@@ -134,6 +134,20 @@ def connect_database_MDCmessagesInputs():
         print("Couldn't connect to Server")
         print("Error message:- " + err)
 
+         
+
+def connect_database_MDCmessagesInputs_jamReport():
+    global MDCMessagesDF
+    sql = "SELECT LRU,Message,EICAS,Equation_Description,Priority,MHIRJ_ISE_Recommended_Action,Additional_Comments,MHIRJ_ISE_inputs,MEL_or_No_Dispatch,Keywords,Equation_ID FROM MDCMessagesInputs" #MDCMessagesInputs_CSV_UPLOAD
+
+    try:
+        MDCMessagesDF = pd.read_sql(sql, conn2)
+        print(MDCMessagesDF.columns)
+        return MDCMessagesDF
+    except pyodbc.Error as err:
+        print("Couldn't connect to Server")
+        print("Error message:- " + err)        
+
 def connect_database_TopMessagesSheet():
     global TopMessagesDF
     sql = "SELECT * FROM TopMessagesSheet"

@@ -1,4 +1,4 @@
-from GenerateReport.helper import LongestConseq, check_2in5, connect_database_MDCdata, connect_database_MDCmessagesInputs, connect_database_TopMessagesSheet, connect_to_fetch_all_jam_messages, highlightJams, isValidParams
+from GenerateReport.helper import LongestConseq, check_2in5, connect_database_MDCdata, connect_database_MDCmessagesInputs, connect_database_TopMessagesSheet, connect_to_fetch_all_jam_messages, highlightJams, isValidParams,connect_database_MDCmessagesInputs_jamReport
 import numpy as np
 import pandas as pd
 from GenerateReport.history import historyReport
@@ -26,7 +26,9 @@ def jamReport(OutputTable, ACSN_chosen,MDCdataDF,listofmessages= listofJamMessag
 #    all_jam_messages = connect_to_fetch_all_jam_messages()
 #    for each_jam_message in all_jam_messages['Jam_Message']:
 #        listofJamMessages.append(each_jam_message)
-
+   inputMessage=connect_database_MDCmessagesInputs_jamReport()
+   print("--------inputmsg------")
+   print(inputMessage)
    datatofilter = MDCdataDF.copy(deep=True)
    print("------dataoffilter-----")
    print(datatofilter)
@@ -71,5 +73,11 @@ def jamReport(OutputTable, ACSN_chosen,MDCdataDF,listofmessages= listofJamMessag
    FinalDF_history_json = FinalDF_history.reset_index()
    print("---final history---------")
    print(FinalDF_history_json)
+  
+#    dfinal = df1.merge(df2, how='inner', left_on='movie_title', right_on='movie_name')
 
-   return FinalDF_history_json
+   merged_df = FinalDF_history_json.merge(inputMessage, how='inner', left_on='EQ_ID', right_on='Equation_ID')
+   print("---------merged df-----------")
+   print(merged_df)
+
+   return merged_df
