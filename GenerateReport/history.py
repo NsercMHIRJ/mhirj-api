@@ -107,7 +107,7 @@ def historyReport(MaxAllowedOccurrences: int, MaxAllowedConsecLegs: int, MaxAllo
         flags_2in5 = MDCMessagesDF.loc[(MDCMessagesDF["Occurrence_Flag"] == 2) & (MDCMessagesDF["Days_Count"] == 5)]["Equation_ID"]
 
         # create main table array
-        MAINtable_array_temp = np.empty((1,21),object) # 21 = # of columns
+        MAINtable_array_temp = np.empty((1,22),object) # 21 = # of columns
         currentRow = 0
         MAINtable_array = []
         count = 0
@@ -263,6 +263,16 @@ def historyReport(MaxAllowedOccurrences: int, MaxAllowedConsecLegs: int, MaxAllo
                         MAINtable_array_temp[0,20] = MDCMessagesDF["Additional_Comments"][MDCMessagesDF["Equation_ID"] == equation].item()
                 except:
                     MAINtable_array_temp[0,20] = ""
+
+                #Keywords
+                try:
+                    if MDCMessagesDF["Keywords"][MDCMessagesDF["Equation_ID"] == equation].item() == "0":
+                        MAINtable_array_temp[0,21] = ""
+                    else:
+                        MAINtable_array_temp[0,21] = MDCMessagesDF["Keywords"][MDCMessagesDF["Equation_ID"] == equation].item()
+                except:
+                    MAINtable_array_temp[0,21] = ""
+
                 #Check for the equation in the Top Messages sheet
                 TopCounter = 0
                 Top_LastRow = TopMessagesArray.shape[0]
@@ -297,7 +307,7 @@ def historyReport(MaxAllowedOccurrences: int, MaxAllowedConsecLegs: int, MaxAllo
         TitlesArrayHistory = ["AC SN", "EICAS Message", "MDC Message", "LRU", "ATA", "B1-Equation", "Type",
                     "Equation Description", "Total Occurrences", "Consecutive Days", "Consecutive FL",
                     "INTERMITNT", "Date from", "Date to", "Reason(s) for flag", "Priority", "Known Top Message - Recommended Documents", "MEL or No-Dispatch", 
-                    "MHIRJ Input", "MHIRJ Recommendation", "Additional Comments"]
+                    "MHIRJ Input", "MHIRJ Recommendation", "Additional Comments", "Keywords"]
 
         # Converts the Numpy Array to Dataframe to manipulate
         #pd.set_option('display.max_rows', None)
@@ -307,7 +317,7 @@ def historyReport(MaxAllowedOccurrences: int, MaxAllowedConsecLegs: int, MaxAllo
         OutputTableHistory = OutputTableHistory[["AC_TN", "AC SN", "EICAS Message", "MDC Message", "LRU", "ATA", "B1-Equation", "Type",
                     "Equation Description", "Total Occurrences", "Consecutive Days", "Consecutive FL",
                     "INTERMITNT", "Date from", "Date to", "Reason(s) for flag", "Priority", "Known Top Message - Recommended Documents", "MEL or No-Dispatch",
-                    "MHIRJ Input", "MHIRJ Recommendation", "Additional Comments"]].sort_values(by= ["Type", "Priority"]) # AC_TN added to output table which means that column order has to be re orderedb8632868 2076
+                    "MHIRJ Input", "MHIRJ Recommendation", "Additional Comments", "Keywords"]].sort_values(by= ["Type", "Priority"]) # AC_TN added to output table which means that column order has to be re orderedb8632868 2076
         
         listofJamMessages = ["B1-309178","B1-309179","B1-309180","B1-060044","B1-060045","B1-007973",
                      "B1-060017","B1-006551","B1-240885","B1-006552","B1-006553","B1-006554",
