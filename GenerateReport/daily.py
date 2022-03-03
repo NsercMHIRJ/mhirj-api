@@ -2,8 +2,8 @@ from GenerateReport.helper import LongestConseq, check_2in5, connect_database_MD
 import numpy as np
 import pandas as pd
 import numbers
-def dailyReport(MaxAllowedOccurrences: int, MaxAllowedConsecLegs: int, MaxAllowedIntermittent: int, MaxAllowedConsecDays: int, ata: str, exclude_EqID:str, airline_operator: str, include_current_message: int, fromDate: str , toDate: str):
-    MDCdataDF = connect_database_MDCdata(ata, exclude_EqID, airline_operator, include_current_message, fromDate, toDate)
+def dailyReport(MaxAllowedOccurrences: int, MaxAllowedConsecLegs: int, MaxAllowedIntermittent: int, MaxAllowedConsecDays: int, ata: str, exclude_EqID:str, airline_operator: str, include_current_message: int, aircraft_no: str, fromDate: str , toDate: str):
+    MDCdataDF = connect_database_MDCdata(aircraft_no, ata, exclude_EqID, airline_operator, include_current_message, fromDate, toDate)
     print("data ", MDCdataDF)
     # Date formatting
     MDCdataDF["MSG_Date"] = pd.to_datetime(MDCdataDF["MSG_Date"])
