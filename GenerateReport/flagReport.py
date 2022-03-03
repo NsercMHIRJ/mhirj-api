@@ -76,7 +76,7 @@ def Toreport(Flagsreport, HistoryReport,MDCdataDF,include_current_message,list_o
                      unavailable.append(ab)
                      print("------exception----------")
 
-                newrow = indexedreport.loc[(AircraftSN, Bcode), ["AC_TN", "ATA", "LRU", "MDC Message", "Type","EICAS Message","Equation Description","Total Occurrences","Consecutive Days","Consecutive FL","INTERMITNT","Reason(s) for flag","Priority","Known Top Message - Recommended Documents", "MEL or No-Dispatch", "MHIRJ Input", "MHIRJ Recommendation", "Additional Comments"]].to_frame().transpose()
+                newrow = indexedreport.loc[(AircraftSN, Bcode), ["AC_TN", "ATA", "LRU", "MDC Message", "Type","EICAS Message","Equation Description","Total Occurrences","Consecutive Days","Consecutive FL","INTERMITNT","Reason(s) for flag","Priority","Known Top Message - Recommended Documents", "MEL or No-Dispatch", "MHIRJ Input", "MHIRJ Recommendation", "Additional Comments","Keywords"]].to_frame().transpose()
                 print("--this is new row---")
                 print(newrow)
                 newrow.insert(loc= 0, column= "AC SN", value= AircraftSN)
