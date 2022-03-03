@@ -3,6 +3,7 @@ from app import DB_RW
 import pyodbc
 import pandas as pd
 import datetime
+import util.const as const
 # conn2 = pyodbc.connect(driver=DB_RW().db_driver, host=DB_RW().hostname, database=DB_RW().db_name,
 #                               user=DB_RW().db_username, password=DB_RW().db_password, Trusted_Connection="no")
 conn2 = pyodbc.connect(
@@ -11,8 +12,8 @@ conn2 = pyodbc.connect(
                               user='humber_rw', password='nP@yWw@!$4NxWeK6p*ttu3q6')
 # conn = pyodbc.connect(driver=DB_RW().db_driver, host=DB_RW().hostname, database=DB_RW().db_name,
 #                               user=DB_RW().db_username, password=DB_RW().db_password)
-conn = pyodbc.connect(driver=App().db_driver, host=App().hostname, database=App().db_name,
-                               user=App().db_username, password=App().db_password)
+#conn = pyodbc.connect(driver=App().db_driver, host=App().hostname, database=App().db_name,
+#                               user=App().db_username, password=App().db_password)
 # conn2 = pyodbc.connect(driver=App().db_driver, host=App().hostname, database=App().db_name,
 #                                user=App().db_username, password=App().db_password)
                   
@@ -23,6 +24,8 @@ def isValidParams(occurences: int, legs: int, INTERMITNT: int, consecutiveDays: 
 def connect_to_fetch_all_ata(from_dt, to_dt):
     all_ata_query = "SELECT DISTINCT SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) as ATA_Main from MDC_MSGS WHERE MSG_Date BETWEEN '" + from_dt + "' AND '" + to_dt + "'"
     try:
+        conn = pyodbc.connect(const.connectionStringMDC)
+        
         all_ata_df = pd.read_sql(all_ata_query, conn)
 
         return all_ata_df
@@ -33,6 +36,7 @@ def connect_to_fetch_all_ata(from_dt, to_dt):
 def connect_to_fetch_all_eqids(from_dt, to_dt):
     all_ata_query = "SELECT DISTINCT EQ_ID from MDC_MSGS WHERE MSG_Date BETWEEN '" + from_dt + "' AND '" + to_dt + "'"
     try:
+        conn = pyodbc.connect(const.connectionStringMDC)
         all_eqid_df = pd.read_sql(all_ata_query, conn)
 
         return all_eqid_df
@@ -112,9 +116,12 @@ def connect_database_MDCdata(aircraft_no, ata, excl_eqid, airline_operator, incl
                "INTERMITNT", "EQ_ID", "SOURCE", "MSG_ID","FLIGHT_NUM"]
     print(sql)
     try:
+        
+        conn = pyodbc.connect(const.connectionStringMDC)
         MDCdataDF = pd.read_sql(sql, conn)
         print("coloumns ", MDCdataDF.columns)
         MDCdataDF = MDCdataDF[column_names]
+        conn.close()
         return MDCdataDF
     except pyodbc.Error as err:
         print("Couldn't connect to Server")
