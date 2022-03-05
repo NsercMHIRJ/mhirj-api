@@ -275,8 +275,8 @@ async def generateJamsReport(analysisType: str, occurences: int, legs: int, inte
        return resObj.to_json(orient='records')
 
    elif (analysisType.lower() == "daily"):
-        OutputTable = dailyReport(occurences, legs, intermittent, consecutiveDays, ata, exclude_EqID, airline_operator, include_current_message, fromDate , toDate)
-        mdcDataDF=mdcDF(occurences, legs, intermittent, consecutiveDays, ata, exclude_EqID, airline_operator, include_current_message, fromDate , toDate)
+        OutputTable = dailyReport(occurences, legs, intermittent, consecutiveDays, ata, exclude_EqID, airline_operator, include_current_message,aircraft_no, fromDate , toDate)
+        mdcDataDF=mdcDF(occurences, legs, intermittent, consecutiveDays, ata, exclude_EqID, airline_operator, include_current_message,aircraft_no, fromDate , toDate)
         resObj= jamReport(OutputTable, ACSN_chosen,mdcDataDF)
         return resObj.to_json(orient='records')
 
