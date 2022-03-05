@@ -7,8 +7,8 @@ import re
 
 
 
-def mdcDF(MaxAllowedOccurrences: int, MaxAllowedConsecLegs: int, MaxAllowedIntermittent: int, MaxAllowedConsecDays: int, ata: str, exclude_EqID:str, airline_operator: str, include_current_message: int, fromDate: str , toDate: str):
-        MDCdataDF = connect_database_MDCdata(ata, exclude_EqID, airline_operator, include_current_message, fromDate, toDate)
+def mdcDF(MaxAllowedOccurrences: int, MaxAllowedConsecLegs: int, MaxAllowedIntermittent: int, MaxAllowedConsecDays: int, ata: str, exclude_EqID:str, airline_operator: str, include_current_message: int,aircraft_no:str, fromDate: str , toDate: str):
+        MDCdataDF = connect_database_MDCdata(aircraft_no,ata, exclude_EqID, airline_operator, include_current_message, fromDate, toDate)
         MDCdataDF["MSG_Date"] = pd.to_datetime(MDCdataDF["MSG_Date"]) # formatting for date
         MDCdataDF["FLIGHT_LEG"].fillna(value= 0.0, inplace= True) # Null values preprocessing - if 0 = Currentflightphase
         MDCdataDF["FLIGHT_PHASE"].fillna(False, inplace= True) # NuCell values preprocessing for currentflightphase

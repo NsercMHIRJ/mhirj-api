@@ -282,15 +282,15 @@ async def generateJamsReport(analysisType: str, occurences: int, legs: int, inte
 
 
 # --------------flagReport------------------    
-@app.post("/api/GenerateReport/{analysisType}/{occurences}/{legs}/{intermittent}/{consecutiveDays}/{ata}/{exclude_EqID}/{airline_operator}/{include_current_message}/{fromDate}/{toDate}/{flag}/{list_of_tuples_acsn_bcode}")
-async def generateFlagReport(analysisType: str, occurences: int, legs: int, intermittent: int, consecutiveDays: int, ata: str, exclude_EqID:str, airline_operator: str, include_current_message: int, fromDate: str , toDate: str, flag:int, list_of_tuples_acsn_bcode):
+@app.post("/api/GenerateReport/{analysisType}/{occurences}/{legs}/{intermittent}/{consecutiveDays}/{ata}/{exclude_EqID}/{airline_operator}/{include_current_message}/{aircraft_no}/{fromDate}/{toDate}/{flag}/{list_of_tuples_acsn_bcode}")
+async def generateFlagReport(analysisType: str, occurences: int, legs: int, intermittent: int, consecutiveDays: int, ata: str, exclude_EqID:str, airline_operator: str, include_current_message: int, aircraft_no: str, fromDate: str , toDate: str, flag:int, list_of_tuples_acsn_bcode):
 
     if (analysisType.lower() == "history"):
         
-        OutputTableHistory = historyReport(occurences, legs, intermittent, consecutiveDays, ata, exclude_EqID, airline_operator, include_current_message, fromDate , toDate)
+        OutputTableHistory = historyReport(occurences, legs, intermittent, consecutiveDays, ata, exclude_EqID, airline_operator, include_current_message,aircraft_no, fromDate , toDate)
         print("----------this is outputtable history--------")
         print(OutputTableHistory)
-        mdcDataDF=mdcDF(occurences, legs, intermittent, consecutiveDays, ata, exclude_EqID, airline_operator, include_current_message, fromDate , toDate)
+        mdcDataDF=mdcDF(occurences, legs, intermittent, consecutiveDays, ata, exclude_EqID, airline_operator, include_current_message,aircraft_no, fromDate , toDate)
         print("----------this is mdcDatadf--------")
         print(mdcDataDF)
         newreport = True
