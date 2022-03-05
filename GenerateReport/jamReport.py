@@ -5,8 +5,8 @@ from GenerateReport.history import historyReport
 # pd.set_option("display.max_rows", None, "display.max_columns", None)
 
 
-def mdcDF(MaxAllowedOccurrences: int, MaxAllowedConsecLegs: int, MaxAllowedIntermittent: int, MaxAllowedConsecDays: int, ata: str, exclude_EqID:str, airline_operator: str, include_current_message: int, fromDate: str , toDate: str):
-    MDCdataDF = connect_database_MDCdata(ata, exclude_EqID, airline_operator, include_current_message, fromDate, toDate)
+def mdcDF(MaxAllowedOccurrences: int, MaxAllowedConsecLegs: int, MaxAllowedIntermittent: int, MaxAllowedConsecDays: int, ata: str, exclude_EqID:str, airline_operator: str, include_current_message: int, aircraft_no: str, fromDate: str , toDate: str):
+    MDCdataDF = connect_database_MDCdata( aircraft_no,ata, exclude_EqID, airline_operator, include_current_message, fromDate, toDate)
     MDCdataDF["AC_SN"] = MDCdataDF["AC_SN"].str.replace('AC', '')
     MDCdataDF.fillna(value= " ", inplace= True) # replacing all REMAINING null values to a blank string
     MDCdataDF.sort_values(by= "MSG_Date", ascending= False, inplace= True, ignore_index= True)
@@ -33,7 +33,7 @@ def jamReport(OutputTable, ACSN_chosen,MDCdataDF,listofmessages= listofJamMessag
    print("------dataoffilter-----")
    print(datatofilter)
    print("---b1--------")
-
+   
    test_jam = OutputTable.loc[OutputTable['AC SN'] == str(ACSN_chosen),'is_jam'].values[0]
    print(test_jam)
 
@@ -48,7 +48,7 @@ def jamReport(OutputTable, ACSN_chosen,MDCdataDF,listofmessages= listofJamMessag
         print("------isin----------")
         print(isin) 
 
-  
+
  
    filter1 = OutputTable[isin][["AC SN", "B1-Equation"]]
    print("----filter---------------")

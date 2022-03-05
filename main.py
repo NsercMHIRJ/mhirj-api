@@ -263,14 +263,14 @@ async def generateReport(analysisType: str, occurences: int, legs: int, intermit
 
 #--------jamReport-----------------
 @app.post(
-   "/api/GenerateReport/{analysisType}/{occurences}/{legs}/{intermittent}/{consecutiveDays}/{ata}/{exclude_EqID}/{airline_operator}/{include_current_message}/{fromDate}/{toDate}/{ACSN_chosen}")
+   "/api/GenerateReport/{analysisType}/{occurences}/{legs}/{intermittent}/{consecutiveDays}/{ata}/{exclude_EqID}/{airline_operator}/{include_current_message}/{aircraft_no}/{fromDate}/{toDate}/{ACSN_chosen}")
 async def generateJamsReport(analysisType: str, occurences: int, legs: int, intermittent: int, consecutiveDays: int,
-                        ata: str, exclude_EqID: str, airline_operator: str, include_current_message: int,
+                        ata: str, exclude_EqID: str, airline_operator: str, include_current_message: int, aircraft_no: str,
                         fromDate: str, toDate: str, ACSN_chosen:int):
    
    if (analysisType.lower() == "history"):
-       OutputTable = historyReport(occurences, legs, intermittent, consecutiveDays, ata, exclude_EqID, airline_operator, include_current_message, fromDate , toDate)
-       mdcDataDF=mdcDF(occurences, legs, intermittent, consecutiveDays, ata, exclude_EqID, airline_operator, include_current_message, fromDate , toDate)
+       OutputTable = historyReport(occurences, legs, intermittent, consecutiveDays, ata, exclude_EqID, airline_operator, include_current_message, aircraft_no, fromDate , toDate)
+       mdcDataDF=mdcDF(occurences, legs, intermittent, consecutiveDays, ata, exclude_EqID, airline_operator, include_current_message, aircraft_no, fromDate , toDate)
        resObj= jamReport(OutputTable, ACSN_chosen,mdcDataDF)
        return resObj.to_json(orient='records')
 
