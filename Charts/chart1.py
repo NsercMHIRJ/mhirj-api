@@ -55,7 +55,17 @@ def chart_one(top_n, aircraftNo,ata_main, fromDate,toDate):
     print("----final----")
     print(final)
 
+   
+
+
     final_df= pd.DataFrame (final,columns = ['LRU','total_message'])
+    print("----final_df----")
+    print(final_df)
+    
+    final_df = final_df.sort_values(by=['total_message'], ascending=False)
+    print("----final_df2----")
+    print(final_df)
+
 
     chart1_sql_df_json = final_df.to_json(orient='records')
     return chart1_sql_df_json
