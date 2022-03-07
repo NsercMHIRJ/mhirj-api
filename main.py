@@ -2386,7 +2386,7 @@ async def get_ChartOneData(top_n:int, aircraftNo:int, fromDate: str , toDate: st
 
 #Chart 1
 @app.post("/api/chart_one/{top_n}/{aircraftNo}/{ata_main}/{fromDate}/{toDate}")
-async def get_ChartOneData(top_n:int, aircraftNo:int, ata_main:str, fromDate: str , toDate: str):
+async def get_ChartOneData(top_n:int, aircraftNo:str, ata_main:str, fromDate: str , toDate: str):
     chart1 =  chart_one(top_n, aircraftNo,ata_main,fromDate,toDate)
     return chart1
 

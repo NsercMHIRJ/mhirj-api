@@ -4,6 +4,11 @@ import pandas as pd
 import datetime
 
 App().app
+conn2 = pyodbc.connect(
+            Trusted_Connection='No',
+            driver='{ODBC Driver 17 for SQL Server}', host='aftermarket-mhirj.database.windows.net', database='MHIRJ_HUMBER',
+                              user='humber_rw', password='nP@yWw@!$4NxWeK6p*ttu3q6')
+
 def connect_to_fetch_all_ata(from_dt, to_dt):
     conn = pyodbc.connect(driver=App().db_driver, host=App().hostname, database=App().db_name,
                               user=App().db_username, password=App().db_password)
@@ -109,6 +114,65 @@ def connect_database_for_chart2(n, ata, from_dt, to_dt):
     except pyodbc.Error as err:
        print("Couldn't connect to Server")
        print("Error message:- " + str(err))
+
+
+#chart1
+def connect_database_for_chart1_test(from_dt, to_dt):
+    sql = "SELECT * FROM MDC_MSGS WHERE  MSG_Date BETWEEN '"+from_dt+"' AND '"+to_dt+"'" 
+    try:
+        conn = pyodbc.connect(driver=App().db_driver, host=App().hostname, database=App().db_name,
+                              user=App().db_username, password=App().db_password)
+        chart1_sql_df = pd.read_sql(sql, conn)
+        #MDCdataDF.columns = column_names
+        return chart1_sql_df
+    except pyodbc.Error as err:
+        print("Couldn't connect to Server")
+        print("Error message:- " + str(err))
+
+def connect_database_for_chart1_test2():
+    sql = "SELECT * FROM MDCMessagesInputs"
+    try:
+        conn2 = pyodbc.connect(
+            Trusted_Connection='No',
+            driver='{ODBC Driver 17 for SQL Server}', host='aftermarket-mhirj.database.windows.net', database='MHIRJ_HUMBER',
+                              user='humber_rw', password='nP@yWw@!$4NxWeK6p*ttu3q6')
+
+        chart1_sql_df = pd.read_sql(sql, conn2)
+        #MDCdataDF.columns = column_names
+        return chart1_sql_df
+    except pyodbc.Error as err:
+        print("Couldn't connect to Server")
+        print("Error message:- " + str(err))
+
+#chart1
+def connect_database_for_chart1_test(from_dt, to_dt):
+    sql = "SELECT * FROM MDC_MSGS WHERE  MSG_Date BETWEEN '"+from_dt+"' AND '"+to_dt+"'" 
+    try:
+        conn = pyodbc.connect(driver=App().db_driver, host=App().hostname, database=App().db_name,
+                              user=App().db_username, password=App().db_password)
+        chart1_sql_df = pd.read_sql(sql, conn)
+        #MDCdataDF.columns = column_names
+        return chart1_sql_df
+    except pyodbc.Error as err:
+        print("Couldn't connect to Server")
+        print("Error message:- " + str(err))
+
+def connect_database_for_chart1_test2():
+    sql = "SELECT * FROM MDCMessagesInputs"
+    try:
+        conn2 = pyodbc.connect(
+            Trusted_Connection='No',
+            driver='{ODBC Driver 17 for SQL Server}', host='aftermarket-mhirj.database.windows.net', database='MHIRJ_HUMBER',
+                              user='humber_rw', password='nP@yWw@!$4NxWeK6p*ttu3q6')
+
+        chart1_sql_df = pd.read_sql(sql, conn2)
+        #MDCdataDF.columns = column_names
+        return chart1_sql_df
+    except pyodbc.Error as err:
+        print("Couldn't connect to Server")
+        print("Error message:- " + str(err))
+
+
 
 ## Chart 1
 def connect_database_for_chart1(n, aircraft_no, ata_main, from_dt, to_dt):
