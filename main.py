@@ -3088,6 +3088,23 @@ async def get_eqIData(all:str):
     data_string = json.dumps(data)
     return data_string
 
+@app.post("/api/get_all_ACSN")
+async def get_eqIData():
+    get_all_acsn_df = connect_database_ACSN()
+    get_all_acsn_df_json = get_all_acsn_df.to_json(orient='records')
+    return get_all_acsn_df_json
+
+def connect_database_ACSN():
+    sql = "SELECT DISTINCT [AC_SN] FROM [dbo].[MDC_MSGS]"
+    try:
+        conn = pyodbc.connect(driver=db_driver, host=hostname, database=db_name,
+                              user=db_username, password=db_password)
+        get_all_acsn_df = pd.read_sql(sql, conn)
+        return get_all_acsn_df
+    except pyodbc.Error as err:
+        print("Couldn't connect to Server")
+        print("Error message:- " + str(err)) 
+
 
 def connect_database_for_ata_main(all):
     sql = "SELECT DISTINCT SUBSTRING(ATA, 0, CHARINDEX('-', ATA)) AS ATA_Main FROM MDC_MSGS"
