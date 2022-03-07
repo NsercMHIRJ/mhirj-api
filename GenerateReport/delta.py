@@ -21,13 +21,13 @@ def create_delta_lists(prev_history, curr_history):
         
     return True_list, False_list
 
-def deltaReport(occurences, legs, intermittent, consecutiveDays, ata, exclude_EqID, airline_operator, include_current_message, prev_fromDate, prev_toDate, curr_fromDate, curr_toDate):
+def deltaReport(occurences, legs, intermittent, consecutiveDays, ata, exclude_EqID, airline_operator, include_current_message,aircraft_no, prev_fromDate, prev_toDate, curr_fromDate, curr_toDate):
     listofJamMessages = ["B1-309178","B1-309179","B1-309180","B1-060044","B1-060045","B1-007973",
                         "B1-060017","B1-006551","B1-240885","B1-006552","B1-006553","B1-006554",
                         "B1-006555","B1-007798","B1-007772","B1-240938","B1-007925","B1-007905",
                         "B1-007927","B1-007915","B1-007926","B1-007910","B1-007928","B1-007920"]
-    curr_history_dataframe = historyReport(occurences, legs, intermittent, consecutiveDays, ata, exclude_EqID, airline_operator, include_current_message, curr_fromDate, curr_toDate)
-    prev_history_dataframe = historyReport(occurences, legs, intermittent, consecutiveDays, ata, exclude_EqID, airline_operator, include_current_message, prev_fromDate, prev_toDate)
+    curr_history_dataframe = historyReport(occurences, legs, intermittent, consecutiveDays, ata, exclude_EqID, airline_operator, include_current_message,aircraft_no, curr_fromDate, curr_toDate)
+    prev_history_dataframe = historyReport(occurences, legs, intermittent, consecutiveDays, ata, exclude_EqID, airline_operator, include_current_message,aircraft_no,prev_fromDate, prev_toDate)
     # curr_history_dataframe = pd.read_json(curr_history_json)
     # prev_history_dataframe = pd.read_json(prev_history_json)
     True_list, False_list = create_delta_lists(prev_history_dataframe, curr_history_dataframe)
@@ -59,12 +59,13 @@ def deltaReport(occurences, legs, intermittent, consecutiveDays, ata, exclude_Eq
     # delta.to_excel(input("Input the desired filename, '.xlsx' is added automatically: ") + ".xlsx", index= False)
     i = 0
     delta = list()
+    print("columns of prev_history_nums ",prev_history_nums.columns)
     for item in prev_history_nums.values:
         tmpData = {'Tail#': item[0], 'AC SN': item[1], 'EICAS Related': item[2], 'MDC Message': item[3],'LRU': item[4], 'ATA': item[5],
             'B1-Equation': item[6], 'Type': item[7], 'Equation Description': item[8], 'Total Occurrences': item[9] , 'Consecutive Days': item[10],
             'Consecutive FL': item[11], 'INTERMITNT': item[12], 'Date From': str(item[13]), 'Date To': str(item[14]), 'Reason(s) for flag': item[15],
             'Priority': item[16], 'MHIRJ Known Message': item[17], 'Mel or No-Dispatch': item[18], 'MHIRJ Input': item[19], 'MHIRJ Recommended Action': item[20], 
-            'MHIRJ Additional Comment': item[21], 'Jam': item[22]}
+            'MHIRJ Additional Comment': item[21], 'Keyword': item[22],'Jam':item[23]}
         if i < curr_history_dataframe.loc[False_list].values.size:
             if item[0] in curr_history_dataframe.loc[False_list].values:
                 if item[5] in listofJamMessages:

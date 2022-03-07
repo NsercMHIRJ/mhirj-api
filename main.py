@@ -3322,13 +3322,13 @@ def listOfJams():
 
 #delta
 @app.post(
-    "/api/GenerateReport/{analysisType}/{occurences}/{legs}/{intermittent}/{consecutiveDays}/{ata}/{exclude_EqID}/{airline_operator}/{include_current_message}/{flag}/{prev_fromDate}/{prev_toDate}/{curr_fromDate}/{curr_toDate}")
+    "/api/GenerateReport/{analysisType}/{occurences}/{legs}/{intermittent}/{consecutiveDays}/{ata}/{exclude_EqID}/{airline_operator}/{include_current_message}/{aircraft_no}/{flag}/{prev_fromDate}/{prev_toDate}/{curr_fromDate}/{curr_toDate}")
 async def generateDeltaReport(analysisType: str, occurences: int, legs: int, intermittent: int, consecutiveDays: int,
-                              ata: str, exclude_EqID: str, airline_operator: str, include_current_message: int,flag,
+                              ata: str, exclude_EqID: str, airline_operator: str, include_current_message: int,aircraft_no:str,flag,
                               prev_fromDate: str, prev_toDate: str, curr_fromDate: str, curr_toDate: str):
         if (analysisType.lower() == "history"):
             # listOfJams()
-            delta = deltaReport(occurences, legs, intermittent, consecutiveDays, ata, exclude_EqID, airline_operator, include_current_message, prev_fromDate, prev_toDate, curr_fromDate, curr_toDate)
+            delta = deltaReport(occurences, legs, intermittent, consecutiveDays, ata, exclude_EqID, airline_operator, include_current_message, aircraft_no, prev_fromDate, prev_toDate, curr_fromDate, curr_toDate)
             return delta
         else:
             return None
