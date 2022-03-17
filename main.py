@@ -3149,7 +3149,7 @@ def connect_database_for_update(Equation_ID,LRU,ATA,Message_No,Comp_ID,Message,F
             driver='{ODBC Driver 17 for SQL Server}', host='aftermarket-mhirj.database.windows.net', database='MHIRJ_HUMBER',
                               user='humber_rw', password='nP@yWw@!$4NxWeK6p*ttu3q6')
         cursor = conn.cursor()  
-        sql ="UPDATE MDCMessagesInputs SET  "
+        sql ="UPDATE MDCMessagesInputs_test SET  "
 
         # sqlConditions = ''
         # numberOfConditions = 0
@@ -3281,6 +3281,9 @@ async def update_data(request: Request):
         print(value.get('EICAS'))
         print(value.get('Priority'))
         connect_database_for_update(value.get('Equation_ID'),value.get('LRU'),value.get('ATA'),value.get('Message_No'),value.get('Comp_ID'),value.get('Message'),value.get('Fault_Logged'),value.get('Status'),value.get('Message_Type'),value.get('EICAS'),value.get('Timer'),value.get('Logic'),value.get('Equation_Description'),value.get('Occurrence_Flag'),value.get('Days_Count'),value.get('Priority'),value.get('MHIRJ_ISE_Recommended_Action'),value.get('Additional_Comments'),value.get('MHIRJ_ISE_inputs'),value.get('MEL_or_No_Dispatch'),value.get('Keywords'))
+
+    return "Successfully UPDATE into MDCMessagesInputs"
+
 
 
 ## Delta Report
