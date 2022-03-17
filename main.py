@@ -3149,7 +3149,7 @@ def connect_database_for_update(Equation_ID,LRU,ATA,Message_No,Comp_ID,Message,F
             driver='{ODBC Driver 17 for SQL Server}', host='aftermarket-mhirj.database.windows.net', database='MHIRJ_HUMBER',
                               user='humber_rw', password='nP@yWw@!$4NxWeK6p*ttu3q6')
         cursor = conn.cursor()  
-        sql ="UPDATE MDCMessagesInputs_test SET  "
+        sql ="UPDATE MDCMessagesInputs SET  "
 
         # sqlConditions = ''
         # numberOfConditions = 0
