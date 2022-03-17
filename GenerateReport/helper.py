@@ -6,10 +6,10 @@ import datetime
 import util.const as const
 # conn2 = pyodbc.connect(driver=DB_RW().db_driver, host=DB_RW().hostname, database=DB_RW().db_name,
 #                               user=DB_RW().db_username, password=DB_RW().db_password, Trusted_Connection="no")
-conn2 = pyodbc.connect(
-            Trusted_Connection='No',
-            driver='{ODBC Driver 17 for SQL Server}', host='aftermarket-mhirj.database.windows.net', database='MHIRJ_HUMBER',
-                              user='humber_rw', password='nP@yWw@!$4NxWeK6p*ttu3q6')
+# conn2 = pyodbc.connect(
+#             Trusted_Connection='No',
+#             driver='{ODBC Driver 17 for SQL Server}', host='aftermarket-mhirj.database.windows.net', database='MHIRJ_HUMBER',
+#                               user='humber_rw', password='nP@yWw@!$4NxWeK6p*ttu3q6')
 # conn = pyodbc.connect(driver=DB_RW().db_driver, host=DB_RW().hostname, database=DB_RW().db_name,
 #                               user=DB_RW().db_username, password=DB_RW().db_password)
 #conn = pyodbc.connect(driver=App().db_driver, host=App().hostname, database=App().db_name,
@@ -134,6 +134,8 @@ def connect_database_MDCmessagesInputs():
     sql = "SELECT * FROM MDCMessagesInputs" #MDCMessagesInputs_CSV_UPLOAD
 
     try:
+        conn2 = pyodbc.connect(const.connectionStringMDCInput)
+
         MDCMessagesDF = pd.read_sql(sql, conn2)
         print(MDCMessagesDF.columns)
         return MDCMessagesDF
@@ -148,6 +150,8 @@ def connect_database_MDCmessagesInputs_jamReport():
     sql = "SELECT Message,EICAS,Equation_Description,Priority,MHIRJ_ISE_Recommended_Action,Additional_Comments,MHIRJ_ISE_inputs,MEL_or_No_Dispatch,Keywords,Equation_ID FROM MDCMessagesInputs" #MDCMessagesInputs_CSV_UPLOAD
 
     try:
+        conn2 = pyodbc.connect(const.connectionStringMDCInput)
+
         MDCMessagesDF = pd.read_sql(sql, conn2)
         print(MDCMessagesDF.columns)
         return MDCMessagesDF
@@ -160,6 +164,8 @@ def connect_database_TopMessagesSheet():
     sql = "SELECT * FROM TopMessagesSheet"
 
     try:
+        conn2 = pyodbc.connect(const.connectionStringMDCInput)
+
         TopMessagesDF = pd.read_sql(sql, conn2)
         return TopMessagesDF
     except pyodbc.Error as err:

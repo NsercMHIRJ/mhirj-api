@@ -3149,112 +3149,112 @@ def connect_database_for_update(Equation_ID,LRU,ATA,Message_No,Comp_ID,Message,F
             driver='{ODBC Driver 17 for SQL Server}', host='aftermarket-mhirj.database.windows.net', database='MHIRJ_HUMBER',
                               user='humber_rw', password='nP@yWw@!$4NxWeK6p*ttu3q6')
         cursor = conn.cursor()  
-        sql ="UPDATE MDCMessagesInputs SET "
+        sql ="UPDATE MDCMessagesInputs SET  "
 
-        sqlConditions = ''
-        numberOfConditions = 0
-        if  LRU :
-            numberOfConditions += 1
-            sql +=  " [LRU]=  '" + LRU + "' "
-
-
-        if  ATA :
-            numberOfConditions += 1
-            sql += " , " if numberOfConditions > 1 else sql
-            sql +=  " [ATA]=  '" + ATA + "' " 
-
-        if  Message_No :
-            numberOfConditions += 1
-            sql += " , " if numberOfConditions > 1 else sql
-            sql +=  " [Message_NO]=  '" + Message_No + "' "  
-
-        if  Comp_ID :
-            numberOfConditions += 1
-            sql += " , " if numberOfConditions > 1 else sql
-            sql +=  " [Comp_ID]=  '" + Comp_ID + "' " 
-
-        if  Message :
-            numberOfConditions += 1
-            sql += " , " if numberOfConditions > 1 else sql
-            sql +=  " [Message]=  '" + Message + "' "  
+        # sqlConditions = ''
+        # numberOfConditions = 0
+        # if  LRU :
+        #     numberOfConditions += 1
+        sql +=  " [LRU]=  '" + LRU + "' "
 
 
-        if  Fault_Logged :
-            numberOfConditions += 1
-            sql += " , " if numberOfConditions > 1 else sql
-            sql +=  " [Fault_Logged]=  '" + Fault_Logged + "' "    
+        # if  ATA :
+        #     numberOfConditions += 1
+        #     sql += " , " if numberOfConditions > 1 else sql
+        sql +=  ", [ATA]=  '" + ATA + "' " 
 
-        if  Status:
-            numberOfConditions += 1
-            sql += " , " if numberOfConditions > 1 else sql
-            sql +=  " [Status]=  '" + Status + "' "    
+        # if  Message_No :
+        #     numberOfConditions += 1
+        #     sql += " , " if numberOfConditions > 1 else sql
+        sql += ", [Message_NO]=  '" + Message_No + "' "  
 
-        if  Message_Type :
-            numberOfConditions += 1
-            sql += " , " if numberOfConditions > 1 else sql
-            sql +=  " [Message_Type]=  '" + Message_Type + "' "                      
+        # if  Comp_ID :
+        #     numberOfConditions += 1
+        #     sql += " , " if numberOfConditions > 1 else sql
+        sql +=  ", [Comp_ID]=  '" + Comp_ID + "' " 
+
+        # if  Message :
+        #     numberOfConditions += 1
+        #     sql += " , " if numberOfConditions > 1 else sql
+        sql +=  ", [Message]=  '" + Message + "' "  
+
+
+        # if  Fault_Logged :
+        #     numberOfConditions += 1
+        #     sql += " , " if numberOfConditions > 1 else sql
+        sql +=  ", [Fault_Logged]=  '" + Fault_Logged + "' "    
+
+        # if  Status:
+        #     numberOfConditions += 1
+        #     sql += " , " if numberOfConditions > 1 else sql
+        sql +=  ", [Status]=  '" + Status + "' "    
+
+        # if  Message_Type :
+        #     numberOfConditions += 1
+        #     sql += " , " if numberOfConditions > 1 else sql
+        sql +=  ", [Message_Type]=  '" + Message_Type + "' "                      
         
-        if  EICAS :
-            numberOfConditions += 1
-            sql += " , " if numberOfConditions > 1 else sql
-            sql +=  " [EICAS]=  '" + EICAS + "' "
+        # if  EICAS :
+        #     numberOfConditions += 1
+        #     sql += " , " if numberOfConditions > 1 else sql
+        sql +=  ", [EICAS]=  '" + EICAS + "' "
 
-        if  Timer :
-            numberOfConditions += 1
-            sql += " , " if numberOfConditions > 1 else sql
-            sql +=  " [Timer]=  '" + Timer + "' " 
+        # if  Timer :
+        #     numberOfConditions += 1
+        #     sql += " , " if numberOfConditions > 1 else sql
+        sql +=  ", [Timer]=  '" + Timer + "' " 
 
-        if  Logic :
-            numberOfConditions += 1
-            sql += " , " if numberOfConditions > 1 else sql
-            sql +=  " [Logic]=  '" + Logic + "' " 
+        # if  Logic :
+        #     numberOfConditions += 1
+        #     sql += " , " if numberOfConditions > 1 else sql
+        sql +=  ", [Logic]=  '" + Logic + "' " 
 
-        if  Equation_Description :
-            numberOfConditions += 1
-            sql += " , " if numberOfConditions > 1 else sql
-            sql +=  " [Equation_Description]=  '" + Equation_Description + "' " 
+        # if  Equation_Description :
+        #     numberOfConditions += 1
+        #     sql += " , " if numberOfConditions > 1 else sql
+        sql +=  ", [Equation_Description]=  '" + Equation_Description + "' " 
 
-        if  Occurrence_Flag :
-            numberOfConditions += 1
-            sql += " , " if numberOfConditions > 1 else sql
-            sql +=  " [Occurrence_Flag]=  '" + Occurrence_Flag + "' "   
+        # if  Occurrence_Flag :
+        #     numberOfConditions += 1
+        #     sql += " , " if numberOfConditions > 1 else sql
+        sql +=  " ,[Occurrence_Flag]=  '" + Occurrence_Flag + "' "   
 
-        if  Days_Count :
-            numberOfConditions += 1
-            sql += " , " if numberOfConditions > 1 else sql
-            sql +=  " [Days_Count]=  '" + Days_Count + "' "                    
+        # if  Days_Count :
+        #     numberOfConditions += 1
+        #     sql += " , " if numberOfConditions > 1 else sql
+        sql +=  ", [Days_Count]=  '" + Days_Count + "' "                    
                                
-        if  Priority :
-            numberOfConditions += 1
-            sql += " , " if numberOfConditions > 1 else sql
-            sql +=  " [Priority] = '" + Priority + "'"
+        # if  Priority :
+        #     numberOfConditions += 1
+        #     sql += " , " if numberOfConditions > 1 else sql
+        sql +=  " ,[Priority] = '" + Priority + "'"
 
 
-        if  MHIRJ_ISE_Recommended_Action :
-            numberOfConditions += 1
-            sql += " , " if numberOfConditions > 1 else sql
-            sql +=  "[MHIRJ_ISE_Recommended_Action] = '" + MHIRJ_ISE_Recommended_Action + "'"
+        # if  MHIRJ_ISE_Recommended_Action :
+        #     numberOfConditions += 1
+        #     sql += " , " if numberOfConditions > 1 else sql
+        sql +=  ",[MHIRJ_ISE_Recommended_Action] = '" + MHIRJ_ISE_Recommended_Action + "'"
 
-        if  Additional_Comments :
-            numberOfConditions += 1
-            sql += " , " if numberOfConditions > 1 else sql
-            sql +=  "[Additional_Comments] = '" + Additional_Comments + "'"         
+        # if  Additional_Comments :
+        #     numberOfConditions += 1
+        #     sql += " , " if numberOfConditions > 1 else sql
+        sql +=  ",[Additional_Comments] = '" + Additional_Comments + "'"         
 
-        if  MHIRJ_ISE_inputs :
-            numberOfConditions += 1
-            sql += " , " if numberOfConditions > 1 else sql
-            sql +=  "[MHIRJ_ISE_inputs] = '" + MHIRJ_ISE_inputs + "'"     
+        # if  MHIRJ_ISE_inputs :
+        #     numberOfConditions += 1
+        #     sql += " , " if numberOfConditions > 1 else sql
+        sql +=  ",[MHIRJ_ISE_inputs] = '" + MHIRJ_ISE_inputs + "'"     
 
 
-        if  MEL_or_No_Dispatch :
-            numberOfConditions += 1
-            sql += " , " if numberOfConditions > 1 else sql
-            sql +=  "[MEL_or_No_Dispatch] = '" + MEL_or_No_Dispatch + "'"
+        # if  MEL_or_No_Dispatch :
+        #     numberOfConditions += 1
+        #     sql += " , " if numberOfConditions > 1 else sql
+        sql +=  ",[MEL_or_No_Dispatch] = '" + MEL_or_No_Dispatch + "'"
 
-        if  Keywords :
-            numberOfConditions += 1
-            sql += " , " if numberOfConditions > 1 else sql
-            sql +=  "[Keywords] = '" + Keywords + "'"           
+        # if  Keywords :
+        #     numberOfConditions += 1
+        #     sql += " , " if numberOfConditions > 1 else sql
+        sql +=  ",[Keywords] = '" + Keywords + "'"           
             
                      
  
