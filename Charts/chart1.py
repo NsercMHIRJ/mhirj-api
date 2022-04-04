@@ -4,11 +4,7 @@ import json
 import numpy as np
 
 def chart_one(top_n, aircraftNo,ata_main, fromDate,toDate):
-# @app.post("/api/chart_one/{top_n}/{aircraftNo}/{fromDate}/{toDate}")
-# async def get_ChartOneData(top_n:int, aircraftNo:int,  fromDate: str , toDate: str):
-    # chart1_sql_df = connect_database_for_chart1(top_n, aircraftNo, ata_main, fromDate, toDate)
-    # chart1_sql_df_json = chart1_sql_df.to_json(orient='records')
-    # return chart1_sql_df_json
+
     AircraftToStudy=aircraftNo
     Topvalues=top_n
     MDCdataDF = connect_database_for_chart1_test(fromDate, toDate)
