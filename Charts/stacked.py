@@ -6,7 +6,7 @@ import numpy as np
 def stacked_chart(ata, top_n, from_dt,to_dt):
 
 # @app.post("/api/Landing_Chart_B/{ata}/{top_n}/{from_dt}/{to_dt}")
-# async def get_Chart_B(ata:str,top_n: int,from_dt: str, to_dt: str):
+# def get_Chart_B(ata:str,top_n: int,from_dt: str, to_dt: str):
     try:
         Topvalues2 = top_n
         if Topvalues2>50:

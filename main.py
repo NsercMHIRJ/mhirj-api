@@ -78,7 +78,7 @@ def connect_database_for_chartb(from_dt, to_dt,aircraftno):
 #chartb(new chart)-----------------------------------------
 
 @app.post("/api/chart_b/{from_date}/{to_date}/{aircraftno}")
-async def get_ScatterChart_MDC_PM_Data(from_date:str, to_date:str, aircraftno:int):
+def get_ScatterChart_MDC_PM_Data(from_date:str, to_date:str, aircraftno:int):
     MDCdataDF = connect_database_for_chartb(from_date, to_date, aircraftno)
     Aircrafttostudy5=str(aircraftno)
 
@@ -96,7 +96,7 @@ async def get_ScatterChart_MDC_PM_Data(from_date:str, to_date:str, aircraftno:in
 
 #-----------Raw data------------------
 @app.get("/api/RawData/{fromDate}/{toDate}/")
-async def get_MDCRawData(fromDate,toDate, ata : Optional[str] = '', eqID : Optional[str] = '', msg : Optional[str] = ''):
+def get_MDCRawData(fromDate,toDate, ata : Optional[str] = '', eqID : Optional[str] = '', msg : Optional[str] = ''):
     message = 0
     if msg:
         message = int(msg)
@@ -111,11 +111,11 @@ async def get_MDCRawData(fromDate,toDate, ata : Optional[str] = '', eqID : Optio
 
 #--------------Report(history/Daily)------------------
 @app.post("/api/GenerateReport/{analysisType}/{occurences}/{legs}/{intermittent}/{consecutiveDays}/{ata}/{exclude_EqID}/{airline_operator}/{include_current_message}/{aircraft_no}/{fromDate}/{toDate}")
-async def generateReport(analysisType: str, occurences: int, legs: int, intermittent: int, consecutiveDays: int, ata: str, exclude_EqID:str, airline_operator: str, include_current_message: int, aircraft_no: str, fromDate: str , toDate: str):
+def generateReport(analysisType: str, occurences: int, legs: int, intermittent: int, consecutiveDays: int, ata: str, exclude_EqID:str, airline_operator: str, include_current_message: int, aircraft_no: str, fromDate: str , toDate: str):
     print(fromDate, " ", toDate)
     if analysisType.lower() == "history":
-        respObj = historyReport(occurences, legs, intermittent, consecutiveDays, ata, exclude_EqID, airline_operator, include_current_message, aircraft_no, fromDate , toDate).to_json(orient='records')
-        return respObj
+        respObj = historyReport(occurences, legs, intermittent, consecutiveDays, ata, exclude_EqID, airline_operator, include_current_message, aircraft_no, fromDate , toDate)
+        return respObj.to_json(orient='records')
     
     respObj = dailyReport(occurences, legs, intermittent, consecutiveDays, ata, exclude_EqID, airline_operator, include_current_message, aircraft_no, fromDate , toDate).to_json(orient='records')
     return respObj
@@ -124,7 +124,7 @@ async def generateReport(analysisType: str, occurences: int, legs: int, intermit
 #--------jamReport-----------------
 @app.post(
    "/api/GenerateReport/{analysisType}/{occurences}/{legs}/{intermittent}/{consecutiveDays}/{ata}/{exclude_EqID}/{airline_operator}/{include_current_message}/{aircraft_no}/{fromDate}/{toDate}/{ACSN_chosen}")
-async def generateJamsReport(analysisType: str, occurences: int, legs: int, intermittent: int, consecutiveDays: int,
+def generateJamsReport(analysisType: str, occurences: int, legs: int, intermittent: int, consecutiveDays: int,
                         ata: str, exclude_EqID: str, airline_operator: str, include_current_message: int, aircraft_no: str,
                         fromDate: str, toDate: str, ACSN_chosen:int):
    
@@ -143,7 +143,7 @@ async def generateJamsReport(analysisType: str, occurences: int, legs: int, inte
 
 # --------------flagReport------------------    
 @app.post("/api/GenerateReport/{analysisType}/{occurences}/{legs}/{intermittent}/{consecutiveDays}/{ata}/{exclude_EqID}/{airline_operator}/{include_current_message}/{aircraft_no}/{fromDate}/{toDate}/{flag}/{list_of_tuples_acsn_bcode}")
-async def generateFlagReport(analysisType: str, occurences: int, legs: int, intermittent: int, consecutiveDays: int, ata: str, exclude_EqID:str, airline_operator: str, include_current_message: int, aircraft_no: str, fromDate: str , toDate: str, flag:int, list_of_tuples_acsn_bcode):
+def generateFlagReport(analysisType: str, occurences: int, legs: int, intermittent: int, consecutiveDays: int, ata: str, exclude_EqID:str, airline_operator: str, include_current_message: int, aircraft_no: str, fromDate: str , toDate: str, flag:int, list_of_tuples_acsn_bcode):
 
     if (analysisType.lower() == "history"):
         
@@ -165,7 +165,7 @@ async def generateFlagReport(analysisType: str, occurences: int, legs: int, inte
 #--------------delta Reoprt--------------
 @app.post(
     "/api/GenerateReport/{analysisType}/{occurences}/{legs}/{intermittent}/{consecutiveDays}/{ata}/{exclude_EqID}/{airline_operator}/{include_current_message}/{aircraft_no}/{flag}/{prev_fromDate}/{prev_toDate}/{curr_fromDate}/{curr_toDate}")
-async def generateDeltaReport(analysisType: str, occurences: int, legs: int, intermittent: int, consecutiveDays: int,
+def generateDeltaReport(analysisType: str, occurences: int, legs: int, intermittent: int, consecutiveDays: int,
                               ata: str, exclude_EqID: str, airline_operator: str, include_current_message: int,aircraft_no:str,flag,
                               prev_fromDate: str, prev_toDate: str, curr_fromDate: str, curr_toDate: str):
         if (analysisType.lower() == "history"):
@@ -179,37 +179,37 @@ async def generateDeltaReport(analysisType: str, occurences: int, legs: int, int
 
 #Chart 1
 @app.post("/api/chart_one/{top_n}/{aircraftNo}/{ata_main}/{fromDate}/{toDate}")
-async def get_ChartOneData(top_n:int, aircraftNo:str, ata_main:str, fromDate: str , toDate: str):
+def get_ChartOneData(top_n:int, aircraftNo:str, ata_main:str, fromDate: str , toDate: str):
     chart1 =  chart_one(top_n, aircraftNo,ata_main,fromDate,toDate)
     return chart1
 
 #Chart 2 
 @app.post("/api/chart_two/{top_values}/{ata}/{fromDate}/{toDate}")
-async def get_ChartwoData(top_values:int, ata:str, fromDate: str , toDate: str):
+def get_ChartwoData(top_values:int, ata:str, fromDate: str , toDate: str):
     chart2 =  chart_two(top_values, ata,fromDate,toDate)
     return chart2
 
 
 #Chart3
 @app.post("/api/chart_three/{aircraft_no}/{equation_id}/{is_flight_phase_enabled}/{fromDate}/{toDate}")
-async def get_CharThreeData(aircraft_no:int, equation_id:str, is_flight_phase_enabled:int, fromDate: str , toDate: str):
+def get_CharThreeData(aircraft_no:int, equation_id:str, is_flight_phase_enabled:int, fromDate: str , toDate: str):
     return chart3Report(aircraft_no, equation_id, is_flight_phase_enabled, fromDate, toDate)
 
 # Chart 4
 @app.post("/api/chart_four/{topCount}/{analysisType}/{occurences}/{legs}/{intermittent}/{consecutiveDays}/{ata}/{exclude_EqID}/{airline_operator}/{include_current_message}/{fromDate}/{toDate}")
-async def get_ChartFourData(topCount: int, analysisType: str, occurences: int, legs: int, intermittent: int, consecutiveDays: int, ata: str, exclude_EqID:str, airline_operator: str, include_current_message: int, fromDate: str , toDate: str):
+def get_ChartFourData(topCount: int, analysisType: str, occurences: int, legs: int, intermittent: int, consecutiveDays: int, ata: str, exclude_EqID:str, airline_operator: str, include_current_message: int, fromDate: str , toDate: str):
     return chart4Report(occurences, legs, intermittent, consecutiveDays, ata, exclude_EqID, airline_operator, include_current_message, fromDate , toDate, topCount, analysisType)
 
 
 #Chart 5
 @app.post("/api/chart_five/{aircraft_no}/{equation_id}/{is_flight_phase_enabled}/{fromDate}/{toDate}")
-async def get_CharFiveData(aircraft_no:int, equation_id:str, is_flight_phase_enabled:int, fromDate: str , toDate: str):
+def get_CharFiveData(aircraft_no:int, equation_id:str, is_flight_phase_enabled:int, fromDate: str , toDate: str):
     return chart5Report(aircraft_no, equation_id, is_flight_phase_enabled, fromDate, toDate)
    
 
 #Landing chartB
 @app.post("/api/Landing_Chart_B")
-async def get_Chart_B():
+def get_Chart_B():
     Landing_ChartB =  Landing_chartB()
     return Landing_ChartB
 
@@ -253,7 +253,7 @@ def connect_to_fetch_all_ata(from_dt, to_dt):
 
 #stacked chart
 @app.post("/api/Landing_Chart_B/{ata}/{top_n}/{from_dt}/{to_dt}")
-async def get_Chart_B(ata:str,top_n: int,from_dt: str, to_dt: str):
+def get_Chart_B(ata:str,top_n: int,from_dt: str, to_dt: str):
     stacked =  stacked_chart(ata, top_n,from_dt,to_dt)
     return stacked
 
@@ -262,21 +262,21 @@ async def get_Chart_B(ata:str,top_n: int,from_dt: str, to_dt: str):
 
 #corelation
 @app.post("/api/corelation_tail/{fromDate}/{toDate}/{equation_id}/{tail_no}/{status}")
-async def getCorelationDataTAIL(fromDate: str, toDate: str, equation_id, tail_no,status:int):
+def getCorelationDataTAIL(fromDate: str, toDate: str, equation_id, tail_no,status:int):
     corelation_df = connect_database_for_corelation_tail(fromDate, toDate, equation_id, tail_no,status)
     corelation_df_json = corelation_df.to_json(orient='records')
     return corelation_df_json
 
 # for reference -> http://localhost:8000/corelation/11-11-2020/11-12-2020/B1-008003/27
 @app.post("/api/corelation_ata/{fromDate}/{toDate}/{status}")
-async def getCorelationDataATA(fromDate: str, toDate: str, status:int, equation_id:Optional[str]="", ata:Optional[str]=""):
+def getCorelationDataATA(fromDate: str, toDate: str, status:int, equation_id:Optional[str]="", ata:Optional[str]=""):
     corelation_df = connect_database_for_corelation_ata(fromDate, toDate, status, equation_id, ata)
     corelation_df_json = corelation_df.to_json(orient='records')
     return corelation_df_json
 
 
 @app.post("/api/corelation_pid/{p_id}/{status}")
-async def getCorelationDataPID(p_id: str,status : int):
+def getCorelationDataPID(p_id: str,status : int):
     corelation_df = connect_database_for_corelation_pid(p_id,status)
     corelation_df_json = corelation_df.to_json(orient='records')
     return corelation_df_json
@@ -284,7 +284,7 @@ async def getCorelationDataPID(p_id: str,status : int):
 
 #return all equation id's
 @app.post("/api/GenerateReport/equation_id/{all}")
-async def get_eqIData(all:str):
+def get_eqIData(all:str):
     f = open ('equations.json', "r")
     data = json.loads(f.read())
     data_string = json.dumps(data)
@@ -292,7 +292,7 @@ async def get_eqIData(all:str):
 
 #return all ACSN
 @app.post("/api/get_all_ACSN")
-async def get_eqIData():
+def get_eqIData():
     get_all_acsn_df = connect_database_ACSN()
     get_all_acsn_df_json = get_all_acsn_df.to_json(orient='records')
     return get_all_acsn_df_json
@@ -324,7 +324,7 @@ def connect_database_for_ata_main(all):
 
 
 @app.post("/api/GenerateReport/ata_main/{all}")
-async def get_eqIData(all:str):
+def get_eqIData(all:str):
     report_ata_main_sql_df = connect_database_for_ata_main(all)
     report_ata_main_sql_df_json = report_ata_main_sql_df.to_json(orient='records')
     return report_ata_main_sql_df_json
@@ -332,7 +332,7 @@ async def get_eqIData(all:str):
     
 #upload message input file   
 @app.post("/api/uploadfile_input_message/")
-async def uploadfile_input_message(file: UploadFile = File(...)):
+def uploadfile_input_message(file: UploadFile = File(...)):
     result = insertData_MDCMessageInputs(file)
     return {"result": result} 
 
@@ -440,26 +440,26 @@ async def update_data(request: Request):
 
 #all mdc message input
 @app.post("/api/all_mdc_messages_input/")
-async def get_mdcMessageInput(eq_id: Optional[str]=""):
+def get_mdcMessageInput(eq_id: Optional[str]=""):
     mdcRaw_df = connect_database_mdc_message_input(eq_id)
     mdcRaw_df_json =  mdcRaw_df.to_json(orient='records')
     print(mdcRaw_df_json)
     return mdcRaw_df_json
 
 @app.post("/api/testing_api/")
-async def testing_api():
+def testing_api():
     return {"update":1}
 
 # delete mdc message input 
 # @app.post("/api/delete_mdc_messages_input_by_eq_id/{eq_id}")
-# async def delete_mdc_messages_input_by_eq_id(eq_id:str):
+# def delete_mdc_messages_input_by_eq_id(eq_id:str):
 #     mdcRaw_df = db_delete_mdc_messages_input_by_eq_id(eq_id)
 #     print(mdcRaw_df)
 #     return  mdcRaw_df
 
 # insert mdc message input
 # @app.post("/api/insert_mdc_messages_input/")
-# async def insert_mdc_messages_input(rawdata: Request):
+# def insert_mdc_messages_input(rawdata: Request):
 #     try : 
 #         t = await rawdata.json()
 #         data = db_insert_mdc_messages_input(t)
