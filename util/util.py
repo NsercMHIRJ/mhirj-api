@@ -314,7 +314,7 @@ def connect_database_for_corelation_tail(from_dt, to_dt, equation_id, tail_no,st
     sql =""
 
     #sql += "SELECT DISTINCT [ATA_Main],[ATA_Sub],[MaintTransID],[DateAndTime],[Failure_Flag],[MRB],[SquawkSource],[Discrepancy],[CorrectiveAction] FROM [dbo]. " +CORELATION_TABLE+ " WHERE CONVERT(date,DateAndTime) BETWEEN '" + from_dt + "'  AND '" + to_dt + "'"
-    sql += "SELECT DISTINCT [ATA_Main],[Discrepancy],[CorrectiveAction],[MaintTransID],[TransDate],[PM_ATA] FROM [dbo]. " +CORELATION_TABLE+ " WHERE CONVERT(date,MDC_Date) BETWEEN '" + from_dt + "'  AND '" + to_dt + "' and CAST(MDC_Date AS DATE) = DATEADD(DAY,-30,CAST('"+from_dt+"' as DATE)) and status='"+str(status)+"'"
+    sql += "SELECT DISTINCT [ATA_Main],[PM_Resolved_Date],[Discrepancy],[CorrectiveAction],[MaintTransID],[TransDate],[PM_ATA] FROM [dbo]. " +CORELATION_TABLE+ " WHERE CONVERT(date,MDC_Date) BETWEEN '" + from_dt + "'  AND '" + to_dt + "' and CAST(MDC_Date AS DATE) = DATEADD(DAY,-30,CAST('"+from_dt+"' as DATE)) and status='"+str(status)+"'"
     
     if equation_id : 
         sql+= " AND Equation_ID = '"+equation_id+"'"
