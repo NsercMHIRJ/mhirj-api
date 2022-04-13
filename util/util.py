@@ -310,12 +310,13 @@ def connect_database_MDCdata(ata, excl_eqid, include_current_message, from_dt, t
     #     print("Error message:- " + str(err))
         
 #corelation connect database 
-def connect_database_for_corelation_tail(from_dt, to_dt, equation_id, tail_no,status):
+def connect_database_for_corelation_tail(from_dt, to_dt, equation_id, tail_no,status,days):
     sql =""
-
+    if not days:
+        days=7
     #sql += "SELECT DISTINCT [ATA_Main],[ATA_Sub],[MaintTransID],[DateAndTime],[Failure_Flag],[MRB],[SquawkSource],[Discrepancy],[CorrectiveAction] FROM [dbo]. " +CORELATION_TABLE+ " WHERE CONVERT(date,DateAndTime) BETWEEN '" + from_dt + "'  AND '" + to_dt + "'"
-    sql += "SELECT DISTINCT [ATA_Main],[PM_Resolved_Date],[Discrepancy],[CorrectiveAction],[MaintTransID],[TransDate],[PM_ATA] FROM [dbo]. " +CORELATION_TABLE+ " WHERE CONVERT(date,MDC_Date) BETWEEN '" + from_dt + "'  AND '" + to_dt + "' and CAST(MDC_Date AS DATE) = DATEADD(DAY,-30,CAST('"+from_dt+"' as DATE)) and status='"+str(status)+"'"
-    
+    #sql += "SELECT DISTINCT [ATA_Main],[PM_Resolved_Date],[Discrepancy],[CorrectiveAction],[MaintTransID],[TransDate],[PM_ATA] FROM [dbo]. " +CORELATION_TABLE+ " WHERE CONVERT(date,MDC_Date) BETWEEN '" + from_dt + "'  AND '" + to_dt + "' and CAST(MDC_Date AS DATE) = DATEADD(DAY,-30,CAST('"+from_dt+"' as DATE)) and status='"+str(status)+"'"
+    sql += "SELECT DISTINCT [ATA_Main],[PM_Resolved_Date],[Discrepancy],[CorrectiveAction],[MaintTransID],[TransDate],[PM_ATA] FROM [dbo]."+CORELATION_TABLE+ " WHERE (CONVERT(date,MDC_Date) BETWEEN '" + from_dt + "'  AND '" + to_dt + "' OR CAST(MDC_Date AS DATE) > DATEADD(DAY,-"+str(days)+",CAST('"+from_dt+"' as DATE))) and status='"+str(status)+"'"
     if equation_id : 
         sql+= " AND Equation_ID = '"+equation_id+"'"
     if tail_no : 

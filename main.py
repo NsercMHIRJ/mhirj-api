@@ -262,8 +262,8 @@ def get_Chart_B(ata:str,top_n: int,from_dt: str, to_dt: str):
 
 #corelation
 @app.post("/api/corelation_tail/{fromDate}/{toDate}/{equation_id}/{tail_no}/{status}")
-def getCorelationDataTAIL(fromDate: str, toDate: str, equation_id, tail_no,status:int):
-    corelation_df = connect_database_for_corelation_tail(fromDate, toDate, equation_id, tail_no,status)
+def getCorelationDataTAIL(fromDate: str, toDate: str, equation_id, tail_no,status:int,days:Optional[int]=""):
+    corelation_df = connect_database_for_corelation_tail(fromDate, toDate, equation_id, tail_no,status,days)
     corelation_df_json = corelation_df.to_json(orient='records')
     return corelation_df_json
 
