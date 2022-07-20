@@ -9,6 +9,7 @@ from Charts.Landing_chartB import Landing_chartB
 
 
 from GenerateReport.daily import dailyReport
+from GenerateReport.filters import db_insert_filter_data
 from GenerateReport.history import historyReport
 from Charts.chart3 import chart3Report
 import numpy as np
@@ -467,3 +468,14 @@ def testing_api():
 #     except Exception as e: 
 #         print(e)
 #         return {'error': 'error in '+str(e)}
+
+#Filter
+@app.post("/api/insert_filter/")
+async def insert_mdc_messages_input(rawdata: Request):
+    try : 
+        t = await rawdata.json()
+        data = db_insert_filter_data(t)
+        return data
+    except Exception as e: 
+        print(e)
+        return {'error': 'error in '+str(e)}
